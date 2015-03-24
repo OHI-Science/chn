@@ -11,9 +11,9 @@ study_area:  China
 git_owner:   OHI-Science
 git_repo:    chn
 git_slug:    OHI-Science/chn
-app_url:     http://ohi-science.nceas.ucsb.edu/chn
+app_url:     https://ohi-science.shinyapps.io/chn_app
 
-default_branch_scenario: subcountry2014/published
+default_branch_scenario: published/subcountry2014
 
 # Jekyll configuration
 
