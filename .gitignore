@@ -1,8 +1,5 @@
 .Rproj.user
 .Rhistory
 .RData
-_site
-_asset_bundler_cache
-.sass
-.sass-cache
-.DS_Store
+github
+chn
