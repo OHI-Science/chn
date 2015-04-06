@@ -1,3 +1,3 @@
 # README
 
-#we are chaning things
+#we are changing things
