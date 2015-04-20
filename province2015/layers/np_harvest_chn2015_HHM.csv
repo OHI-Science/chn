@@ -1,0 +1,130 @@
+"rgn_id","year","product","tones"
+"LN",2007,"Seasalt",135788
+"LN",2008,"Seasalt",145690
+"LN",2009,"Seasalt",2.2233e+06
+"LN",2010,"Seasalt",1.4605e+06
+"LN",2011,"Seasalt",1.3362e+06
+"LN",2012,"Seasalt",1.1739e+06
+"HB",2007,"Seasalt",4.0532e+06
+"HB",2008,"Seasalt",4.3009e+06
+"HB",2009,"Seasalt",4.2165e+06
+"HB",2010,"Seasalt",4.2941e+06
+"HB",2011,"Seasalt",4.0225e+06
+"HB",2012,"Seasalt",3.3469e+06
+"TJ",2007,"Seasalt",2.123e+06
+"TJ",2008,"Seasalt",2.249e+06
+"TJ",2009,"Seasalt",2.2756e+06
+"TJ",2010,"Seasalt",2.044e+06
+"TJ",2011,"Seasalt",1.81e+06
+"TJ",2012,"Seasalt",1.6995e+06
+"SD",2007,"Seasalt",2.23568e+07
+"SD",2008,"Seasalt",2.24567e+07
+"SD",2009,"Seasalt",2.41272e+07
+"SD",2010,"Seasalt",2.27305e+07
+"SD",2011,"Seasalt",2.41863e+07
+"SD",2012,"Seasalt",2.2191e+07
+"JS",2007,"Seasalt",946700
+"JS",2008,"Seasalt",1.23456e+06
+"JS",2009,"Seasalt",1.0661e+06
+"JS",2010,"Seasalt",1.4991e+06
+"JS",2011,"Seasalt",942500
+"JS",2012,"Seasalt",781000
+"ZJ",2007,"Seasalt",123500
+"ZJ",2008,"Seasalt",115670
+"ZJ",2009,"Seasalt",170500
+"ZJ",2010,"Seasalt",105900
+"ZJ",2011,"Seasalt",139900
+"ZJ",2012,"Seasalt",108800
+"FJ",2007,"Seasalt",536700
+"FJ",2008,"Seasalt",345600
+"FJ",2009,"Seasalt",531400
+"FJ",2010,"Seasalt",299900
+"FJ",2011,"Seasalt",485000
+"FJ",2012,"Seasalt",270400
+"GD",2007,"Seasalt",105600
+"GD",2008,"Seasalt",125700
+"GD",2009,"Seasalt",115700
+"GD",2010,"Seasalt",141600
+"GD",2011,"Seasalt",158000
+"GD",2012,"Seasalt",86200
+"GX",2007,"Seasalt",124200
+"GX",2008,"Seasalt",132900
+"GX",2009,"Seasalt",153400
+"GX",2010,"Seasalt",142900
+"GX",2011,"Seasalt",36300
+"GX",2012,"Seasalt",164300
+"HN",2007,"Seasalt",98000
+"HN",2008,"Seasalt",112340
+"HN",2009,"Seasalt",124800
+"HN",2010,"Seasalt",147800
+"HN",2011,"Seasalt",107500
+"HN",2012,"Seasalt",42200
+"LN",2007,"ChemProduct",327765
+"LN",2008,"ChemProduct",771622
+"LN",2009,"ChemProduct",446015
+"LN",2010,"ChemProduct",652876
+"LN",2011,"ChemProduct",892629
+"LN",2012,"ChemProduct",1.02028e+06
+"HB",2007,"ChemProduct",822200
+"HB",2008,"ChemProduct",567800
+"HB",2009,"ChemProduct",820340
+"HB",2010,"ChemProduct",73960
+"HB",2011,"ChemProduct",73960
+"HB",2012,"ChemProduct",1.04640e+06
+"TJ",2007,"ChemProduct",1.4567e+06
+"TJ",2008,"ChemProduct",1.5681e+06
+"TJ",2009,"ChemProduct",1.64e+06
+"TJ",2010,"ChemProduct",1.66629e+06
+"TJ",2011,"ChemProduct",1.54371e+06
+"TJ",2012,"ChemProduct",1.61e+06
+"SD",2007,"ChemProduct",6.34902e+06
+"SD",2008,"ChemProduct",4.58024e+06
+"SD",2009,"ChemProduct",7.24077e+06
+"SD",2010,"ChemProduct",6.34902e+06
+"SD",2011,"ChemProduct",4.58024e+06
+"SD",2012,"ChemProduct",8.41474e+06
+"JS",2007,"ChemProduct",1.30786e+06
+"JS",2008,"ChemProduct",73720
+"JS",2009,"ChemProduct",1.2847e+06
+"JS",2010,"ChemProduct",1.30786e+06
+"JS",2011,"ChemProduct",1.76204e+06
+"JS",2012,"ChemProduct",2.09057e+06
+"ZJ",2007,"ChemProduct",494421
+"ZJ",2008,"ChemProduct",619852
+"ZJ",2009,"ChemProduct",373133
+"ZJ",2010,"ChemProduct",494421
+"ZJ",2011,"ChemProduct",619852
+"ZJ",2012,"ChemProduct",1.00117e+06
+"FJ",2007,"ChemProduct",378987
+"FJ",2008,"ChemProduct",752636
+"FJ",2009,"ChemProduct",269840
+"FJ",2010,"ChemProduct",378987
+"FJ",2011,"ChemProduct",752636
+"FJ",2012,"ChemProduct",1.46211e+06
+"GD",2007,"ChemProduct",576500
+"GD",2008,"ChemProduct",665400
+"GD",2009,"ChemProduct",840900
+"GD",2010,"ChemProduct",576500
+"GD",2011,"ChemProduct",665400
+"GD",2012,"ChemProduct",805000
+"HB",2009,"Sea medicianProduct",820340
+"HB",2010,"Sea medicianProduct",73960
+"HB",2011,"Sea medicianProduct",73960
+"TJ",2009,"Sea medicianProduct",1.64e+06
+"TJ",2010,"Sea medicianProduct",1.66629e+06
+"TJ",2011,"Sea medicianProduct",1.54371e+06
+"SD",2009,"Sea medicianProduct",7.24077e+06
+"SD",2010,"Sea medicianProduct",6.34902e+06
+"SD",2011,"Sea medicianProduct",4.58024e+06
+"JS",2009,"Sea medicianProduct",1.2847e+06
+"JS",2010,"Sea medicianProduct",1.30786e+06
+"JS",2011,"Sea medicianProduct",73720
+"ZJ",2009,"Sea medicianProduct",373133
+"ZJ",2010,"Sea medicianProduct",494421
+"ZJ",2011,"Sea medicianProduct",619852
+"FJ",2009,"Sea medicianProduct",269840
+"FJ",2010,"Sea medicianProduct",378987
+"FJ",2011,"Sea medicianProduct",752636
+"GD",2009,"Sea medicianProduct",840900
+"GD",2010,"Sea medicianProduct",576500
+"GD",2011,"Sea medicianProduct",665400
