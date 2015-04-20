@@ -1,3 +1,0 @@
-# METADATA
-
-# details
