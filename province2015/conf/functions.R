@@ -658,16 +658,29 @@ NP = function(scores, layers, year_max, debug=F){
 
 CS = function(layers){
 
+  # temporary libraries to load
+  library(reshape2)
+  library(dplyr)
+
   # layers
-  lyrs = list('rk' = c('hab_health' = 'health',
-                       'hab_extent' = 'extent',
-                       'hab_trend'  = 'trend'))
+  lyrs = list('rk' = c('cs_condition'    = 'condition',
+                       'cs_contribution' = 'contribution',
+                       'cs_extent'       = 'extent'))
   lyr_names = sub('^\\w*\\.','', names(unlist(lyrs)))
 
   # cast data
   D = SelectLayersData(layers, layers=lyr_names)
   rk = rename(dcast(D, id_num + category ~ layer, value.var='val_num', subset = .(layer %in% names(lyrs[['rk']]))),
               c('id_num'='region_id', 'category'='habitat', lyrs[['rk']]))
+# rk should look like this:
+# region_id              habitat    extent     health        trend
+# 1          1                coral  863.6450 0.01995085 -0.129376110
+# 2          1             mangrove  576.3450 0.96815287 -0.159235669
+# 3          1   mangrove_inland1km  174.6500         NA           NA
+# 4          1 mangrove_offshore1km   99.5506         NA           NA
+# 5          1           rocky_reef 8685.3500         NA           NA
+# 6          1             seagrass 4739.1300 0.21726431  1.000000000
+# 7          1          soft_bottom 1486.2700 0.97316866 -0.008019402
 
   # limit to CS habitats
   rk = subset(rk, habitat %in% c('mangrove','saltmarsh','seagrass'))
