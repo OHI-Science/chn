@@ -1,26 +1,26 @@
 "rgn_id","product","weight"
-"LN","seasalt",0.2
-"HB","seasalt",0.2
-"TJ","seasalt",0.2
-"SD","seasalt",0.2
-"JS","seasalt",0.2
-"ZJ","seasalt",0.2
-"FJ","seasalt",0.2
-"GD","seasalt",0.2
-"GX","seasalt",0.2
-"HN","seasalt",0.2
-"LN","ChemProduct",0.4
-"HB","ChemProduct",0.4
-"TJ","ChemProduct",0.4
-"SD","ChemProduct",0.4
-"JS","ChemProduct",0.4
-"ZJ","ChemProduct",0.4
-"FJ","ChemProduct",0.4
-"GD","ChemProduct",0.4
-"HB","Sea medicianProduct",0.4
-"TJ","Sea medicianProduct",0.4
-"SD","Sea medicianProduct",0.4
-"JS","Sea medicianProduct",0.4
-"ZJ","Sea medicianProduct",0.4
-"FJ","Sea medicianProduct",0.4
-"GD","Sea medicianProduct",0.4
+1,"seasalt",0.2
+2,"seasalt",0.2
+3,"seasalt",0.2
+4,"seasalt",0.2
+5,"seasalt",0.2
+7,"seasalt",0.2
+8,"seasalt",0.2
+9,"seasalt",0.2
+10,"seasalt",0.2
+11,"seasalt",0.2
+1,"ChemProduct",0.4
+2,"ChemProduct",0.4
+3,"ChemProduct",0.4
+4,"ChemProduct",0.4
+5,"ChemProduct",0.4
+7,"ChemProduct",0.4
+8,"ChemProduct",0.4
+9,"ChemProduct",0.4
+2,"Sea medicianProduct",0.4
+3,"Sea medicianProduct",0.4
+4,"Sea medicianProduct",0.4
+5,"Sea medicianProduct",0.4
+7,"Sea medicianProduct",0.4
+8,"Sea medicianProduct",0.4
+9,"Sea medicianProduct",0.4
