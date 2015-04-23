@@ -1,17 +1,18 @@
 # data_prep.r
 
+dir_chn_prep = '~/github/chn/province2015/prep'
+setwd(dir_chn_prep)
+
 # setup ----
 library(readxl)  # install.packages('readxl')
 library(readr)   # install.packages('readr')
 library(stringr) # install.packages('stringr')
 library(tools)
 library(dplyr)  # install.packages('dplyr')
-source('~/github/chn/province2015/prep/prep_functions.r')
+source(file.path(dir_chn_prep,'prep_functions.r'))
 
 # paths: '~/' means '/Users/julialowndes/' for Julie
 dir_raw = '~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/'
-dir_chn_prep = '~/github/chn/province2015/prep'
-
 
 chn_file_list = list.files(dir_raw)
 
@@ -24,7 +25,7 @@ cs_file_list = c('cs_contribtion_chn2015_HHM.csv.xlsx',
                  'cs_condition_chn2015_HHM.xlsx',
                  'cs_extent_chn2015_HHM.xlsx')
 
-for (f_orig in cs_file_list) {  # f_orig = 'cs_extent_chn2015_HHM.xlsx'
+for (f_orig in cs_file_list) {  # f_orig = 'cs_contribtion_chn2015_HHM.csv.xlsx'
 
   dir_f = file.path(dir_chn_prep, '4_CS')
 
@@ -38,7 +39,8 @@ for (f_orig in cs_file_list) {  # f_orig = 'cs_extent_chn2015_HHM.xlsx'
   }
 
   # add rgn_id from prep_functions.r
-  dn = add_rgn_id(d, fld_name = 'rgn_ID'); head(dn)
+  dn = add_rgn_id(d, fld_name = 'rgn_ID') %>%
+    filter(!is.na(rgn_id)); head(dn)
 
   # work with file name
   f_new = file_path_sans_ext(file_path_sans_ext(f_orig))
