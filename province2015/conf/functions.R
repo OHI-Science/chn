@@ -711,16 +711,15 @@ CS = function(layers){
   ## status model calculations
   #  for each region, for each habitat, it's the (sum of extent*condition*contribution)/sum(extent)
   #  xCS = sum(ck           * Cc/Cr     * Ak) / At
-  #  xCS = sum(contribution * condition * area_per_habitat) / total_area_all_habitats
+  #  xCS = sum(contribution * condition * extent_per_habitat) / total_extent_all_habitats
 
   xCS = rk %>%
-    rename(area = extent) %>%
-    mutate(c_c_a = contribution * condition * area) %>%
+    mutate(c_c_a = contribution * condition * extent) %>%
     group_by(region_id) %>%
     summarize(sum_c_c_a  = sum(c_c_a),      # summarize will act based on group_by
-              total_area = sum(area)) %>%   # compare by substituting 'mutate' in place of 'summarize'
+              total_extent = sum(extent)) %>%   # compare by substituting 'mutate' in place of 'summarize'
     ungroup() %>%
-    mutate(xCS_calc = sum_c_c_a/total_area,
+    mutate(xCS_calc = sum_c_c_a/total_extent,
            score = min(1,xCS_calc) * 100); head(xCS)
 
   # format to combine with other goals **variable must be called r.status with the proper formatting**
@@ -741,10 +740,8 @@ CS = function(layers){
 
   # trend calculations
   trendCS = rk %>%
-    rename(area       = extent,
-           area_trend = extent_trend) %>%
     group_by(region_id) %>%
-    summarize(trend_raw = sum(area * area_trend) / sum(area),
+    summarize(trend_raw = sum(extent * extent_trend) / sum(extent),
               score = max(min(trend_raw, 1), -1))
 
   # format to combine with other goals **variable must be called r.trend with the following formatting**
