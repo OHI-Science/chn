@@ -3,7 +3,7 @@
 
 Data sources:
 
-- Mora, C., Myers, R.A., Coll, M., Libralato, S., Pitcher, T.J., Sumaila, R.U., Worm, B. (2009). **Management Effectiveness of the World??‘è??s Marine Fisheries**. _PLoS Biol_, 7(6), e1000131. [doi:10.1371/journal.pbio.1000131](http://dx.doi.org/10.1371/journal.pbio.1000131)","value","value","ao_access_gl2014.csv","equal","global management effectiveness scores were applied equally to all regions.","ao_access","~/github/ohi-global/eez2014/layers/ao_access.csv","global","rgn_id",,,,"value",,TRUE,,,0.706,0.706,TRUE,,,,11,FALSE
+- Mora, C., Myers, R.A., Coll, M., Libralato, S., Pitcher, T.J., Sumaila, R.U., Worm, B. (2009). **Management Effectiveness of the World??ïè??s Marine Fisheries**. _PLoS Biol_, 7(6), e1000131. [doi:10.1371/journal.pbio.1000131](http://dx.doi.org/10.1371/journal.pbio.1000131)","value","value","ao_access_gl2014.csv","equal","global management effectiveness scores were applied equally to all regions.","ao_access","~/github/ohi-global/eez2014/layers/ao_access.csv","global","rgn_id",,,,"value",,TRUE,,,0.706,0.706,TRUE,,,,11,FALSE
 "AO","ao_need","Purchasing power parity as a proxy for subsistence fishing need, by region","The per capita purchasing power parity (PPP) adjusted gross domestic product (GDP): GDPpcPPP.
 
 Data sources:
@@ -54,6 +54,9 @@ Data sources:
 Data sources:
 
 - [FAO fisheries statistics](http://www.fao.org/fishery/statistics/global-capture-production/en)","w_fis","value","fp_wildcaught_weight_gl2014.csv","equal","global weights were applied equally to all regions. ","fp_wildcaught_weight","~/github/ohi-global/eez2014/layers/fp_wildcaught_weight.csv","global","rgn_id",,,,"w_fis",,TRUE,,,0.392934561421624,0.392934561421624,TRUE,,,,11,FALSE
+"HAB CS CP","hab_extent","Habitat extent","Modeled combined habitat extent","km2","km^2","hab_extent_gl2014.csv","raster | area_offshore","","hab_extent","~/github/ohi-global/eez2014/layers/hab_extent.csv","global","rgn_id",,"habitat",,"km2",,TRUE,,,0,797434,FALSE,,,,11,FALSE
+"HAB CS CP","hab_health","Habitat health","Modeled combined habitat health condition trend","health","value","hab_health_gl2014.csv","equal","global habitat health was applied equally to all regions. ","hab_health","~/github/ohi-global/eez2014/layers/hab_health.csv","global","rgn_id",,"habitat",,"health",,TRUE,,,0.5,1,TRUE,,,,11,FALSE
+"HAB CS CP","hab_trend","Habitat health trend","Modeled combined habitat health trend","trend","trend score","hab_trend_gl2014.csv","equal","global trends were applied equally to all regions.","hab_trend","~/github/ohi-global/eez2014/layers/hab_trend.csv","global","rgn_id",,"habitat",,"trend",,TRUE,,,-1,0.0444586963105543,FALSE,,,,11,FALSE
 "HAB CS CP","cs_contribution","Contribution to Carbon Storage","Relative contribution to carbon stoarge by each habitat","value","score","cs_contribution_chn2015_HHM.csv","","","","","","rgn_id",,"habitat",,"value",,TRUE,,,0.5,1,TRUE,,,,11,FALSE
 "HAB CS CP","cs_condition","Condition","Ratio of current condition to reference condition of each habitat","value","value","cs_condition_chn2015_HHM.csv","","","","","","rgn_id",,"habitat",,"value",,TRUE,,,0.45,0.8,TRUE,,,,11,FALSE
 "HAB CS CP","cs_extent","Area","Area of each habitat in each province","hectare","hectare","cs_extent_chn2015_HHM_maxyr.csv","","","","","","rgn_id",,"habitat","year","hectare",,TRUE,2007,2013,100,2513980,FALSE,,,,11,FALSE

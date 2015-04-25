@@ -428,15 +428,15 @@ NP = function(scores, layers, year_max, debug=F){
   h_w          = layers$data[['np_harvest_product_weight']]
   r_cyanide    = layers$data[['np_cyanide']]
   r_blast      = layers$data[['np_blast']]
-  hab_extent   = layers$data[['cs_extent']]
+  hab_extent   = layers$data[['hab_extent']]
 
   # extract habitats used
   hab_coral = hab_extent %>%
     filter(habitat=='coral') %>%
-    select(rgn_id, hectare)
+    select(rgn_id, km2)
   hab_rky   = hab_extent %>%
     filter(habitat=='rocky_reef') %>%
-    select(rgn_id, hectare)
+    select(rgn_id, km2)
 
   if (debug & !file.exists('temp')) dir.create('temp', recursive=T)
 
@@ -478,43 +478,43 @@ NP = function(scores, layers, year_max, debug=F){
       filter(product=='corals') %>%
       left_join(
         hab_coral %>%
-          filter(hectare > 0) %>%
-          select(rgn_id, hectare), by='rgn_id'),
+          filter(km2 > 0) %>%
+          select(rgn_id, km2), by='rgn_id'),
     # seaweeds in rocky reef
     h %>%
       filter(product=='seaweeds') %>%
       left_join(
         hab_rky %>%
-          filter(hectare > 0) %>%
-          select(rgn_id, hectare), by='rgn_id'))
+          filter(km2 > 0) %>%
+          select(rgn_id, km2), by='rgn_id'))
 
   # area for products in both coral and rocky reef habitats: shells, ornamentals, sponges
   b = h %>%
     filter(product %in% c('shells', 'ornamentals','sponges')) %>%
     left_join(
       hab_coral %>%
-        filter(hectare > 0) %>%
-        select(rgn_id, coral_hectare=hectare),
+        filter(km2 > 0) %>%
+        select(rgn_id, coral_km2=km2),
       by='rgn_id') %>%
     left_join(
       hab_rky %>%
-        filter(hectare > 0) %>%
-        select(rgn_id, rky_hectare=hectare),
+        filter(km2 > 0) %>%
+        select(rgn_id, rky_km2=km2),
       by='rgn_id') %>%
     rowwise() %>%
     mutate(
-      hectare = sum(c(rky_hectare, coral_hectare), na.rm=T)) %>%
+      km2 = sum(c(rky_km2, coral_km2), na.rm=T)) %>%
     group_by(rgn_id, product) %>%
-    filter(hectare > 0)
+    filter(km2 > 0)
 
   # exposure: combine areas, get tonnes / area, and rescale with log transform
   E =
     rbind_list(
       a,
       b %>%
-        select(-rky_hectare, -coral_hectare)) %>%
+        select(-rky_km2, -coral_km2)) %>%
     mutate(
-      exposure_raw = ifelse(tonnes > 0 & hectare > 0, tonnes / hectare, 0)) %>%
+      exposure_raw = ifelse(tonnes > 0 & km2 > 0, tonnes / km2, 0)) %>%
     group_by(product) %>%
     mutate(
       exposure_product_max = max(exposure_raw, na.rm=T)) %>%
@@ -771,12 +771,12 @@ CP = function(layers){
   # sum mangrove_offshore1km + mangrove_inland1km = mangrove to match with extent and trend
   m = layers$data[['hab_extent']] %>%
     filter(habitat %in% c('mangrove_inland1km','mangrove_offshore1km')) %>%
-    select(rgn_id, habitat, hectare)
+    select(rgn_id, habitat, km2)
 
   if (nrow(m) > 0){
     m = m %>%
       group_by(rgn_id) %>%
-      summarize(hectare = sum(hectare, na.rm=T)) %>%
+      summarize(km2 = sum(km2, na.rm=T)) %>%
       mutate(habitat='mangrove') %>%
       ungroup()
   }
@@ -797,13 +797,13 @@ CP = function(layers){
           # do not use all mangrove
           layers$data[['hab_extent']] %>%
             filter(!habitat %in% c('mangrove','mangrove_inland1km','mangrove_offshore1km')) %>%
-            select(rgn_id, habitat, hectare),
+            select(rgn_id, habitat, km2),
 
           # just use inland1km and offshore1km
           m)),
 
       by=c('rgn_id','habitat'), type='full') %>%
-    select(rgn_id, habitat, hectare, health, trend)
+    select(rgn_id, habitat, km2, health, trend)
 
   # limit to CP habitats and add rank
   habitat.rank = c('coral'            = 4,
@@ -816,31 +816,24 @@ CP = function(layers){
     filter(habitat %in% names(habitat.rank)) %>%
     mutate(
       rank = habitat.rank[habitat],
-      extent = ifelse(hectare==0, NA, hectare))
+      extent = ifelse(km2==0, NA, km2))
 
   if (nrow(d) > 0){
-    # status
-    scores_CP = d %>%
-      filter(!is.na(rank) & !is.na(health) & !is.na(extent)) %>%
-      group_by(rgn_id) %>%
-      summarize(
-        score = pmin(1, sum(rank * health * extent) / (sum(extent) * max(rank)) ) * 100,
-        dimension = 'status')
-
-    # trend
-    d_trend = d %>%
-      filter(!is.na(rank) & !is.na(trend) & !is.na(extent))
-    if (nrow(d_trend) > 0 ){
-      scores_CP = rbind_list(
-        scores_CP,
-        d_trend %>%
-          group_by(rgn_id) %>%
-          summarize(
-            score = sum(rank * trend * extent) / (sum(extent)* max(rank)),
-            dimension = 'trend'))
-    }
-
-    scores_CP = scores_CP %>%
+    scores_CP = rbind_list(
+      # status
+      d %>%
+        filter(!is.na(rank) & !is.na(health) & !is.na(extent)) %>%
+        group_by(rgn_id) %>%
+        summarize(
+          score = pmin(1, sum(rank * health * extent) / (sum(extent) * max(rank)) ) * 100,
+          dimension = 'status'),
+      # trend
+      d %>%
+        filter(!is.na(rank) & !is.na(trend) & !is.na(extent)) %>%
+        group_by(rgn_id) %>%
+        summarize(
+          score = sum(rank * trend * extent) / (sum(extent)* max(rank)),
+          dimension = 'trend')) %>%
       mutate(
         goal = 'CP') %>%
       select(region_id=rgn_id, goal, dimension, score)
@@ -1558,7 +1551,7 @@ HAB = function(layers){
           select(rgn_id, habitat, trend),
 
         layers$data[['hab_extent']] %>%
-          select(rgn_id, habitat, extent=hectare)),
+          select(rgn_id, habitat, extent=km2)),
 
       by=c('rgn_id','habitat'), type='full') %>%
     select(rgn_id, habitat, extent, health, trend)
