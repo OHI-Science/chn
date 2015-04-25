@@ -1,6 +1,6 @@
 # prep_cs.r
 
-# 1. explore CS data
+# 1. explore CS data. Decide to save 2 files, one for status and one for trend
 # 2. status: save CS extent data with max year only for status
 # 3. trend: calculate trend using all CS extent years
 
@@ -50,6 +50,7 @@ extent_status = extent %>%
 
 f_out = paste0(file_path_sans_ext(f_in), '_maxyr.csv')
 write_csv(extent_status, file.path(dir_scenario, 'layers', f_out))
+# now register this in layers.csv as cs_extent
 
 
 ## 3. trend: calculate trend using all CS extent years ----
@@ -79,4 +80,5 @@ extent_trend =
 
 f_out = paste0(file_path_sans_ext(f_in), '_trend.csv')
 write_csv(extent_trend, file.path(dir_scenario, 'layers', f_out))
+# now register this in layers.csv as cs_extent_trend
 
