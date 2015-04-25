@@ -22,6 +22,7 @@ for (p in c('devtools')){
 }
 
 # install packages
+install.packages(c('zoo', 'psych'))
 install_github('ohi-science/rCharts')
 install_github('ohi-science/ohicore@dev')
 
