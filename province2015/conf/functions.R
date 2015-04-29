@@ -664,10 +664,10 @@ NP = function(scores, layers, year_max, debug=F){
 CS = function(layers){
 
   # temporary libraries to load while testing
-  #   library(reshape2) # only for dcast
-  #   library(plyr) # currently so subset = . works
-  #   library(dplyr)
-  #   library(tidyr)
+    library(reshape2) # only for dcast
+    library(plyr) # currently so subset = . works
+    library(dplyr)
+    library(tidyr)
 
   # identify and select layers
   lyrs = c('cs_condition',
@@ -694,14 +694,14 @@ CS = function(layers){
            extent       = cs_extent,
            extent_trend = cs_extent_trend); head(rk)
 
-  # rk
-  #    region_id     habitat contribution condition  extent
-  #            1 saltmarshes          1.0       0.8 1188600
-  #            1  seagrasses          0.5       0.8     100
-  #            2 saltmarshes          1.0       0.8   81551
-  #            3 saltmarshes          1.0       0.8   76840
-  #            4 saltmarshes          1.0       0.8  721275
-  #            4  seagrasses          0.5       0.8     289
+#    region_id     habitat contribution condition  extent extent_trend
+#            1 saltmarshes          1.0       0.8 1188600         -0.1
+#            1  seagrasses          0.5       0.8     100          0.0
+#            2 saltmarshes          1.0       0.8   81551         -0.1
+#            3 saltmarshes          1.0       0.8   76840         -0.1
+#            4 saltmarshes          1.0       0.8  721275         -0.1
+#            4  seagrasses          0.5       0.8     289         -0.1
+
 
   # limit to CS habitats (since only some habitats contribute to CS, but all are included in BD)
   rk = rk %>%
@@ -716,7 +716,7 @@ CS = function(layers){
   xCS = rk %>%
     mutate(c_c_a = contribution * condition * extent) %>%
     group_by(region_id) %>%
-    summarize(sum_c_c_a  = sum(c_c_a),      # summarize will act based on group_by
+    summarize(sum_c_c_a  = sum(c_c_a),          # summarize will act based on group_by
               total_extent = sum(extent)) %>%   # compare by substituting 'mutate' in place of 'summarize'
     ungroup() %>%
     mutate(xCS_calc = sum_c_c_a/total_extent,
