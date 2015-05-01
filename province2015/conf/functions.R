@@ -442,7 +442,7 @@ NP = function(scores, layers, year_max, debug=F){
 
   # merge harvest in tonnes and usd
   h =
-    join_all(
+     (
       list(
         h_tonnes,
         h_tonnes_rel,
@@ -684,9 +684,11 @@ CS = function(layers){
            layer,
            habitat = category,
            val_num) %>%
-    dcast(region_id + habitat ~ layer, # TODO Julie:::: make `spread work`: spread(layer, region_id:habitat)
-          value.var='val_num',
-          subset = .(layer %in% lyrs)) %>%
+    ##spread 
+    spread(layer, region_id) %>% #new code, tested and works - Ning and Omar
+    #dcast(region_id + habitat ~ layer, # TODO Julie:::: make `spread work`: spread(layer, region_id:habitat)
+          #value.var='val_num',
+        # subset = .(layer %in% lyrs)) %>%
     select(region_id,
            habitat,
            contribution = cs_contribution,
@@ -697,11 +699,7 @@ CS = function(layers){
   # rk
   #    region_id     habitat contribution condition  extent
   #            1 saltmarshes          1.0       0.8 1188600
-  #            1  seagrasses          0.5       0.8     100
-  #            2 saltmarshes          1.0       0.8   81551
-  #            3 saltmarshes          1.0       0.8   76840
-  #            4 saltmarshes          1.0       0.8  721275
-  #            4  seagrasses          0.5       0.8     289
+  #            1  seagrasses           
 
   # limit to CS habitats (since only some habitats contribute to CS, but all are included in BD)
   rk = rk %>%
