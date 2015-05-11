@@ -442,7 +442,7 @@ NP = function(scores, layers, year_max, debug=F){
 
   # merge harvest in tonnes and usd
   h =
-    join_all(
+     (
       list(
         h_tonnes,
         h_tonnes_rel,
@@ -684,9 +684,11 @@ CS = function(layers){
            layer,
            habitat = category,
            val_num) %>%
-    dcast(region_id + habitat ~ layer, # TODO Julie:::: make `spread work`: spread(layer, region_id:habitat)
-          value.var='val_num',
-          subset = .(layer %in% lyrs)) %>%
+    ##spread
+    spread(layer, region_id) %>% #new code, tested and works - Ning and Omar
+    #dcast(region_id + habitat ~ layer, # TODO Julie:::: make `spread work`: spread(layer, region_id:habitat)
+          #value.var='val_num',
+        # subset = .(layer %in% lyrs)) %>%
     select(region_id,
            habitat,
            contribution = cs_contribution,
