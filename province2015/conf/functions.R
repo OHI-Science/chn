@@ -442,7 +442,7 @@ NP = function(scores, layers, year_max, debug=F){
 
   # merge harvest in tonnes and usd
   h =
-     (
+     join_all(
       list(
         h_tonnes,
         h_tonnes_rel,
