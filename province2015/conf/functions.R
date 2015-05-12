@@ -664,8 +664,6 @@ NP = function(scores, layers, year_max, debug=F){
 CS = function(layers){
 
   # temporary libraries to load while testing
-    library(reshape2) # only for dcast
-    library(plyr) # currently so subset = . works
     library(dplyr)
     library(tidyr)
 
@@ -677,18 +675,13 @@ CS = function(layers){
   D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
 
 
-  # spread (cast) data
+  # spread data so layers are columns
   rk = D %>%
     select(region_id = id_num,
-           year,
            layer,
            habitat = category,
            val_num) %>%
-    ##spread
-    spread(layer, region_id) %>% #new code, tested and works - Ning and Omar
-    #dcast(region_id + habitat ~ layer, # TODO Julie:::: make `spread work`: spread(layer, region_id:habitat)
-          #value.var='val_num',
-        # subset = .(layer %in% lyrs)) %>%
+    tidyr::spread(layer, val_num) %>%   #spread(key=variable to become the column headings, value=data)
     select(region_id,
            habitat,
            contribution = cs_contribution,
