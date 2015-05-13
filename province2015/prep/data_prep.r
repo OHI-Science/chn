@@ -38,7 +38,7 @@ for (f_orig in cs_file_list) {  # f_orig = 'cs_contribtion_chn2015_HHM.csv.xlsx'
       rename(habitat = habit); head(d)
   }
 
-  # add rgn_id from prep_functions.r
+  # add rgn_id from prep_functions.r - add_rgn_id()
   dn = add_rgn_id(d, fld_name = 'rgn_ID') %>%
     filter(!is.na(rgn_id)); head(dn)
 

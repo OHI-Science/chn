@@ -16,3 +16,8 @@ add_rgn_id = function(d, fld_name = 'rgn_ID') {
   # return data.frame
   return(as.data.frame(dn))
 }
+
+
+fill_nas = function() {
+ Julie to do
+}

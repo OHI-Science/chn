@@ -412,25 +412,29 @@ AO = function(layers,
 
 NP <- function(scores, layers, year_max, debug = FALSE){
   ### Apr 2014: updated by @oharac to use dplyr, tidyr.
-  # TODO: add smoothing a la PLoS 2013 manuscript # ??? CCO: done? is this the NP data_prep smoothing?
 
-  ### new code version - load combined harvest variables
-  r_cyanide    = layers$data[['np_cyanide']]
-  r_blast      = layers$data[['np_blast']]
-  hab_extent   = layers$data[['hab_extent']]
+  # temporary libraries to load while testing
+  #     library(dplyr)
+  #     library(tidyr)
 
-  ### FIS status for fish oil exposure
-  FIS_status   <-  scores %>%
-    filter(goal == 'FIS' & dimension == 'status') %>%
-    select(rgn_id = region_id, score)
+
+#   ### new code version - load combined harvest variables
+#   r_cyanide    = layers$data[['np_cyanide']]
+#   r_blast      = layers$data[['np_blast']]
+#   hab_extent   = layers$data[['hab_extent']]
+#
+  np_exposure = layers$data[['np_exposure']]
+  np_harvest  = layers$data[['np_harvest_tonnes']]
+  np_risk     = layers$data[['np_risk']]
+  np_weight   = layers$data[['np_harvest_weight']]
 
 
   ###########################################################.
   ### Here I define five main sub-functions.  The main script that
   ### actually calls these functions is at the very end of the NP section.
   ###   np_rebuild_harvest
-  ###   np_calc_exposure
-  ###   np_calc_risk
+  ###   np_calc_exposure; deleted but would have returned np_exp
+  ###   np_calc_risk; deleted but would have returned np_risk
   ###   np_calc_sustainability
   ###   np_calc_scores
 
@@ -466,150 +470,7 @@ NP <- function(scores, layers, year_max, debug = FALSE){
     return(np_harvest)
   }
 
-
-  np_calc_exposure <- function(np_harvest, hab_extent, FIS_status) {
-    ### calculates NP exposure based on habitats (for corals, seaweeds,
-    ### ornamentals, shells, sponges) and FIS status scores (for fish oil).
-    ### Returns the first input data frame with a new column for exposure:
-    ### [rgn_id rgn_name product year tonnes tonnes_rel prod_weight exposure]
-    #########################################.
-
-    ### Determine Habitat Areas for Exposure
-    ### extract habitats used
-    hab_coral <- hab_extent %>%
-      filter(habitat == 'coral') %>%
-      select(rgn_id, km2)
-    hab_rocky   <- hab_extent %>%
-      filter(habitat == 'rocky_reef') %>%
-      select(rgn_id, km2)
-
-    ### area for products having single habitats for exposure
-    area_single_hab <- bind_rows(
-      # corals in coral reef
-      np_harvest %>%
-        filter(product == 'corals') %>%
-        left_join(
-          hab_coral %>%
-            filter(km2 > 0) %>%
-            select(rgn_id, km2), by = 'rgn_id'),
-      ### seaweeds in rocky reef
-      np_harvest %>%
-        filter(product == 'seaweeds') %>%
-        left_join(
-          hab_rocky %>%
-            filter(km2 > 0) %>%
-            select(rgn_id, km2), by = 'rgn_id'))
-
-    ### area for products in both coral and rocky reef habitats: shells, ornamentals, sponges
-    area_dual_hab <- np_harvest %>%
-      filter(product %in% c('shells', 'ornamentals','sponges')) %>%
-      left_join(
-        hab_coral %>%
-          filter(km2 > 0) %>%
-          select(rgn_id, coral_km2 = km2),
-        by = 'rgn_id') %>%
-      left_join(
-        hab_rocky %>%
-          filter(km2 > 0) %>%
-          select(rgn_id, rocky_km2 = km2),
-        by = 'rgn_id') %>%
-      rowwise() %>%
-      mutate(
-        km2 = sum(c(rocky_km2, coral_km2), na.rm = TRUE)) %>%
-      filter(km2 > 0)
-
-    ### Determine Exposure
-    ### exposure: combine areas, get tonnes / area, and rescale with log transform
-    np_exp <-
-      bind_rows(
-        area_single_hab,
-        area_dual_hab %>%
-          select(-rocky_km2, -coral_km2)) %>%
-      mutate(
-        expos_raw = ifelse(tonnes > 0 & km2 > 0, (tonnes / km2), 0)) %>%
-      group_by(product) %>%
-      mutate(
-        expos_prod_max = (1 - .35)*max(expos_raw, na.rm = TRUE)) %>%
-      ### Reduced max exposure:
-      ###   .35 is the threshold for harvest peak used in status
-      ungroup() %>%
-      mutate(
-        exposure = (log(expos_raw + 1) / log(expos_prod_max + 1)),
-        exposure = ifelse(exposure > 1, 1, exposure)) %>%
-      select(-km2, -expos_raw, -expos_prod_max)
-    ### clean up columns
-
-    ### add exposure for countries with (habitat extent == NA)
-    np_exp <- np_exp %>%
-      group_by(product) %>%
-      mutate(mean_exp = mean(exposure, na.rm = TRUE)) %>%
-      mutate(exposure = ifelse(is.na(exposure), mean_exp, exposure)) %>%
-      select(-mean_exp) %>%
-      ungroup()
-
-    ### add exposure for fish_oil
-    np_exp <- np_exp %>% bind_rows(
-      np_harvest %>%
-        filter(product=='fish_oil') %>%
-        left_join(
-          FIS_status %>%
-            mutate(exposure = score / 100) %>%
-            #              mutate(exposure = ifelse(is.na(exposure), 0, exposure)) %>%
-            ### ??? adding this ^^^ from below - now will filter only NAs in fish_oil exposure, not seaweeds and coral exposure
-            select(rgn_id, exposure),
-          by = 'rgn_id'))
-
-    # ??? CCO: This assigns exposure to zero for ANY product with NA (fish oil, seaweeds, corals)
-    #     np_exp <- np_exp %>%
-    #      mutate(exposure = ifelse(is.na(exposure), 0, exposure))
-
-    return(np_exp)
-  }
-
-  np_calc_risk <- function(np_exp, r_cyanide, r_blast) {
-    ### calculates NP risk based on:
-    ###   ornamentals:      risk = 1 if blast or cyanide fishing
-    ###   corals:           risk = 1 for all cases
-    ###   shells, sponges:  risk = 0 for all cases
-    ###   others:           risk = NA?
-    ### Returns a data frame of risk, by product, by region:
-    ###
-    #########################################.
-
-    ### Determine Risk
-
-    ### risk for ornamentals set to 1 if blast or cyanide fishing present, based on Nature 2012 code
-    ###  despite Nature 2012 Suppl saying Risk for ornamental fish is set to the "relative intensity of cyanide fishing"
-    risk_orn <- r_cyanide %>%
-      filter(!is.na(score) & score > 0) %>%
-      select(rgn_id, cyanide = score) %>%
-      merge(
-        r_blast %>%
-          filter(!is.na(score) & score > 0) %>%
-          select(rgn_id, blast = score),
-        all = TRUE) %>%
-      mutate(ornamentals = 1)
-
-    ### risk as binary
-    np_risk <-
-      ### fixed risk: corals (1), sponges (0) and shells (0)
-      data.frame(
-        rgn_id  = unique(np_harvest$rgn_id),
-        corals  = 1,
-        sponges = 0,
-        shells  = 0) %>%
-      ### ornamentals
-      left_join(
-        risk_orn %>%
-          select(rgn_id, ornamentals),
-        by = 'rgn_id')  %>%
-      mutate(
-        ornamentals = ifelse(is.na(ornamentals), 0, ornamentals)) %>%
-      gather(product, risk, -rgn_id)
-    return(np_risk)
-  }
-
-  np_calc_sustainability <- function(np_exp, np_risk) {
+#   np_calc_sustainability <- function(np_exp, np_risk) {
     ### calculates NP sustainability coefficient for each natural product, based
     ### on (1 - mean(c(exposure, risk))).  Returns first input dataframe with
     ### new columns for sustainability coefficient, and sustainability-adjusted
@@ -618,21 +479,22 @@ NP <- function(scores, layers, year_max, debug = FALSE){
     #########################################.
 
     ### join Exposure (with harvest) and Risk
-    np_sust <- np_exp %>%
-      left_join(
-        np_risk,
+    np_sust <- np_exposure %>%
+      select(rgn_id,
+             product,
+             exposure = value) %>%     # different approach, same result to just below
+      full_join(
+        np_risk %>%
+          rename(risk = value) %>%
+          select(-layer),          # different approach, same result to just above
         by = c('rgn_id', 'product')) %>%
-      rowwise() %>%
+        rowwise() %>%              # otherwise will operate on the whole dataframe
       mutate(sustainability = 1 - mean(c(exposure, risk), na.rm = TRUE))
 
-    ### calculate rgn-product-year status
-    np_sust <- np_sust %>%
-      mutate(product_status = tonnes_rel * sustainability) %>%
-      filter(rgn_name != 'DISPUTED') %>%
-      select(-tonnes, -tonnes_rel, -risk, -exposure)
+  # sapply(np_sust, class); way to check the class of each variable within the dataframe
 
-    return(np_sust)
-  }
+#     return(np_sust)
+#   }
 
   np_calc_scores <- function(np_sust, year_max) {
     ### Calculates NP status for all production years for each region, based
@@ -708,8 +570,8 @@ NP <- function(scores, layers, year_max, debug = FALSE){
 CS = function(layers){
 
   # temporary libraries to load while testing
-    library(dplyr)
-    library(tidyr)
+#     library(dplyr)
+#     library(tidyr)
 
   # identify and select layers
   lyrs = c('cs_condition',
@@ -726,9 +588,7 @@ CS = function(layers){
            habitat = category,
            val_num) %>%
     tidyr::spread(layer, val_num) %>%   #spread(key=variable to become the column headings, value=data)
-    select(region_id,
-           habitat,
-           contribution = cs_contribution,
+    rename(contribution = cs_contribution,
            condition    = cs_condition,
            extent       = cs_extent,
            extent_trend = cs_extent_trend); head(rk)
