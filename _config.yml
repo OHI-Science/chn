@@ -13,7 +13,7 @@ git_repo:    chn
 git_slug:    OHI-Science/chn
 app_url:     http://ohi-science.nceas.ucsb.edu/chn
 
-default_branch_scenario: published/subcountry2014
+default_branch_scenario: published/province2015
 
 # Jekyll configuration
 
