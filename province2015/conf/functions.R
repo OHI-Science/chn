@@ -410,162 +410,127 @@ AO = function(layers,
   return(scores)
 }
 
-NP <- function(scores, layers, year_max, debug = FALSE){
-  ### Apr 2014: updated by @oharac to use dplyr, tidyr.
+NP <- function(layers){
 
   # temporary libraries to load while testing
   #     library(dplyr)
   #     library(tidyr)
 
-
-#   ### new code version - load combined harvest variables
-#   r_cyanide    = layers$data[['np_cyanide']]
-#   r_blast      = layers$data[['np_blast']]
-#   hab_extent   = layers$data[['hab_extent']]
-#
+  # load appropriate layers
   np_exposure = layers$data[['np_exposure']]
   np_harvest  = layers$data[['np_harvest_tonnes']]
   np_risk     = layers$data[['np_risk']]
   np_weight   = layers$data[['np_harvest_weight']]
 
 
-  ###########################################################.
-  ### Here I define five main sub-functions.  The main script that
-  ### actually calls these functions is at the very end of the NP section.
-  ###   np_rebuild_harvest
-  ###   np_calc_exposure; deleted but would have returned np_exp
-  ###   np_calc_risk; deleted but would have returned np_risk
-  ###   np_calc_sustainability
-  ###   np_calc_scores
+  # Calculate sustainability
+  # sustainability = 1 - (exposure + risk) / 2
 
-  np_rebuild_harvest <- function(layers) {
-    ### Reassembles NP harvest information from separate data layers:
-    ### [rgn_name  rgn_id  product  year  tonnes  tonnes_rel  prod_weight]
-    #########################################.
-
-    ## load data from layers dataframe
-    rgns         <- layers$data[['rgn_labels']]
-    h_tonnes     <- layers$data[['np_harvest_tonnes']]
-    h_tonnes_rel <- layers$data[['np_harvest_tonnes_relative']]
-    h_w          <- layers$data[['np_harvest_product_weight']]
-
-    # merge harvest in tonnes and usd
-    np_harvest <- h_tonnes %>%
-      full_join(
-        h_tonnes_rel,
-        by=c('rgn_id', 'product', 'year')) %>%
-      left_join(
-        h_w %>%
-          select(rgn_id, product, prod_weight = weight),
-        by=c('rgn_id', 'product')) %>%
-      left_join(
-        rgns %>%
-          select(rgn_id, rgn_name=label),
-        by='rgn_id') %>%
-      select(
-        rgn_name, rgn_id, product, year,
-        tonnes, tonnes_rel, prod_weight) %>%
-      group_by(rgn_id, product)
-
-    return(np_harvest)
-  }
-
-#   np_calc_sustainability <- function(np_exp, np_risk) {
-    ### calculates NP sustainability coefficient for each natural product, based
-    ### on (1 - mean(c(exposure, risk))).  Returns first input dataframe with
-    ### new columns for sustainability coefficient, and sustainability-adjusted
-    ### NP product_status:
-    ### [rgn_id  rgn_name  product  year  prod_weight  sustainability  product_status]
-    #########################################.
-
-    ### join Exposure (with harvest) and Risk
-    np_sust <- np_exposure %>%
-      select(rgn_id,
-             product,
-             exposure = value) %>%     # different approach, same result to just below
-      full_join(
-        np_risk %>%
-          rename(risk = value) %>%
-          select(-layer),          # different approach, same result to just above
-        by = c('rgn_id', 'product')) %>%
-        rowwise() %>%              # otherwise will operate on the whole dataframe
-      mutate(sustainability = 1 - mean(c(exposure, risk), na.rm = TRUE))
-
+  np_sust <- np_exposure %>%
+    select(rgn_id,
+           product,
+           exposure = value) %>%     # different approach, same result to just below
+    full_join(
+      np_risk %>%
+        select(rgn_id,
+               product,
+               risk = value),          # different approach, same result to just above
+      by = c('rgn_id', 'product')) %>%
+    rowwise() %>%              # otherwise will operate on the whole dataframe
+    mutate(sustainability = 1 - mean(c(exposure, risk), na.rm = TRUE))
   # sapply(np_sust, class); way to check the class of each variable within the dataframe
 
-#     return(np_sust)
-#   }
 
-  np_calc_scores <- function(np_sust, year_max) {
-    ### Calculates NP status for all production years for each region, based
-    ### upon weighted mean of all products produced.
-    ### From this, reports the most recent year as the NP status.
-    ### Calculates NP trend for each region, based upon slope of a linear
-    ### model over the past six years inclusive (five one-year intervals).
-    ### Returns data frame with status and trend by region:
-    ### [goal   dimension   region_id   score]
-    #########################################.
+  # Calculate relative harvest using the mean as the reference point
+  # relative harvest = tonnes / mean(tonnes) for each region-product
+  np_harvest_rel <- np_harvest %>%
+    select(-layer) %>%
+    group_by(rgn_id, product) %>%
+    mutate(tonnes_mean = mean(tonnes),
+           tonnes_rel = tonnes / tonnes_mean) %>%
+    rowwise() %>%
+    mutate(tonnes_rel_capped = min(tonnes_rel, 1)); head(np_harvest_rel)
+  hist(np_harvest_rel$tonnes_rel_capped)
 
-    ### Calculate status, trends
-    ### aggregate across products to rgn-year status, weighting by usd_rel
-    np_status_all <- np_sust %>%
-      filter(!is.na(product_status) & !is.na(prod_weight)) %>%
-      ### ??? CCO: guadeloupe & martinique have NA for ornamental prod_weight.  Is this a gap-filling error?
-      select(rgn_name, rgn_id, year, product, product_status, prod_weight) %>%
-      group_by(rgn_id, year) %>%
-      summarize(status = weighted.mean(product_status, prod_weight)) %>%
-      filter(!is.na(status)) %>% # 1/0 produces NaN
-      ungroup()
+  # Question for OHI-China Team:
+  # 1. Currently, the reference point for NP is the mean tonnes for each product-region.
+  #    Please review the reference point and the variable 'tonnes_real_capped';
+  #    is this the behavior you expect? Should so many scores be 1.0?
 
-    #   if (debug){
-    #     ### write out data
-    #     write.csv(np_risk, sprintf('temp/%s_NP_2-rgn-year-product_data.csv', basename(getwd())), row.names = FALSE, na='')
-    #     write.csv(status_all, sprintf('temp/%s_NP_3-rgn-year_status.csv', basename(getwd())), row.names = FALSE, na='')
-    #   }
+  #    rgn_id year product  tonnes tonnes_mean tonnes_rel tonnes_rel_capped
+  #         1 2007 seasalt  135788     1079230  0.1258194         0.1258194
+  #         1 2008 seasalt  145690     1079230  0.1349944         0.1349944
+  #         1 2009 seasalt 2223300     1079230  2.0600805         1.0000000
+  #         1 2010 seasalt 1460500     1079230  1.3532801         1.0000000
+  #         1 2011 seasalt 1336200     1079230  1.2381053         1.0000000
+  #         1 2012 seasalt 1173900     1079230  1.0877203         1.0000000
 
-    ### get current status
-    np_status_current <- np_status_all %>%
-      filter(year == year_max & !is.na(status)) %>%
-      mutate(
-        dimension = 'status',
-        score     = round(status,4) * 100) %>%
-      select(rgn_id, dimension, score)
-    stopifnot(
-      min(np_status_current$score, na.rm = TRUE) >= 0,
-      max(np_status_current$score, na.rm = TRUE) <= 100)
 
-    ### trend based on 5 intervals (6 years of data)
-    np_trend <- np_status_all %>%
-      filter(year <= year_max & year > (year_max - 5) & !is.na(status)) %>%
-      group_by(rgn_id) %>%
-      do(mdl = lm(status ~ year, data=.)) %>%
-      summarize(
-        rgn_id    = rgn_id,
-        dimension = 'trend',
-        score     = max(-1, min(1, coef(mdl)[['year']] * 5)))
-    stopifnot(min(np_trend$score) >= -1, max(np_trend$score) <= 1)
+  # Calculate status for each product (status of each natural product per region)
+  # xp = Hp * Sp
 
-    ### return scores
-    np_scores <- np_status_current %>%
-      full_join(np_trend) %>%
-      mutate(goal = 'NP') %>%
-      select(goal, dimension, region_id=rgn_id, score) %>%
-      arrange(goal, dimension, region_id)
+  xp = np_harvest_rel %>%
+    left_join(np_sust,
+              by = c('rgn_id', 'product')) %>%
+    mutate(product_status = tonnes_rel_capped * sustainability)
+  hist(xp$product_status)
 
-    return(np_scores)
-  }
+  # Calculate Xp (status of each region)
+  ### Calculates NP status for all production years for each region, based
+  ### upon weighted mean of all products produced.
+  ### From this, reports the most recent year as the NP status.
+  ### Calculates NP trend for each region, based upon slope of a linear
+  ### model over the past six years inclusive (five one-year intervals).
+  ### Returns data frame with status and trend by region:
+  ### [goal   dimension   region_id   score]
+  #########################################.
 
-  ##########################################.
-  ### Natural Products main starts here:
+  ### Calculate status, trends
+  ### aggregate across products to rgn-year status, weighting with np_weight
+  np_status_all <- xp %>%
+    left_join(np_weight,
+              by = c('rgn_id', 'product')) %>%
+    select(rgn_id, year, product, product_status, weight) %>%
+    group_by(rgn_id, year) %>%
+    summarize(status = weighted.mean(product_status, weight)) %>%
+    filter(!is.na(status)) %>% # 1/0 produces NaN
+    ungroup()
 
-  np_harvest <- np_rebuild_harvest(layers)
-  np_exp     <- np_calc_exposure(np_harvest, hab_extent, FIS_status)
-  np_risk    <- np_calc_risk(np_exp, r_cyanide, r_blast)
-  np_sust    <- np_calc_sustainability(np_exp, np_risk)
-  np_scores  <- np_calc_scores(np_sust, year_max)
+  # Question for OHI-China team:
+  # 2. Should the np_weight be based on production value? What do these weights mean?
+
+  ### get current status
+  np_status_current <- np_status_all %>%
+    filter(year == max(year) & !is.na(status)) %>%
+    mutate(
+      dimension = 'status',
+      score     = round(status,4) * 100) %>%
+    select(rgn_id, dimension, score)
+  stopifnot(
+    min(np_status_current$score, na.rm = TRUE) >= 0,
+    max(np_status_current$score, na.rm = TRUE) <= 100)
+
+  ### trend based on 5 intervals (6 years of data)
+  np_trend <- np_status_all %>%
+    filter(year <= max(year) & year > (max(year) - 5) & !is.na(status)) %>%
+    group_by(rgn_id) %>%
+    do(mdl = lm(status ~ year, data=.)) %>%
+    summarize(
+      rgn_id    = rgn_id,
+      dimension = 'trend',
+      score     = max(-1, min(1, coef(mdl)[['year']] * 5)))
+  stopifnot(min(np_trend$score) >= -1, max(np_trend$score) <= 1)
+
+  ### return scores
+  np_scores <- np_status_current %>%
+    full_join(np_trend) %>%
+    mutate(goal = 'NP') %>%
+    select(goal, dimension, region_id=rgn_id, score) %>%
+    arrange(goal, dimension, region_id)
 
   return(np_scores)
 }
+
 
 CS = function(layers){
 
@@ -588,10 +553,10 @@ CS = function(layers){
            habitat = category,
            val_num) %>%
     tidyr::spread(layer, val_num) %>%   #spread(key=variable to become the column headings, value=data)
-    rename(contribution = cs_contribution,
-           condition    = cs_condition,
-           extent       = cs_extent,
-           extent_trend = cs_extent_trend); head(rk)
+    dplyr::rename(contribution = cs_contribution,
+                  condition    = cs_condition,
+                  extent       = cs_extent,
+                  extent_trend = cs_extent_trend); head(rk)
 
 #    region_id     habitat contribution condition  extent extent_trend
 #            1 saltmarshes          1.0       0.8 1188600         -0.1
