@@ -6,7 +6,6 @@ add_rgn_id = function(d, fld_name = 'rgn_ID') {
   # join data to lookup table
   d2 = d %>%
     rename_(.dots = setNames(fld_name, "rgn_code")) %>%
-#     group_by
   full_join(
     lk_tbl, by = c('rgn_code')) %>%
     select(-rgn_code); head(d2); summary(d2)
