@@ -13,6 +13,7 @@ source(file.path(dir_chn_prep,'prep_functions.r'))
 
 # paths: '~/' means '/Users/julialowndes/' for Julie
 dir_raw = '~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/'
+dir_layers = '~/github/chn/province2015/layers'
 
 chn_file_list = list.files(dir_raw)
 
@@ -67,7 +68,7 @@ np_file_list = c('np _weight_chn2015_HHM.csv.xlsx',
                  'np_exposure_chn2015_HHM.csv.xlsx',
                  'np_risk_chn2015_HHM.csv.xlsx')
 
-for (f_orig in np_file_list) {  # f_orig = 'np_harvest_chn2015_HHM.csv.xlsx'
+for (f_orig in np_file_list) {  # f_orig =  'np_risk_chn2015_HHM.csv.xlsx'
 
   dir_f = file.path(dir_chn_prep, '3_NP')
 
@@ -75,16 +76,24 @@ for (f_orig in np_file_list) {  # f_orig = 'np_harvest_chn2015_HHM.csv.xlsx'
   f_new = file_path_sans_ext(file_path_sans_ext(f_orig))
   f_new = str_replace(f_new, ' ', '')
 
-  # typo correction
+  # typo correction for column header (needs an if statement)
   if ('tones' %in% names(d)) {
     d = d %>%
       rename(tonnes = tones); head(d)
   }
 
+  # typo correction for product names (str_replace doesn't need and if statement)
+  d = d %>%
+    mutate(product = str_replace_all(product, 'Sea medicianProduct', 'sea_medicine'),
+           product = str_replace_all(product, 'Seasalt',             'seasalt'),
+           product = str_replace_all(product, 'ChemProduct',         'sea_chemicals'))
+
+
   # add rgn_id from prep_functions.r
   dn = add_rgn_id(d, fld_name = 'rgn_id'); head(dn)
 
   # save as csv
-  write_csv(dn, file.path(dir_f, paste0(f_new, '.csv')))
+  write_csv(dn, file.path(dir_f, paste0(f_new, '.csv'))) # save a copy in prep
+  write_csv(dn, file.path(dir_layers, paste0(f_new, '.csv'))) # save in layers folder
 
 }

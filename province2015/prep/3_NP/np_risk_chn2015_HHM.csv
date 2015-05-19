@@ -9,19 +9,19 @@
 9,"seasalt",0
 10,"seasalt",0
 11,"seasalt",0
-1,"ChemProduct",0
-2,"ChemProduct",0
-3,"ChemProduct",0
-4,"ChemProduct",0
-5,"ChemProduct",0
-7,"ChemProduct",0
-8,"ChemProduct",0
-9,"ChemProduct",0
-2,"Sea medicianProduct",0.2
-3,"Sea medicianProduct",0.2
-4,"Sea medicianProduct",0.2
-5,"Sea medicianProduct",0.2
-7,"Sea medicianProduct",0.2
-8,"Sea medicianProduct",0.2
-9,"Sea medicianProduct",0.2
+1,"sea_chemicals",0
+2,"sea_chemicals",0
+3,"sea_chemicals",0
+4,"sea_chemicals",0
+5,"sea_chemicals",0
+7,"sea_chemicals",0
+8,"sea_chemicals",0
+9,"sea_chemicals",0
+2,"sea_medicine",0.2
+3,"sea_medicine",0.2
+4,"sea_medicine",0.2
+5,"sea_medicine",0.2
+7,"sea_medicine",0.2
+8,"sea_medicine",0.2
+9,"sea_medicine",0.2
 6,NA,NA
