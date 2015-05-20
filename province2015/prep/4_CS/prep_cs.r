@@ -78,7 +78,7 @@ extent_trend =
   arrange(rgn_id, habitat); head(extent_trend)
 
 
-f_out = paste0(file_path_sans_ext(f_in), '_trend.csv')
+f_out = paste0(tools::file_path_sans_ext(f_in), '_trend.csv')
 write_csv(extent_trend, file.path(dir_scenario, 'layers', f_out))
 # now register this in layers.csv as cs_extent_trend
 
