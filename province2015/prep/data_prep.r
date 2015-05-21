@@ -15,6 +15,9 @@ source(file.path(dir_chn_prep,'prep_functions.r'))
 dir_raw = '~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/'
 dir_layers = '~/github/chn/province2015/layers'
 
+##changed raw file path on Ning's computer:
+dir_raw = '~/Google Drive/OHI China 2015/model_data/'
+
 chn_file_list = list.files(dir_raw)
 
 # CS data ----
@@ -26,18 +29,6 @@ cs_file_list = c('cs_contribtion_chn2015_HHM.csv.xlsx',
                  'cs_condition_chn2015_HHM.xlsx',
                  'cs_extent_chn2015_HHM.xlsx')
 
-for (f_orig in cs_file_list) {  # f_orig = 'cs_contribtion_chn2015_HHM.csv.xlsx'
-
-  dir_f = file.path(dir_chn_prep, '4_CS')
-
-  # read in data
-  d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
-
-  # typo correction
-  if ('habit' %in% names(d)) {
-    d = d %>%
-      rename(habitat = habit); head(d)
-  }
 
   # add rgn_id from prep_functions.r - add_rgn_id()
   dn = add_rgn_id(d, fld_name = 'rgn_ID') %>%
@@ -71,7 +62,7 @@ np_file_list = c('np _weight_chn2015_HHM.csv.xlsx',
 for (f_orig in np_file_list) {  # f_orig =  'np_risk_chn2015_HHM.csv.xlsx'
 
   dir_f = file.path(dir_chn_prep, '3_NP')
-
+r
   d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
   f_new = file_path_sans_ext(file_path_sans_ext(f_orig))
   f_new = str_replace(f_new, ' ', '')
@@ -96,4 +87,18 @@ for (f_orig in np_file_list) {  # f_orig =  'np_risk_chn2015_HHM.csv.xlsx'
   write_csv(dn, file.path(dir_f, paste0(f_new, '.csv'))) # save a copy in prep
   write_csv(dn, file.path(dir_layers, paste0(f_new, '.csv'))) # save in layers folder
 
+}
+
+# CP data
+
+cp_file_list=c("cp_condition_chn2015_zb.csv",
+               "cp_extent_chn2015_zb.csv")
+
+for (f_orig in cp_file_list) {
+  dir_f = file.path(dir_chn_prep, "5_CP")
+  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+  dn = add_rgn_id(d, fld_name = 'rgn_ID')
+
+  write_csv(dn, file.path(dir_f))
+  write_csv(dn, file.path(dir_layers))
 }
