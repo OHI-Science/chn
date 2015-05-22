@@ -189,6 +189,22 @@ for (f_orig in lsp_file_list) {
 
   write_csv(d, file.path(dir_f, f_new))
   write_csv(d, file.path(dir_layers, f_new))
+
 }
 
+# LE
+le_file_list = c("le_eco_chn2015_zb.csv")
+
+liv_file_list = c("le_livjob_chn2015_zb.csv",
+                 "le_livwage_chn2015_zb.csv")
+
+for (f_orig in liv_file_list) {
+  dir_f = file.path(dir_chn_prep, "6.1_LIV")
+  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+
+  dn = add_rgn_id(d, fld_name = "province")
+
+  write_csv(dn, file.path(dir_f, f_orig))
+  write_csv(dn, file.path(dir_layers, f_orig))
+}
 
