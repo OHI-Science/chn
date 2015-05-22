@@ -175,3 +175,17 @@ for (f_orig in ico_file_list) {
   write_csv(d, file.path(dir_f, f_new))
   write_csv(d, file.path(dir_layers, f_new))
 }
+
+# LSP
+lsp_file_list = c("6H_lsp_cmpa_chn2015_YWW.csv",
+                  "6H_lsp_marinearea_chn2015_YWW.csv")
+
+for (f_orig in lsp_file_list) {
+  dir_f = file.path(dir_chn_prep, "9.2_LSP")
+  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+
+  f_new = str_replace(f_orig, "6H_", "")
+
+  write_csv(d, file.path(dir_f, f_new))
+  write_csv(d, file.path(dir_layers, f_new))
+}
