@@ -136,4 +136,42 @@ for (f_orig in mar_file_list) {
   ## Error in if (max(unique(dn$rgn_id)) != dim(lk_tbl)[1]) { :
   ## missing value where TRUE/FALSE needed
   ### but i counted, all the provinces are there for each data set...
+
+  f_new = file_path_sans_ext(f_orig) %>%
+    str_replace("6A_", "")
+
+  write_csv(dn, file.path(dir_f, paste9(f_new, "_chn2015_LZH.csv")))
+  write_csv(dn, file.path(dir_layers, paste0(f_new, "_chn2015_LZH.csv")))
+
+}
+
+# TR
+tr_file_list = c("6G_tr_marinearea_chn2015_YWW.csv",
+                 "6G_tr_tourist_chn2015_YWW.csv")
+
+for (f_orig in tr_file_list) {
+  dir_f = file.path(dir_chn_prep, "7_TR")
+  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+
+  f_new = str_replace(f_orig, "6G_", "")
+
+  write_csv(d, file.path(dir_f, f_new))
+  write_csv(d, file.path(dir_layers, f_new))
+}
+
+# ICO
+ico_file_list = c("6H_ico_species_chn2015_YWW.csv")
+
+for (f_orig in ico_file_list) {
+  dir_f = file.path(dir_chn_prep, "9.1_ICO")
+  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+
+  if ("region_id" %in% names(d)) {
+  d = rename(d, rgn_id = region_id); head(d)
+  }
+
+  f_new = str_replace(f_orig, "6H_", "")
+
+  write_csv(d, file.path(dir_f, f_new))
+  write_csv(d, file.path(dir_layers, f_new))
 }
