@@ -4,10 +4,9 @@ branches:
   - draft
 env:
   global:
-  - default_branch_scenario="published/subcountry2014"
-  - study_area="China"
+  - default_branch_scenario: "published/subcountry2014"
+  - study_area: "China"
   - secure: M5igum6cJ1w14Qc/fr8W3H+wZOHQYAMJpdtr9DJIKL6t1fypTEv/VMbAdRdOlU22aGPfsAmhoveeWiAaOPR/qdM22DshsWhWBk7eNl9sKAStrJpHWJdoOgud0KoP8PSf++SvEmmCiX2D/cB/55SM+7E6VJ5f1jOeKCHjxMdarKY=
-  - secure: bb+xtR5QaT8uBp6IzvkSilcWRumQhAKqWZ1un7jS5BCaV0qqn+SIyDMw/Qs0OMkIlTeJvBIPu3SY0fE5Sdmbrf3a0/E1wMhUeRfyjmXQRdx4coNVh31WW76hMSV12/sMPwdhiQNGimNzY4XvhIydMag5fDcPKEJ3qwHgAeqV5Eo=
 matrix:
   fast_finish: true
 before_install:
