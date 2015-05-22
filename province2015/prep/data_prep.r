@@ -62,7 +62,7 @@ np_file_list = c('np _weight_chn2015_HHM.csv.xlsx',
 for (f_orig in np_file_list) {  # f_orig =  'np_risk_chn2015_HHM.csv.xlsx'
 
   dir_f = file.path(dir_chn_prep, '3_NP')
-r
+
   d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
   f_new = file_path_sans_ext(file_path_sans_ext(f_orig))
   f_new = str_replace(f_new, ' ', '')
@@ -99,6 +99,41 @@ for (f_orig in cp_file_list) {
   d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
   dn = add_rgn_id(d, fld_name = 'rgn_ID')
 
-  write_csv(dn, file.path(dir_f))
-  write_csv(dn, file.path(dir_layers))
+  write_csv(dn, file.path(dir_f, f_orig))
+  write_csv(dn, file.path(dir_layers, f_orig))
+}
+
+# FP data
+##FIS data
+fis_file_list = c("6A_fis_ft.xlsx",
+                 "6A_fis_mmsy.xlsx",
+                 "6A_fis_tc.xlsx",
+                 "6A_fis_ut.xlsx",
+                 "6A_fp_w.xlsx")
+
+for (f_orig in fis_file_list) {
+  dir_f = file.path(dir_chn_prep, "1.1_FIS")
+  d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
+  dn = add_rgn_id(d, fld_name = "province_id")
+
+  f_new = file_path_sans_ext(f_orig)
+  f_new = str_replace(f_new, "6A_", "")
+
+  write_csv(dn, file.path(dir_f, paste0(f_new, "_chn2015_LZH.csv")))
+  write_csv(dn, file.path(dir_layers, paste0(f_new, "_chn2015_LZH.csv")))
+}
+
+## MAR
+mar_file_list = c("6A_mar_ac.xlsx",
+                  "6A_mar_smk.xlsx",
+                  "6A_mar_yc.xlsx",
+                  "6A_mar_yk.xlsx")
+
+for (f_orig in mar_file_list) {
+  dir_f = file.path(dir_chn_prep, "1.2_MAR")
+  d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
+  dn = add_rgn_id(d, fld_name = "province_id") ## need to revisit.
+  ## Error in if (max(unique(dn$rgn_id)) != dim(lk_tbl)[1]) { :
+  ## missing value where TRUE/FALSE needed
+  ### but i counted, all the provinces are there for each data set...
 }
