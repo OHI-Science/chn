@@ -23,6 +23,7 @@ dir_raw = '~/Google Drive/OHI China 2015/model_data/'
 ## then: dir_raw = '~/github/chn/province2015/prep/subfolder'
 
 chn_file_list = list.files(dir_raw)
+## seems like we never used this line of code
 
 # CS data ----
 
@@ -102,6 +103,10 @@ for (f_orig in cp_file_list) {
   dir_f = file.path(dir_chn_prep, "5_CP")
   d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
   dn = add_rgn_id(d, fld_name = 'rgn_ID')
+
+  if ('habit' %in% names(dn)) {
+    dn = rename(dn, habitat = habit); head(dn)
+  }
 
   write_csv(dn, file.path(dir_f, f_orig))
   write_csv(dn, file.path(dir_layers, f_orig))
