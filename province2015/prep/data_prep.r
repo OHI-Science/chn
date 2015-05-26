@@ -94,7 +94,7 @@ for (f_orig in np_file_list) {  # f_orig =  'np_risk_chn2015_HHM.csv.xlsx'
 
 }
 
-# CP data
+# CP data ----
 
 cp_file_list=c("cp_condition_chn2015_zb.csv",
                "cp_extent_chn2015_zb.csv")
@@ -112,7 +112,7 @@ for (f_orig in cp_file_list) {
   write_csv(dn, file.path(dir_layers, f_orig))
 }
 
-# FP data
+# FP data ----
 ##FIS data
 fis_file_list = c("6A_fis_ft.xlsx",
                  "6A_fis_mmsy.xlsx",
@@ -153,7 +153,7 @@ for (f_orig in mar_file_list) {
 
 }
 
-#AO
+#AO ----
 ao_file_list = c("6B_ao_pp.xlsx",
                  "6B_ao_oao.xlsx",
                  "6B_ao_du.xlsx")
@@ -171,7 +171,7 @@ for (f_orig in ao_file_list) {
   write_csv(dn, file.path(dir_layers, paste0(f_new, "_chn2015_LZH.csv")))
 }
 
-# TR
+# TR ----
 tr_file_list = c("6G_tr_marinearea_chn2015_YWW.csv",
                  "6G_tr_tourist_chn2015_YWW.csv")
 
@@ -185,7 +185,7 @@ for (f_orig in tr_file_list) {
   write_csv(d, file.path(dir_layers, f_new))
 }
 
-# ICO
+# ICO ----
 ico_file_list = c("6H_ico_species_chn2015_YWW.csv")
 
 for (f_orig in ico_file_list) {
@@ -203,7 +203,7 @@ for (f_orig in ico_file_list) {
 
 }
 
-# LSP
+# LSP ----
 lsp_file_list = c("6H_lsp_cmpa_chn2015_YWW.csv",
                   "6H_lsp_marinearea_chn2015_YWW.csv")
 
@@ -218,7 +218,7 @@ for (f_orig in lsp_file_list) {
 
 }
 
-# LE
+# LE ----
 liv_file_list = c("le_livjob_chn2015_zb.csv",
                  "le_livwage_chn2015_zb.csv")
 
@@ -232,7 +232,7 @@ for (f_orig in liv_file_list) {
   write_csv(dn, file.path(dir_layers, f_orig))
 }
 
-# ECO
+# ECO ----
 eco_file_list = c("le_eco_chn2015_zb.csv")
 
 for (f_orig in eco_file_list) {
@@ -244,3 +244,4 @@ for (f_orig in eco_file_list) {
   write_csv(dn, file.path(dir_f, f_orig))
   write_csv(dn, file.path(dir_layers, f_orig))
 }
+
