@@ -81,8 +81,8 @@ for (f_orig in np_file_list) {  # f_orig =  'np_risk_chn2015_HHM.csv.xlsx'
   # typo correction for product names (str_replace doesn't need an if statement)
   d = d %>%
     mutate(product = str_replace_all(product, 'Sea medicianProduct', 'sea_medicine'),
-           product = str_replace_all(product, 'Seasalt',             'sea_salt'),
-           product = str_replace_all(product, 'seasalt',             'sea_salt'),
+           product = str_replace_all(product, 'Seasalt',             'seasalt'),
+           product = str_replace_all(product, 'seasalt',             'seasalt'),
            product = str_replace_all(product, 'ChemProduct',         'sea_chemicals'))
 
 
