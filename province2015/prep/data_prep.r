@@ -11,9 +11,11 @@ library(tools)
 library(dplyr)  # install.packages('dplyr')
 source(file.path(dir_chn_prep,'prep_functions.r'))
 
+
+dir_layers = '~/github/chn/province2015/layers'
+
 # paths: '~/' means '/Users/julialowndes/' for Julie
 dir_raw = '~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/'
-dir_layers = '~/github/chn/province2015/layers'
 
 ##changed raw file path on Ning's computer:
 dir_raw = '~/Google Drive/OHI China 2015/model_data/'
@@ -154,12 +156,10 @@ mar_file_list = c("6A_mar_ac.xlsx",
                   "6A_mar_yc.xlsx",
                   "6A_mar_yk.xlsx")
 
-for (f_orig in mar_file_list) {
+for (f_orig in mar_file_list) { # f_orig = "6A_mar_yk.xlsx"
   dir_f = file.path(dir_chn_prep, "1.2_MAR")
   d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
-  dn = add_rgn_id(d, fld_name = "province_id") ## worked, but showed an error message:
-  ## Error in if (max(unique(dn$rgn_id)) != dim(lk_tbl)[1]) { :
-  ## missing value where TRUE/FALSE needed
+  dn = add_rgn_id(d, fld_name = "province_id")
 
   f_new = file_path_sans_ext(f_orig) %>%
     str_replace("6A_", "")
