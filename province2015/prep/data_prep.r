@@ -15,14 +15,16 @@ source(file.path(dir_chn_prep,'prep_functions.r'))
 dir_layers = '~/github/chn/province2015/layers'
 
 # paths: '~/' means '/Users/julialowndes/' for Julie
-dir_raw = '~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/'
 
-##changed raw file path on Ning's computer:
-dir_raw = '~/Google Drive/OHI China 2015/model_data/'
+dir_raw = c('ningningj'='~/Google Drive/OHI China 2015/model_data/',
+            'OmarPro'='~/github/Google_Drive/OHI_China_2015/model_data',
+            'julialowndes'='~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/',
+            'jstewart'    ='~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/')[Sys.info()["user"]]
+
 ## to make a universal pathway, should we just upload raw files into prep
 ## folder, and prep, and then save the cleaned data to layers folder? right now
 ## we have the same cleaned files in both prep and layers
-## then: dir_raw = '~/github/chn/province2015/prep/subfolder' # ForOmar: dir_raw = '~/github/Google_Drive/OHI_China_2015/model_data'
+## then: dir_raw = '~/github/chn/province2015/prep/subfolder'
 
 chn_file_list = list.files(dir_raw)
 ## seems like we never used this line of code
