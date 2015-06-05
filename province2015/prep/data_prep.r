@@ -200,7 +200,7 @@ tr_file_list = c("6G_tr_marinearea_chn2015_YWW.csv",
 for (f_orig in tr_file_list) {
   dir_f = file.path(dir_chn_prep, "7_TR")
   d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
-
+  d = filter(d,!is.na(rgn_id)); head(d); # View(d)
   f_new = str_replace(f_orig, "6G_", "")
 
   write_csv(d, file.path(dir_f, f_new))
