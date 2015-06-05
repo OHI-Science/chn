@@ -716,6 +716,29 @@ CP = function(layers){
 
 TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 
+  ##China model:
+  # X =  log [(At/Vt * S) + 1]
+
+  # At = number of tourists in year t (million)
+  # Vt = area of sea whitin jurisdiction (km2)
+  # S = 0.787, sustainability coefficient
+
+  #library(dplyr)
+  #library(tidyr)
+  # merge tourist + area into one frame
+  S = 0.787
+  d = layers$data[['tr_tourist']] %>%
+    left_join(layers$data[["tr_marinearea"]], by="rgn_id") %>%
+    select(rgn_id,
+           year,
+           tourist = million,
+           area = km2) %>%
+    mutate(tour_per_area = tourist/area,
+           tour_per_area_S = tour_per_area * S,
+           tour_per_area_S_1 = tour_per_area_S +1,
+           log = log10(tour_per_area_S_1)) #head(d); summary(d)
+
+
   # formula:
   #   E = Ed / (L - (L*U))
   #   Sr = (S-1)/5
