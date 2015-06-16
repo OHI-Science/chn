@@ -235,6 +235,7 @@ lsp_file_list = c("6H_lsp_cmpa_chn2015_YWW.csv",
 for (f_orig in lsp_file_list) {
   dir_f = file.path(dir_chn_prep, "9.2_LSP")
   d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+  d = filter(d, !is.na(rgn_id))
 
   f_new = str_replace(f_orig, "6H_", "")
 
