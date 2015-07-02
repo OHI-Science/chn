@@ -629,7 +629,7 @@ CS = function(layers){
 
 
   # return scores
-  scores = cbind(rbind(r.status, r.trend))
+  scores = rbind(r.status, r.trend)
   return(scores)
 }
 
