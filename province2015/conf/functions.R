@@ -629,25 +629,43 @@ CS = function(layers){
 
 
   # return scores
-  scores = cbind(rbind(r.status, r.trend))
+  scores = rbind(r.status, r.trend)
   return(scores)
 }
 
 
 CP = function(layers){
 
-  # sum mangrove_offshore1km + mangrove_inland1km = mangrove to match with extent and trend
-  m = layers$data[['hab_extent']] %>%
-    filter(habitat %in% c('mangrove_inland1km','mangrove_offshore1km')) %>%
-    select(rgn_id, habitat, km2)
+  # China model:
+  # x = sum [(Cc/Cr) * (Wk/Wmax) * (Ak/Atotal)]
+  # x = sum [condition * (Wk/Wmax) * (Ak/Atotal))]
 
-  if (nrow(m) > 0){
-    m = m %>%
-      group_by(rgn_id) %>%
-      summarize(km2 = sum(km2, na.rm=T)) %>%
-      mutate(habitat='mangrove') %>%
-      ungroup()
-  }
+  # select data, combine cp_condition and cs_extent (ie. most rencent year)
+
+  m = layers$data[['cp_condition']] %>%
+    select(rgn_id,
+           habitat,
+           condition=value) %>%
+    full_join(layers$data[['cs_extent']] %>%
+                select(-layer,
+                       extent=hectare) ) %>% #join by rgn_id, habitat
+     group_by(rgn_id) #?? didn't change the table. why?
+
+  # add habitat weight
+  habitat.wt = c('saltmarshes' = 3,
+                 'mangroves' = 4,
+                 'seagrasses' = 1)
+
+  # Calculate status based on the most recent year's data
+  m = m %>%
+    mutate(weight = habitat.wt[habitat]) %>%
+    group_by(rgn_id) %>%
+    summarize(A_total = sum(extent),
+              rgn_score = condition * weight/4 * extent/A_total) %>%
+
+
+#### below is the previous code
+
 
   # join layer data
   d =
@@ -720,7 +738,7 @@ CP = function(layers){
 
 TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 
-  ##China model:
+  ## China model:
   # X =  log [(At/Vt * S) + 1]
 
   # At = number of tourists in year t (million)
@@ -737,12 +755,20 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
            year,
            tourist = million,
            area = km2) %>%
-    mutate(tour_per_area = tourist/area,
+    mutate(tour_per_area = tourist*1000000/area,
            tour_per_area_S = tour_per_area * S,
            tour_per_area_S_1 = tour_per_area_S +1,
-           log = log10(tour_per_area_S_1)) #head(d); summary(d)
+           log = log10(tour_per_area_S_1)); head(d); summary(d) ## really strange outcome. are the log supposed to be status score?
 
+# rgn_id year tourist    area tour_per_area tour_per_area_S tour_per_area_S_1          log
+#   1      1 2008 6487.79 2000000   0.003243895     0.002552945          1.002553 0.0011073172
+#   2      1 2009 4223.38 2000000   0.002111690     0.001661900          1.001662 0.0007211549
+#   3      1 2010 5503.80 2000000   0.002751900     0.002165745          1.002166 0.0009395542
+#   4      1 2011 6775.49 2000000   0.003387745     0.002666155          1.002666 0.0011563557
+#   5      2 2008  568.93  129300   0.004400077     0.003462861          1.003463 0.0015013035
+#   6      2 2009  630.67  129300   0.004877572     0.003838649          1.003839 0.0016639124
 
+  # PREVIOUS:
   # formula:
   #   E = Ed / (L - (L*U))
   #   Sr = (S-1)/5
