@@ -567,7 +567,9 @@ CS = function(layers){
 #            4  seagrasses          0.5       0.8     289         -0.1
 
 
-  # limit to CS habitats (since only some habitats contribute to CS, but all are included in BD)
+  # limit to CS habitats (since only some habitats contribute to CS, but all are included in BD) -> not really needed
+  # here b/c only these three habitats are included in the dataset. But good to pay attention to it, and if needed,
+  # use filter as such:
   rk = rk %>%
     filter(habitat %in% c('mangroves','saltmarshes','seagrasses'))
 
@@ -578,13 +580,15 @@ CS = function(layers){
   #  xCS = sum(contribution * condition * extent_per_habitat) / total_extent_all_habitats
 
   xCS = rk %>%
-    mutate(c_c_a = contribution * condition * extent) %>%
+    mutate(c_c_a = contribution * condition * extent) %>%  #calculate for each region, each habitat
     group_by(region_id) %>%
-    summarize(sum_c_c_a  = sum(c_c_a),          # summarize will act based on group_by
-              total_extent = sum(extent)) %>%   # compare by substituting 'mutate' in place of 'summarize'
-    ungroup() %>%
+    summarize(sum_c_c_a  = sum(c_c_a),          # summarize will act based on group_by; aggregate for each region
+              total_extent = sum(extent)) %>%   # compare by substituting 'mutate' in place of 'summarize'; summarize
+                                                # gives one aggregated sum_c_c_a to each region, while mutate would simply add
+                                                # one new column and give one sum_c_c_a to each region and habitat
+    ungroup() %>% #always a good practice to ungroup before next operation
     mutate(xCS_calc = sum_c_c_a/total_extent,
-           score = min(1,xCS_calc) * 100); head(xCS)
+           score = min(1,xCS_calc) * 100); head(xCS) #score can't exceed 100
 
   # format to combine with other goals **variable must be called r.status with the proper formatting**
     r.status = xCS %>%
@@ -1332,9 +1336,10 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
   rgn_id = c(1:11)
 
  for (i in 1:11) {
-   D = filter(d, rgn_id == 7)
+   D = filter(d, rgn_id == i)
    trend = min(1, max(0, 4 * coef(lm(pct_cmpa ~ year, data=D))[['year']]))
    trend2 = data.frame(rgn_id, trend)
+   return(trend2)
  } ## 0 for all provinces, eventhough for region 4,5, 7, and 8 show slight increase in cmpa; it is a rounding issue.
 
 
@@ -1360,19 +1365,19 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
 
   # get percent of total area that is protected for inland1km (cp) and offshore3nm (cmpa) per year
   # and calculate status score
-  r.yrs = merge(r.yrs, r, all.x=T); head(r.yrs)
-  r.yrs = within(r.yrs,{
-    pct_cp    = pmin(cp_cumsum   / area_inland1km   * 100, 100)
-    pct_cmpa  = pmin(cmpa_cumsum / area_offshore3nm * 100, 100)
-    prop_protected    = ( pmin(pct_cp / ref_pct_cp, 1) + pmin(pct_cmpa / ref_pct_cmpa, 1) ) / 2
-  })
-
-  # extract status based on specified year
-  r.status = r.yrs %>%
-    filter(year==status_year) %>%
-    select(region_id, status=prop_protected) %>%
-    mutate(status=status*100)
-  head(r.status)
+#   r.yrs = merge(r.yrs, r, all.x=T); head(r.yrs)
+#   r.yrs = within(r.yrs,{
+#     pct_cp    = pmin(cp_cumsum   / area_inland1km   * 100, 100)
+#     pct_cmpa  = pmin(cmpa_cumsum / area_offshore3nm * 100, 100)
+#     prop_protected    = ( pmin(pct_cp / ref_pct_cp, 1) + pmin(pct_cmpa / ref_pct_cmpa, 1) ) / 2
+#   })
+#
+#   # extract status based on specified year
+#   r.status = r.yrs %>%
+#     filter(year==status_year) %>%
+#     select(region_id, status=prop_protected) %>%
+#     mutate(status=status*100)
+#   head(r.status)
 
   # calculate trend
   r.trend = ddply(subset(r.yrs, year %in% trend_years), .(region_id), function(x){
