@@ -636,10 +636,6 @@ CS = function(layers){
 
 CP = function(layers){
 
-  # China model:
-  # x = sum [(Cc/Cr) * (Wk/Wmax) * (Ak/Atotal)]
-  # x = sum [condition * (Wk/Wmax) * (Ak/Atotal))]
-
   # select data, combine cp_condition and cs_extent (ie. most rencent year)
 
   m = layers$data[['cp_condition']] %>%
@@ -648,23 +644,39 @@ CP = function(layers){
            condition=value) %>%
     full_join(layers$data[['cs_extent']] %>%
                 select(-layer,
-                       extent=hectare) ) %>% #join by rgn_id, habitat
-     group_by(rgn_id) #?? didn't change the table. why?
+                       -year,
+                       extent = hectare) ) %>% #join by rgn_id, habitat
+     group_by(rgn_id) #?? didn't change the table. why? see below
 
   # add habitat weight
   habitat.wt = c('saltmarshes' = 3,
                  'mangroves' = 4,
                  'seagrasses' = 1)
-
-  # Calculate status based on the most recent year's data
   m = m %>%
-    mutate(weight = habitat.wt[habitat]) %>%
+    mutate(weight = habitat.wt[habitat])
+
+#       rgn_id     habitat condition     extent weight
+#   1       1 saltmarshes       0.5 1188600.00      4
+#   2       2 saltmarshes       0.5   81551.00      4
+#   3       3 saltmarshes       0.5   76840.00      4
+#   4       4 saltmarshes       0.5  721275.00      4
+#   5       5 saltmarshes       0.5  363979.00      4
+#   6       6 saltmarshes       0.5   18314.80      4
+#   7       7 saltmarshes       0.5  164270.00      4
+
+
+  # Calculate CP status based on the most recent year's data
+  # China model:
+  # x = sum [ (Cc / Cr)  * (Wk / Wmax) * (Ak / Atotal) ]
+  # x = sum [condition   * (Wk / Wmax) * (Extent_k / Total_extent))]
+
+  xCP = m %>%
     group_by(rgn_id) %>%
-    summarize(A_total = sum(extent),
-              rgn_score = condition * weight/4 * extent/A_total) %>%
+    summarize(total_extent = sum(extent), ## ?? did not work...
+              hab_score = condition * weight/4 * extent/A_total,
+              rgn_score = sum(hab_score))
 
-
-#### below is the previous code
+#################### below are the gl2014 codes #############################
 
 
   # join layer data
