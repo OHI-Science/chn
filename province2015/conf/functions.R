@@ -545,7 +545,6 @@ CS = function(layers){
            'cs_extent_trend')
   D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
 
-
   # spread data so layers are columns
   rk = D %>%
     select(region_id = id_num,
@@ -1033,6 +1032,38 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 
 LIV_ECO = function(layers, subgoal){
 
+  # select data
+  lyrs = c(#'le_livjob',
+        'le_livwage',
+        'le_eco')
+  D =SelectLayersData(layers, lyrs); head(D); summary(D) # did not work:
+     #   > head(D)
+     #   NULL
+
+  ## but it works to load the individual data set. could it be because le_livjob has an extra column "datalayer"?
+
+  # > layers$data[['le_livjob']]
+  # rgn_id                                              datalayer   value year     layer
+  # 1        3                                  beach placer industry     762 2007 le_livjob
+  # 2        3                                  beach placer industry     762 2008 le_livjob
+  # 3        3                                  beach placer industry     812 2009 le_livjob
+
+  ## load individual data layer separately instead:
+ jobs = layers$data[['le_livjob']] %>%
+   select(rgn_id, sector = datalayer, jobs = value, year) #head(jobs)
+
+ wage = layers$data[['le_livwage']] %>%
+   select(rgn_id, wage = value, year) #head(wage)
+
+ income = layers$data[['le_eco']] %>%
+   select(rgn_id, income = value, year) #head(income)
+
+
+
+
+
+
+  #################### gl2014 codes #########################
   ## read in all data:
 
   # gdp, wages, jobs and workforce_size data
