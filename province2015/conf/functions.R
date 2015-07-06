@@ -545,7 +545,6 @@ CS = function(layers){
            'cs_extent_trend')
   D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
 
-
   # spread data so layers are columns
   rk = D %>%
     select(region_id = id_num,
@@ -646,7 +645,6 @@ CP = function(layers){
                 select(-layer,
                        -year,
                        extent = hectare) ) %>% #join by rgn_id, habitat
-     group_by(rgn_id) #?? didn't change the table. why? see below
 
   # add habitat weight
   habitat.wt = c('saltmarshes' = 3,
@@ -673,7 +671,7 @@ CP = function(layers){
   xCP = m %>%
     group_by(rgn_id) %>%
     summarize(total_extent = sum(extent), ## ?? did not work...
-              hab_score = condition * weight/4 * extent/A_total,
+              hab_score = condition * weight/4 * extent/total_extent,
               rgn_score = sum(hab_score))
 
 #################### below are the gl2014 codes #############################
@@ -780,7 +778,7 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 #   5      2 2008  568.93  129300   0.004400077     0.003462861          1.003463 0.0015013035
 #   6      2 2009  630.67  129300   0.004877572     0.003838649          1.003839 0.0016639124
 
-  # PREVIOUS:
+  ######################### gl2014 model############################
   # formula:
   #   E = Ed / (L - (L*U))
   #   Sr = (S-1)/5
@@ -1033,6 +1031,91 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 
 LIV_ECO = function(layers, subgoal){
 
+  # select data
+  lyrs = c(#'le_livjob',
+        'le_livwage',
+        'le_eco')
+  D =SelectLayersData(layers, lyrs); head(D); summary(D) # did not work, why? could it be because le_livjob has an extra column "datalayer"?
+     #   > head(D)
+     #   NULL
+
+  ## but it works to load the individual data set.
+
+  # > layers$data[['le_livjob']]
+  # rgn_id                                              datalayer   value year     layer
+  # 1        3                                  beach placer industry     762 2007 le_livjob
+  # 2        3                                  beach placer industry     762 2008 le_livjob
+  # 3        3                                  beach placer industry     812 2009 le_livjob
+
+  ## load data layers separately instead:
+ jobs = layers$data[['le_livjob']] %>%
+   select(rgn_id, sector = datalayer, jobs = value, year) #head(jobs)
+
+ wage = layers$data[['le_livwage']] %>%
+   select(rgn_id, wage = value, year) #head(wage)
+
+ income = layers$data[['le_eco']] %>%
+   select(rgn_id, income = value, year) #head(income)
+
+  # China model:
+  # xLIV = ( sum(jobs) / sum(jobs_ref) + wage / wage_ref) /2
+  # xECO = income / income_ref
+  # xLE = (xLIV + xECO)/2
+
+ # LIV status calculation
+
+ # find reference points: from model description: the maximum quantity in each category has been
+ # used as the reference point --> across all regions, or within each region?
+ # for cross-region maximums:
+  jobs_score = jobs %>%
+   group_by(sector) %>%
+   mutate(jobs_ref = max(jobs)) %>% #find reference for each industry, across all regions and all years (2007-2011)
+   ungroup() %>%
+   group_by(rgn_id, year) %>%
+   summarize(jobs_score = sum(jobs)/sum(jobs_ref)); head(jobs_score)
+
+ wage_score = wage %>%
+ mutate(wage_ref = max(wage),
+        wage_score = wage/wage_ref)
+
+ xLIV = full_join(jobs_score,
+                  select(wage_score, rgn_id, year, wage_score)) %>%
+   mutate(xLIV = (jobs_score + wage_score)/2 ) %>%
+   filter(year == 2011) ; head(xLIV)
+
+#     rgn_id year jobs_score wage_score      xLIV
+#  1      1 2011  0.3878582  0.5509561 0.4694071
+#  2      2 2011  0.1148219  0.4720532 0.2934375
+#  3      3 2011  0.2105070  0.7464249 0.4784660
+#  4      4 2011  0.6331043  0.5872831 0.6101937
+#  5      5 2011  0.2313507  0.7029477 0.4671492
+#  6      6 2011  0.2523145  1.0000000 0.6261573
+
+  # ECO status calculation
+
+xECO = income %>%
+  mutate (eco_ref = max(as.numeric(income[,2]))) #did not work:
+
+# 1st try: mutate (eco_ref = max(income))
+# Error in Summary.factor(c(4L, 7L, 10L, 18L, 2L, 3L, 44L, 1L, 5L, 8L, 12L,  :
+#                             ‘max’ not meaningful for factors
+
+# 2nd try:  mutate (eco_ref = max( as.numeric(income[,2])))
+# Error in `[.default`(c(4L, 7L, 10L, 18L, 2L, 3L, 44L, 1L, 5L, 8L, 12L,  :
+#                          incorrect number of dimensions
+
+
+
+
+
+
+
+
+
+
+
+
+  #################### gl2014 codes #########################
   ## read in all data:
 
   # gdp, wages, jobs and workforce_size data
