@@ -92,7 +92,7 @@ Data sources:
 "LIV ECO","le_popn","Total population by subregion","Population data from The World Bank","count","count","le_popn_gl2014.csv","rgn_id",,,"year","count",,TRUE,1960,2012,660330000,1350695000,FALSE,,,,11,FALSE
 "LIV","le_livjob","Employment","number of employment in sea-related industry in costal region","value","10,000 people","le_livjob_chn2015_zb.csv","rgn_id",,"datalayer","year","value",,TRUE,2007,2011,249,1363640,FALSE,,,,11,FALSE
 "LIV","le_livwage","Income","average income of urban and rural households in costal provinces ","value","Chinese Yuan","le_livwage_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2011,7791.71,28293,FALSE,,,,11,FALSE
-"ECO","le_eco","Economy","total economy of sea-related industries in coastal provinces ","value","Billion Yuan","le_eco_chn2015_zb.csv","rgn_id",,,"year",,"value",TRUE,2007,2010,,,FALSE,,,,11,
+"ECO","le_eco","Economy","total economy of sea-related industries in coastal provinces ","value","Billion Yuan","le_eco_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2010,343.5,8253.7,FALSE,,,,11,FALSE
 "LSP","lsp_prot_area_inland1km","Coastal protected areas inland 1km","Coastal protected areas inland to 1km from the UN WDPA.
 
 Data sources:
