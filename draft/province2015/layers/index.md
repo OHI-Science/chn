@@ -4,7 +4,7 @@ title: "Layers"
 excerpt: "OHI layers for China"
 share: false
 ads: false
-branch_scenario: published/province2015
+branch_scenario: draft/province2015
 toc: true
 ---
 
@@ -48,7 +48,7 @@ Fisheries management effectiveness and opportunity
 <p>Data sources:</p>
 
 <ul>
-<li>Mora, C., Myers, R.A., Coll, M., Libralato, S., Pitcher, T.J., Sumaila, R.U., Worm, B. (2009). <strong>Management Effectiveness of the World??<a5><8f>??s Marine Fisheries</strong>. <em>PLoS Biol</em>, 7(6), e1000131. <a href="http://dx.doi.org/10.1371/journal.pbio.1000131">doi:10.1371/journal.pbio.1000131</a></li>
+<li>Mora, C., Myers, R.A., Coll, M., Libralato, S., Pitcher, T.J., Sumaila, R.U., Worm, B. (2009). <strong>Management Effectiveness of the World??????s Marine Fisheries</strong>. <em>PLoS Biol</em>, 7(6), e1000131. <a href="http://dx.doi.org/10.1371/journal.pbio.1000131">doi:10.1371/journal.pbio.1000131</a></li>
 </ul>
 
 
@@ -180,6 +180,36 @@ Resilience from commitment to CITES
 <ul>
 <li><a href="http://www.cites.org/eng/disc/parties/chronolo.php">CITES List of Contracting Parties</a></li>
 </ul>
+
+
+
+## cp_condition
+
+Condition
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | cp_condition_chn2015_zb.csv                                                   |
+| value units       | value                                                      |
+| value range       | 0.45 to 0.8                               |
+| global extraction | :  |
+
+<p>Ratio of current status and reference status for each habitat</p>
+
+
+
+## cp_extent
+
+Extent
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | cp_extent_chn2015_zb.csv                                                   |
+| value units       | Hectare                                                      |
+| value range       | 19.9 to 2513980                               |
+| global extraction | :  |
+
+<p>Total area of habitats in each province </p>
 
 
 
@@ -379,6 +409,21 @@ B/Bmsy estimates obtained using the catch-MSY method
 
 
 
+## fis_ft
+
+Fishing effort 
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | fis_ft_chn2015_LZH.csv                                                   |
+| value units       | Kilowatts                                                      |
+| value range       | 36003 to 3456170                               |
+| global extraction | :  |
+
+<p>Fishing effort at time t</p>
+
+
+
 ## fis_meancatch
 
 Catch data for each Taxon/FAO/SAUP region averaged across years (1980-2011)
@@ -418,6 +463,36 @@ area of each saup/total OHI reporting region
 <ul>
 <li><a href="http://www.seaaroundus.org">Sea Around Us Project (SAUP)</a></li>
 </ul>
+
+
+
+## fis_tc
+
+Normalizing parameter 
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | fis_tc_chn2015_LZH.csv                                                   |
+| value units       | value                                                      |
+| value range       | 0.285858 to 0.285858                               |
+| global extraction | :  |
+
+<p>Normalizing parameter for each province</p>
+
+
+
+## fis_ut
+
+Catch
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | fis_ut_chn2015_LZH.csv                                                   |
+| value units       | Tonnes                                                      |
+| value range       | 15754 to 3192000                               |
+| global extraction | :  |
+
+<p>Catch at time t</p>
 
 
 
@@ -882,6 +957,21 @@ IUCN population trend as a proxy for iconic species trend
 
 
 
+## le_eco
+
+Economy
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | le_eco_chn2015_zb.csv                                                   |
+| value units       | Billion Yuan                                                      |
+| value range       | NA to NA                               |
+| global extraction | :  |
+
+<p>total economy of sea-related industries in coastal provinces </p>
+
+
+
 ## le_gdp
 
 GDP
@@ -915,6 +1005,36 @@ Jobs
 | global extraction | :  |
 
 <p>gapfilled</p>
+
+
+
+## le_livjob
+
+Employment
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | le_livjob_chn2015_zb.csv                                                   |
+| value units       | 10,000 people                                                      |
+| value range       | 249 to 1363640                               |
+| global extraction | :  |
+
+<p>number of employment in sea-related industry in costal region</p>
+
+
+
+## le_livwage
+
+Income
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | le_livwage_chn2015_zb.csv                                                   |
+| value units       | Chinese Yuan                                                      |
+| value range       | 7791.71 to 28293                               |
+| global extraction | :  |
+
+<p>average income of urban and rural households in costal provinces </p>
 
 
 
@@ -1029,6 +1149,36 @@ Sector evenness as a measure of economic diversity
 
 
 
+## lsp_cmpa
+
+Coastal marine protected area_CMPA
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | lsp_cmpa_chn2015_YWW.csv                                                   |
+| value units       | km2                                                      |
+| value range       | 70.17 to 34476.7                               |
+| global extraction | :  |
+
+<p>Coastal marine protected area_CMPA)</p>
+
+
+
+## lsp_marinearea
+
+Jurisdictional marine area
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | lsp_marinearea_chn2015_YWW.csv                                                   |
+| value units       | km2                                                      |
+| value range       | 3000 to 2e+06                               |
+| global extraction | :  |
+
+<p>Area of sea within jurisdiction of each province</p>
+
+
+
 ## lsp_prot_area_inland1km
 
 Coastal protected areas inland 1km
@@ -1068,6 +1218,21 @@ Coastal marine protected areas offshore 3km
 <ul>
 <li>United Nations - World Conservation Monitoring Centre?????_s World Database on Protected Areas (WDPA) through <a href="http://www.protectedplanet.net">Protected Planet</a></li>
 </ul>
+
+
+
+## mar_ac
+
+Area of mariculture
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | mar_ac_chn2015_LZH.csv                                                   |
+| value units       | km2                                                      |
+| value range       | 0 to 942050                               |
+| global extraction | :  |
+
+<p>Area of coastal region that could be permitted for maricultre in each province  </p>
 
 
 
@@ -1132,6 +1297,21 @@ Mariculture harvest
 <ul>
 <li><a href="http://www.fao.org/fishery/statistics/global-aquaculture-production/en">FAO global aquaculture production</a></li>
 </ul>
+
+
+
+## mar_smk
+
+MSI of each species 
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | mar_smk_chn2015_LZH.csv                                                   |
+| value units       | value                                                      |
+| value range       | 0.367 to 0.867                               |
+| global extraction | :  |
+
+<p>Mariculture sustainability index (MSI) of each species</p>
 
 
 
@@ -1858,6 +2038,21 @@ Direct employment in tourism
 
 
 
+## tr_marinearea
+
+Marine area
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | tr_marinearea_chn2015_YWW.csv                                                   |
+| value units       | km2                                                      |
+| value range       | 3000 to 2e+06                               |
+| global extraction | :  |
+
+<p>Area of sea within jurisdiction of each province</p>
+
+
+
 ## tr_sustainability
 
 Sustainability index
@@ -1870,6 +2065,21 @@ Sustainability index
 | global extraction | :  |
 
 <p>Tourism Competitiveness Index (TTCI) from the World Economic Forum</p>
+
+
+
+## tr_tourist
+
+Number of tourists 
+
+| metadata          | value                                                                |
+|-------------------|----------------------------------------------------------------------|
+| filename          | tr_tourist_chn2015_YWW.csv                                                   |
+| value units       | millions                                                      |
+| value range       | 568.93 to 229472                               |
+| global extraction | :  |
+
+<p>number of tourists in year t</p>
 
 
 

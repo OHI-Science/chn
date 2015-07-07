@@ -4,18 +4,18 @@ title: "Scores"
 excerpt: "OHI scores for China and regions contained"
 share: false
 ads: false
-branch_scenario: published/subcountry2014
+branch_scenario: published/province2015
 toc: true
 ---
 
 Scores displayed below are based on template data that were extracted from the global assessment. These scores will update when data layers are modified.
 
-<nav class="navbar navbar-default" role="navigation">   <div class="container-fluid">     <div class="navbar-header">       <a class="navbar-brand" href="#">Branch/Scenario</a>     </div>     <div class="collapse navbar-collapse" id="navbar-1">       <ul class="nav navbar-nav">         <li class="dropdown">           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">published/subcountry2014<span class="caret"></span></a>           <ul class="dropdown-menu" role="menu">                       <li><a href="{{ site.baseurl }}/draft/subcountry2014/scores/">draft/subcountry2014</a></li>                     </ul>         </li>       </ul>     </div>   </div> </nav> 
+<nav class="navbar navbar-default" role="navigation">   <div class="container-fluid">     <div class="navbar-header">       <a class="navbar-brand" href="#">Branch/Scenario</a>     </div>     <div class="collapse navbar-collapse" id="navbar-1">       <ul class="nav navbar-nav">         <li class="dropdown">           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">published/province2015<span class="caret"></span></a>           <ul class="dropdown-menu" role="menu">                       <li><a href="{{ site.baseurl }}/draft/province2015/scores/">draft/province2015</a></li>                     </ul>         </li>       </ul>     </div>   </div> </nav> 
 
 
 ## China
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_GLOBAL.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_GLOBAL.png)
 
 |                                |  score| status| future|
 |:-------------------------------|------:|------:|------:|
@@ -43,7 +43,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Fujian
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Fujian.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Fujian.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
@@ -71,7 +71,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Guangdong
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Guangdong.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Guangdong.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
@@ -99,7 +99,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Guangxi
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Guangxi.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Guangxi.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
@@ -127,7 +127,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Hainan
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Hainan.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Hainan.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
@@ -155,7 +155,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Hebei
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Hebei.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Hebei.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
@@ -183,7 +183,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Jiangsu
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Jiangsu.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Jiangsu.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
@@ -211,7 +211,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Liaoning
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Liaoning.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Liaoning.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
@@ -239,7 +239,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Shandong
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Shandong.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Shandong.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
@@ -267,7 +267,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Shanghai
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Shanghai.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Shanghai.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
@@ -295,7 +295,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Tianjin
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Tianjin.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Tianjin.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
@@ -323,7 +323,7 @@ Scores displayed below are based on template data that were extracted from the g
 
 ## Zhejiang
   
-![]({{ site.baseurl }}/results/published/subcountry2014/figures/flower_Zhejiang.png)
+![]({{ site.baseurl }}/results/published/province2015/figures/flower_Zhejiang.png)
 
 |                                |  score| status| future| trend| pressures| resilience|
 |:-------------------------------|------:|------:|------:|-----:|---------:|----------:|
