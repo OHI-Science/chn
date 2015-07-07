@@ -644,7 +644,7 @@ CP = function(layers){
     full_join(layers$data[['cs_extent']] %>%
                 select(-layer,
                        -year,
-                       extent = hectare) ) %>% #join by rgn_id, habitat
+                       extent = hectare) ) #join by rgn_id, habitat
 
   # add habitat weight
   habitat.wt = c('saltmarshes' = 3,
@@ -670,9 +670,14 @@ CP = function(layers){
 
   xCP = m %>%
     group_by(rgn_id) %>%
-    summarize(total_extent = sum(extent), ## ?? did not work...
-              hab_score = condition * weight/4 * extent/total_extent,
-              rgn_score = sum(hab_score))
+    mutate(total_extent = sum(extent)) %>%
+    ungroup() %>%
+    mutate(hab_score = condition * weight/4 * extent/total_extent,
+           rgn_score = sum(hab_score)) %>%
+    arrange(rgn_id)
+
+#ToDO: calculate xCP for each year, and trend
+
 
 #################### below are the gl2014 codes #############################
 
