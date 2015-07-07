@@ -768,15 +768,19 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
     mutate(tour_per_area = tourist*1000000/area,
            tour_per_area_S = tour_per_area * S,
            tour_per_area_S_1 = tour_per_area_S +1,
-           log = log10(tour_per_area_S_1)); head(d); summary(d) ## really strange outcome. are the log supposed to be status score?
+           log = log10(tour_per_area_S_1),
+           ref_point = max(log), #assume ref point is maximum log(tour_per_area_S)
+           xTR = log/ref_point); head(d); summary(d) ## really strange outcome. are the log supposed to be status score?
 
-# rgn_id year tourist    area tour_per_area tour_per_area_S tour_per_area_S_1          log
-#   1      1 2008 6487.79 2000000   0.003243895     0.002552945          1.002553 0.0011073172
-#   2      1 2009 4223.38 2000000   0.002111690     0.001661900          1.001662 0.0007211549
-#   3      1 2010 5503.80 2000000   0.002751900     0.002165745          1.002166 0.0009395542
-#   4      1 2011 6775.49 2000000   0.003387745     0.002666155          1.002666 0.0011563557
-#   5      2 2008  568.93  129300   0.004400077     0.003462861          1.003463 0.0015013035
-#   6      2 2009  630.67  129300   0.004877572     0.003838649          1.003839 0.0016639124
+#       rgn_id year tourist    area tour_per_area tour_per_area_S tour_per_area_S_1      log ref_point       xTR
+#   1      1 2008 6487.79 2000000      3243.895        2552.945          2553.945 3.407212  6.762775 0.5038186
+#   2      1 2009 4223.38 2000000      2111.690        1661.900          1662.900 3.220866  6.762775 0.4762640
+#   3      1 2010 5503.80 2000000      2751.900        2165.745          2166.745 3.335808  6.762775 0.4932602
+#   4      1 2011 6775.49 2000000      3387.745        2666.155          2667.155 3.426048  6.762775 0.5066039
+#   5      2 2008  568.93  129300      4400.077        3462.861          3463.861 3.539560  6.762775 0.5233888
+#   6      2 2009  630.67  129300      4877.572        3838.649          3839.649 3.584292  6.762775 0.5300031
+
+# TODO: add dimension, calculate trend (4 years)
 
   ######################### gl2014 model############################
   # formula:
