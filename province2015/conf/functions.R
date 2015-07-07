@@ -545,7 +545,6 @@ CS = function(layers){
            'cs_extent_trend')
   D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
 
-
   # spread data so layers are columns
   rk = D %>%
     select(region_id = id_num,
@@ -567,7 +566,9 @@ CS = function(layers){
 #            4  seagrasses          0.5       0.8     289         -0.1
 
 
-  # limit to CS habitats (since only some habitats contribute to CS, but all are included in BD)
+  # limit to CS habitats (since only some habitats contribute to CS, but all are included in BD) -> not really needed
+  # here b/c only these three habitats are included in the dataset. But good to pay attention to it, and if needed,
+  # use filter as such:
   rk = rk %>%
     filter(habitat %in% c('mangroves','saltmarshes','seagrasses'))
 
@@ -578,13 +579,15 @@ CS = function(layers){
   #  xCS = sum(contribution * condition * extent_per_habitat) / total_extent_all_habitats
 
   xCS = rk %>%
-    mutate(c_c_a = contribution * condition * extent) %>%
+    mutate(c_c_a = contribution * condition * extent) %>%  #calculate for each region, each habitat
     group_by(region_id) %>%
-    summarize(sum_c_c_a  = sum(c_c_a),          # summarize will act based on group_by
-              total_extent = sum(extent)) %>%   # compare by substituting 'mutate' in place of 'summarize'
-    ungroup() %>%
+    summarize(sum_c_c_a  = sum(c_c_a),          # summarize will act based on group_by; aggregate for each region
+              total_extent = sum(extent)) %>%   # compare by substituting 'mutate' in place of 'summarize'; summarize
+                                                # gives one aggregated sum_c_c_a to each region, while mutate would simply add
+                                                # one new column and give one sum_c_c_a to each region and habitat
+    ungroup() %>% #always a good practice to ungroup before next operation
     mutate(xCS_calc = sum_c_c_a/total_extent,
-           score = min(1,xCS_calc) * 100); head(xCS)
+           score = min(1,xCS_calc) * 100); head(xCS) #score can't exceed 100
 
   # format to combine with other goals **variable must be called r.status with the proper formatting**
     r.status = xCS %>%
@@ -625,25 +628,55 @@ CS = function(layers){
 
 
   # return scores
-  scores = cbind(rbind(r.status, r.trend))
+  scores = rbind(r.status, r.trend)
   return(scores)
 }
 
 
 CP = function(layers){
 
-  # sum mangrove_offshore1km + mangrove_inland1km = mangrove to match with extent and trend
-  m = layers$data[['hab_extent']] %>%
-    filter(habitat %in% c('mangrove_inland1km','mangrove_offshore1km')) %>%
-    select(rgn_id, habitat, km2)
+  # select data, combine cp_condition and cs_extent (ie. most rencent year)
 
-  if (nrow(m) > 0){
-    m = m %>%
-      group_by(rgn_id) %>%
-      summarize(km2 = sum(km2, na.rm=T)) %>%
-      mutate(habitat='mangrove') %>%
-      ungroup()
-  }
+  m = layers$data[['cp_condition']] %>%
+    select(rgn_id,
+           habitat,
+           condition=value) %>%
+    full_join(layers$data[['cs_extent']] %>%
+                select(-layer,
+                       -year,
+                       extent = hectare) ) %>% #join by rgn_id, habitat
+     group_by(rgn_id) #?? didn't change the table. why? see below
+
+  # add habitat weight
+  habitat.wt = c('saltmarshes' = 3,
+                 'mangroves' = 4,
+                 'seagrasses' = 1)
+  m = m %>%
+    mutate(weight = habitat.wt[habitat])
+
+#       rgn_id     habitat condition     extent weight
+#   1       1 saltmarshes       0.5 1188600.00      4
+#   2       2 saltmarshes       0.5   81551.00      4
+#   3       3 saltmarshes       0.5   76840.00      4
+#   4       4 saltmarshes       0.5  721275.00      4
+#   5       5 saltmarshes       0.5  363979.00      4
+#   6       6 saltmarshes       0.5   18314.80      4
+#   7       7 saltmarshes       0.5  164270.00      4
+
+
+  # Calculate CP status based on the most recent year's data
+  # China model:
+  # x = sum [ (Cc / Cr)  * (Wk / Wmax) * (Ak / Atotal) ]
+  # x = sum [condition   * (Wk / Wmax) * (Extent_k / Total_extent))]
+
+  xCP = m %>%
+    group_by(rgn_id) %>%
+    summarize(total_extent = sum(extent), ## ?? did not work...
+              hab_score = condition * weight/4 * extent/A_total,
+              rgn_score = sum(hab_score))
+
+#################### below are the gl2014 codes #############################
+
 
   # join layer data
   d =
@@ -716,6 +749,37 @@ CP = function(layers){
 
 TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 
+  ## China model:
+  # X =  log [(At/Vt * S) + 1]
+
+  # At = number of tourists in year t (million)
+  # Vt = area of sea whitin jurisdiction (km2)
+  # S = 0.787, sustainability coefficient
+
+  #library(dplyr)
+  #library(tidyr)
+  # merge tourist + area into one frame
+  S = 0.787
+  d = layers$data[['tr_tourist']] %>%
+    left_join(layers$data[["tr_marinearea"]], by="rgn_id") %>%
+    select(rgn_id,
+           year,
+           tourist = million,
+           area = km2) %>%
+    mutate(tour_per_area = tourist*1000000/area,
+           tour_per_area_S = tour_per_area * S,
+           tour_per_area_S_1 = tour_per_area_S +1,
+           log = log10(tour_per_area_S_1)); head(d); summary(d) ## really strange outcome. are the log supposed to be status score?
+
+# rgn_id year tourist    area tour_per_area tour_per_area_S tour_per_area_S_1          log
+#   1      1 2008 6487.79 2000000   0.003243895     0.002552945          1.002553 0.0011073172
+#   2      1 2009 4223.38 2000000   0.002111690     0.001661900          1.001662 0.0007211549
+#   3      1 2010 5503.80 2000000   0.002751900     0.002165745          1.002166 0.0009395542
+#   4      1 2011 6775.49 2000000   0.003387745     0.002666155          1.002666 0.0011563557
+#   5      2 2008  568.93  129300   0.004400077     0.003462861          1.003463 0.0015013035
+#   6      2 2009  630.67  129300   0.004877572     0.003838649          1.003839 0.0016639124
+
+  # PREVIOUS:
   # formula:
   #   E = Ed / (L - (L*U))
   #   Sr = (S-1)/5
@@ -968,6 +1032,38 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 
 LIV_ECO = function(layers, subgoal){
 
+  # select data
+  lyrs = c(#'le_livjob',
+        'le_livwage',
+        'le_eco')
+  D =SelectLayersData(layers, lyrs); head(D); summary(D) # did not work:
+     #   > head(D)
+     #   NULL
+
+  ## but it works to load the individual data set. could it be because le_livjob has an extra column "datalayer"?
+
+  # > layers$data[['le_livjob']]
+  # rgn_id                                              datalayer   value year     layer
+  # 1        3                                  beach placer industry     762 2007 le_livjob
+  # 2        3                                  beach placer industry     762 2008 le_livjob
+  # 3        3                                  beach placer industry     812 2009 le_livjob
+
+  ## load individual data layer separately instead:
+ jobs = layers$data[['le_livjob']] %>%
+   select(rgn_id, sector = datalayer, jobs = value, year) #head(jobs)
+
+ wage = layers$data[['le_livwage']] %>%
+   select(rgn_id, wage = value, year) #head(wage)
+
+ income = layers$data[['le_eco']] %>%
+   select(rgn_id, income = value, year) #head(income)
+
+
+
+
+
+
+  #################### gl2014 codes #########################
   ## read in all data:
 
   # gdp, wages, jobs and workforce_size data
@@ -1271,51 +1367,86 @@ ICO = function(layers){
 
 }
 
+
 LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years){
 
-  lyrs = list('r'  = c('rgn_area_inland1km'   = 'area_inland1km',
-                       'rgn_area_offshore3nm' = 'area_offshore3nm'),
-              'ry' = c('lsp_prot_area_offshore3nm' = 'cmpa',
-                       'lsp_prot_area_inland1km'   = 'cp'))
-  lyr_names = sub('^\\w*\\.','', names(unlist(lyrs)))
+  lyrs = list('lsp_cmpa',
+              'lsp_marinearea')
 
   # cast data ----
-  d = SelectLayersData(layers, layers=lyr_names)
-  r  = rename(dcast(d, id_num ~ layer, value.var='val_num', subset = .(layer %in% names(lyrs[['r']]))),
-              c('id_num'='region_id', lyrs[['r']]))
-  ry = rename(dcast(d, id_num + year ~ layer, value.var='val_num', subset = .(layer %in% names(lyrs[['ry']]))),
-              c('id_num'='region_id', lyrs[['ry']]))
+  cmpa = SelectLayersData(layers, layers='lsp_cmpa')
+  marinearea = SelectLayersData(layers, layers='lsp_marinearea')
+
+  cmpa = cmpa %>%
+    select(rgn_id = id_num,
+           year,
+           cmpa = val_num); head(cmpa)
+
+  marinearea = marinearea %>%
+    select(rgn_id = id_num,
+           marinearea = val_num); head(marinearea)
+
+  # Calculate status of each year in each province
+  d = cmpa %>%
+    left_join(marinearea)%>% #head(d)
+    mutate(reference = marinearea*0.3)%>%
+    mutate(pct_cmpa = cmpa/marinearea*100)%>%
+    mutate(status = pmin(pct_cmpa/30 *100, 100))
+
+ # select status: year = 2012
+  status = filter(d, year == 2012)%>%
+   select(rgn_id, status)
+
+ # calculate trend: not working. lm wrong: example: rgn 7: 12-14 --> coefficient too large
+  #  coef(lm(pct_cmpa ~ year, data=D))
+  #  (Intercept)          year
+  #  -1165.6904933     0.5864533
+
+  rgn_id = c(1:11)
+
+ for (i in 1:11) {
+   D = filter(d, rgn_id == i)
+   trend = min(1, max(0, 4 * coef(lm(pct_cmpa ~ year, data=D))[['year']]))
+   trend2 = data.frame(rgn_id, trend)
+   return(trend2)
+ } ## 0 for all provinces, eventhough for region 4,5, 7, and 8 show slight increase in cmpa; it is a rounding issue.
+
+
+#   r  = rename(dcast(d, id_num ~ layer, value.var='val_num', subset = .(layer %in% names(lyrs[['r']]))),
+#               c('id_num'='region_id', lyrs[['r']]))
+#   ry = rename(dcast(d, id_num + year ~ layer, value.var='val_num', subset = .(layer %in% names(lyrs[['ry']]))),
+#               c('id_num'='region_id', lyrs[['ry']]))
 
   # fill in time series from first year specific region_id up to max year for all regions and generate cumulative sum
-  yr.max = max(max(ry$year), status_year)
-  r.yrs = ddply(ry, .(region_id), function(x){
-    data.frame(region_id=x$region_id[1],
-               year=min(x$year):yr.max)
-  })
-  r.yrs = merge(r.yrs, ry, all.x=T)
-  r.yrs$cp[is.na(r.yrs$cp)]     = 0
-  r.yrs$cmpa[is.na(r.yrs$cmpa)] = 0
-  r.yrs = within(r.yrs, {
-    cp_cumsum    = ave(cp  , region_id, FUN=cumsum)
-    cmpa_cumsum  = ave(cmpa, region_id, FUN=cumsum)
-    pa_cumsum    = cp_cumsum + cmpa_cumsum
-  })
+#   yr.max = max(max(ry$year), status_year)
+#   r.yrs = ddply(ry, .(region_id), function(x){
+#     data.frame(region_id=x$region_id[1],
+#                year=min(x$year):yr.max)
+#   })
+#   r.yrs = merge(r.yrs, ry, all.x=T)
+#   r.yrs$cp[is.na(r.yrs$cp)]     = 0
+#   r.yrs$cmpa[is.na(r.yrs$cmpa)] = 0
+#   r.yrs = within(r.yrs, {
+#     cp_cumsum    = ave(cp  , region_id, FUN=cumsum)
+#     cmpa_cumsum  = ave(cmpa, region_id, FUN=cumsum)
+#     pa_cumsum    = cp_cumsum + cmpa_cumsum
+#   })
 
   # get percent of total area that is protected for inland1km (cp) and offshore3nm (cmpa) per year
   # and calculate status score
-  r.yrs = merge(r.yrs, r, all.x=T); head(r.yrs)
-  r.yrs = within(r.yrs,{
-    pct_cp    = pmin(cp_cumsum   / area_inland1km   * 100, 100)
-    pct_cmpa  = pmin(cmpa_cumsum / area_offshore3nm * 100, 100)
-    prop_protected    = ( pmin(pct_cp / ref_pct_cp, 1) + pmin(pct_cmpa / ref_pct_cmpa, 1) ) / 2
-  })
-
-  # extract status based on specified year
-  r.status = r.yrs %>%
-    filter(year==status_year) %>%
-    select(region_id, status=prop_protected) %>%
-    mutate(status=status*100)
-  head(r.status)
+#   r.yrs = merge(r.yrs, r, all.x=T); head(r.yrs)
+#   r.yrs = within(r.yrs,{
+#     pct_cp    = pmin(cp_cumsum   / area_inland1km   * 100, 100)
+#     pct_cmpa  = pmin(cmpa_cumsum / area_offshore3nm * 100, 100)
+#     prop_protected    = ( pmin(pct_cp / ref_pct_cp, 1) + pmin(pct_cmpa / ref_pct_cmpa, 1) ) / 2
+#   })
+#
+#   # extract status based on specified year
+#   r.status = r.yrs %>%
+#     filter(year==status_year) %>%
+#     select(region_id, status=prop_protected) %>%
+#     mutate(status=status*100)
+#   head(r.status)
 
   # calculate trend
   r.trend = ddply(subset(r.yrs, year %in% trend_years), .(region_id), function(x){

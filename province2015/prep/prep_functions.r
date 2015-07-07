@@ -15,7 +15,7 @@ add_rgn_id = function(d, fld_name = 'rgn_ID') {
 
   ## fill missing regions as NAs --Julie come back here
   # if there are missing rgn_ids, fill with NAs
-  if (max(unique(dn$rgn_id)) != dim(lk_tbl)[1]){ # this won't work, will need a group_by here, or above
+  if ( max(unique(dn$rgn_id), na.rm=T) != dim(lk_tbl)[1] ){ # this won't work, will need a group_by here, or above
 
     if (!'year' %in% names(dn)) {
       dl = dn %>%
