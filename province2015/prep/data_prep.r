@@ -266,7 +266,8 @@ for (f_orig in eco_file_list) {
   dir_f = file.path(dir_chn_prep, "6.2_ECO")
   d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
 
-  dn = add_rgn_id(d, fld_name = "province")
+  dn = add_rgn_id(d, fld_name = "province") %>%
+  mutate(value = str_replace(value, ',',''))
 
   write_csv(dn, file.path(dir_f, f_orig))
   write_csv(dn, file.path(dir_layers, f_orig))
