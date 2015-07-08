@@ -1040,11 +1040,11 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 
 LIV_ECO = function(layers, subgoal){
 
-  # select data
-  lyrs = c(#'le_livjob',
-        'le_livwage',
-        'le_eco')
-  D =SelectLayersData(layers, lyrs); head(D); summary(D) # did not work, why? could it be because le_livjob has an extra column "datalayer"?
+#   # select data ---> TO check later
+#   lyrs = c('le_livjob',
+#         'le_livwage',
+#         'le_eco')
+#   D =SelectLayersData(layers, lyrs); head(D); summary(D) # did not work, why? could it be because le_livjob has an extra column "datalayer"?
      #   > head(D)
      #   NULL
 
@@ -1056,29 +1056,28 @@ LIV_ECO = function(layers, subgoal){
   # 2        3                                  beach placer industry     762 2008 le_livjob
   # 3        3                                  beach placer industry     812 2009 le_livjob
 
-  ## load data layers separately instead:
+  ## load data layers separately:
  jobs = layers$data[['le_livjob']] %>%
-   select(rgn_id, sector = datalayer, jobs = value, year) #head(jobs)
+   select(rgn_id, sector = datalayer, jobs = value, year); head(jobs)
 
  wage = layers$data[['le_livwage']] %>%
-   select(rgn_id, wage = value, year) #head(wage)
+   select(rgn_id, wage = value, year); head(wage)
 
  income = layers$data[['le_eco']] %>%
-   select(rgn_id, income = value, year) #head(income)
+   select(rgn_id, income = value, year); head(income)
 
   # China model:
   # xLIV = ( sum(jobs) / sum(jobs_ref) + wage / wage_ref) /2
   # xECO = income / income_ref
   # xLE = (xLIV + xECO)/2
 
- # LIV status calculation
+ # current LIV status:
 
- # find reference points: from model description: the maximum quantity in each category has been
- # used as the reference point --> across all regions, or within each region?
- # for cross-region maximums:
+ # find reference points: "from model description: the maximum quantity in each category has been
+ # used as the reference point". cross-region maximums:
   jobs_score = jobs %>%
    group_by(sector) %>%
-   mutate(jobs_ref = max(jobs)) %>% #find reference for each industry, across all regions and all years (2007-2011)
+   mutate(jobs_ref = max(jobs)) %>% #find reference point for each industry, across all regions and all years (2007-2011)
    ungroup() %>%
    group_by(rgn_id, year) %>%
    summarize(jobs_score = sum(jobs)/sum(jobs_ref)); head(jobs_score)
@@ -1087,10 +1086,12 @@ LIV_ECO = function(layers, subgoal){
  mutate(wage_ref = max(wage),
         wage_score = wage/wage_ref)
 
- xLIV = full_join(jobs_score,
+ xLIV_all_years = full_join(jobs_score,
                   select(wage_score, rgn_id, year, wage_score)) %>%
-   mutate(xLIV = (jobs_score + wage_score)/2 ) %>%
-   filter(year == 2011) ; head(xLIV)
+                  mutate(xLIV = (jobs_score + wage_score)/2 )
+
+ xLIV = xLIV_all_years %>%
+   filter(year == 2011) ; head(xLIV) # pull out the most recent year's LIV status
 
 #     rgn_id year jobs_score wage_score      xLIV
 #  1      1 2011  0.3878582  0.5509561 0.4694071
@@ -1101,26 +1102,69 @@ LIV_ECO = function(layers, subgoal){
 #  6      6 2011  0.2523145  1.0000000 0.6261573
 
   # ECO status calculation
+xECO_all_years = income %>%
+  mutate (eco_ref = max(income),
+          xECO = income/eco_ref); head(xECO_all_years)
 
-xECO = income %>%
-  mutate (eco_ref = max(as.numeric(income[,2]))) #did not work:
+xECO = xECO_all_years %>%
+  filter(year == 2010); head(xECO)
 
-# 1st try: mutate (eco_ref = max(income))
-# Error in Summary.factor(c(4L, 7L, 10L, 18L, 2L, 3L, 44L, 1L, 5L, 8L, 12L,  :
-#                             ‘max’ not meaningful for factors
+  # current xLE status calculation:
+  # xLIV: 2011; xECO: 2010. Use these two scores for now; or should we use 2010 data only?
+xLE =  xLIV %>%
+  select(rgn_id, xLIV) %>%
+  left_join(select(xECO, rgn_id, xECO)) %>% #join xLIV and xECO
+  mutate(score = min(100, (xLIV + xECO)/2*100)) %>% #calculate LE status score
+  #format
+  select(region_id = rgn_id,
+         score) %>%
+  mutate(dimension = 'status',
+         goal = "LIV"); head(xLE)
 
-# 2nd try:  mutate (eco_ref = max( as.numeric(income[,2])))
-# Error in `[.default`(c(4L, 7L, 10L, 18L, 2L, 3L, 44L, 1L, 5L, 8L, 12L,  :
-#                          incorrect number of dimensions
+#   rgn_id      xLIV      xECO       xLE
+# 1      1 0.4694071 0.3173849 0.3933960
+# 2      2 0.2934375 0.1396828 0.2165602
+# 3      3 0.4784660 0.3660782 0.4222721
+# 4      4 0.6101937 0.8571307 0.7336622
+# 5      5 0.4671492 0.4302192 0.4486842
+# 6      6 0.6261573 0.6329888 0.6295731
 
+ # trend calculation (2007-2010)
+ # calculate status (xLE) of each year, then a linear model on status
 
+xLE_all_years = xLIV_all_years %>%
+                select(rgn_id, year, xLIV) %>%
+                filter(year < 2011) %>% #select only 2007:2010, b/c no xECO in 2011
+                full_join(select(xECO_all_years, rgn_id, year, xECO)) %>%
+                mutate(xLE = (xLIV + xECO)/2*100); head(xLE_all_years); summary(xLE_all_years)
 
+# LIV trend
+# From SOM p. 29: trend was calculated as the slope in the individual sector values (not summed sectors)
+# over the most recent five years...
+# with the average weighted by the number of jobs in each sector
+# ... averaging slopes across sectors weighted by the revenue in each sector
 
+LE_trend = xLE_all_years %>%
+  #group_by(rgn_id) %>%
+  filter(rgn_id == 1) %>%
+  do(mdl = lm(xLE ~ year, data=.)) %>%
+  summarize(rgn_id    = rgn_id,
+            dimension = 'trend',
+            score = coef(mdl)[['year']] * 4)
+            #score     = max(-1, min(1, coef(mdl)[['year']] * 4)))
+stopifnot(min(LE_trend$score) >= -1, max(LE_trend$score) <= 1); head(LE_trend) #did not work...
 
+#   rgn_id dimension score
+# 1      1     trend     1
+# 2      2     trend     1
+# 3      3     trend     1
+# 4      4     trend     1
+# 5      5     trend     1
+# 6      6     trend     1
 
-
-
-
+#calculated for only region 1, score too high:
+#   rgn_id dimension    score
+# 1      1     trend 12.50322
 
 
 
