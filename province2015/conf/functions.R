@@ -496,9 +496,6 @@ NP <- function(layers){
     filter(!is.na(status)) %>% # 1/0 produces NaN
     ungroup()
 
-  # Question for OHI-China team:
-  # 2. Should the np_weight be based on production value? What do these weights mean?
-
   ### get current status
   np_status_current <- np_status_all %>%
     filter(year == max(year) & !is.na(status)) %>%
@@ -684,10 +681,10 @@ CP = function(layers){
 # 2          2 50.00000    status   CP
 # 3          3 50.00000    status   CP
 
-# Trend (same as CS trend)
+# Trend
 r.trend = m %>%
   group_by(rgn_id) %>%
-  summarize(trend_raw = sum(extent * trend) / sum(extent),
+  summarize(trend_raw = sum(weight * extent * trend) / (sum(extent) * max(weight)),
             score = max(min(trend_raw, 1), -1)*100,
             dimension = 'trend',
             goal = 'CP') %>%
@@ -809,8 +806,6 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 #   2      1 2009 4223.38 2000000       2111.69         1661.90           1662.90 3.22      6.76 47.63
 #   3      1 2010 5503.80 2000000       2751.90         2165.75           2166.75 3.34      6.76 49.33
 #   4      1 2011 6775.49 2000000       3387.74         2666.16           2667.16 3.43      6.76 50.66
-#   5      2 2008  568.93  129300       4400.08         3462.86           3463.86 3.54      6.76 52.34
-#   6      2 2009  630.67  129300       4877.57         3838.65           3839.65 3.58      6.76 53.00
 
  # current TR status
 r.status = d %>%
@@ -822,30 +817,31 @@ r.status = d %>%
           dimension,
           score = xTR); head(r.status)
 
- # Trend
+ # Trend: 4 years of data, 3 intervals
 r.trend = d %>%
-  arrange(year, rgn_id) %>%
   group_by(rgn_id) %>%
-  do(dml = lm(xTR ~ year, data = d)) %>%
-  do(data.frame(
-    rgn_id = d$rgn_id,
+  do(dml = lm(xTR ~ year, data =.)) %>%
+  summarize(
+    region_id = rgn_id,
     dimension = 'trend',
     goal = 'TR',
-    #score = max(min(coef(.$dml)[['year']] * 5, 1), -1))) #didn't work...
-    score = coef(.$dml)[['year']]*4)) ### did not work either.... see below:
+    score = max(min(coef(dml)[['year']] * 3, 1), -1)*100)
 
-#     rgn_id dimension goal score
-# 1       1     trend   TR 2.152
-# 2       1     trend   TR 2.152
-# 3       1     trend   TR 2.152
-# 4       1     trend   TR 2.152
-# 5       2     trend   TR 2.152
-# 6       2     trend   TR 2.152
-# 7       2     trend   TR 2.152
-# 8       2     trend   TR 2.152
-# 9       3     trend   TR 2.152
-# 10      3     trend   TR 2.152
+#     region_id dimension goal  score
+# 1          1     trend   TR   76.2
+# 2          2     trend   TR  100.0
+# 3          3     trend   TR  100.0
+# 4          4     trend   TR  100.0
+# 5          5     trend   TR  100.0
+# 6          6     trend   TR  100.0
+# 7          7     trend   TR  100.0
+# 8          8     trend   TR  100.0
+# 9          9     trend   TR -100.0
+# 10        10     trend   TR  100.0
+# 11        11     trend   TR  100.0
 
+scores_TR = rbind(r.status, r.trend)
+return(scores_TR)
 
   ######################### gl2014 model############################
   # formula:
@@ -1185,9 +1181,7 @@ xLE =  xLIV %>%
 # 1      1 0.4694071 0.3173849 0.3933960
 # 2      2 0.2934375 0.1396828 0.2165602
 # 3      3 0.4784660 0.3660782 0.4222721
-# 4      4 0.6101937 0.8571307 0.7336622
-# 5      5 0.4671492 0.4302192 0.4486842
-# 6      6 0.6261573 0.6329888 0.6295731
+
 
  # trend calculation (2007-2010)
  # calculate status (xLE) of each year, then a linear model on status
