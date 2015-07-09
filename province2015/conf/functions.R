@@ -496,9 +496,6 @@ NP <- function(layers){
     filter(!is.na(status)) %>% # 1/0 produces NaN
     ungroup()
 
-  # Question for OHI-China team:
-  # 2. Should the np_weight be based on production value? What do these weights mean?
-
   ### get current status
   np_status_current <- np_status_all %>%
     filter(year == max(year) & !is.na(status)) %>%
@@ -635,7 +632,9 @@ CS = function(layers){
 
 CP = function(layers){
 
-  # select data, combine cp_condition and cs_extent (ie. most rencent year)
+  # select data, combine cp_condition, cs_extent_maxyr (ie. most rencent year. but not the same year for
+  # all regions and habitats ), and cs_extent_trend for trend calculation b/c there were very few and uneven years
+  #of data for each region
 
   m = layers$data[['cp_condition']] %>%
     select(rgn_id,
@@ -644,7 +643,10 @@ CP = function(layers){
     full_join(layers$data[['cs_extent']] %>%
                 select(-layer,
                        -year,
-                       extent = hectare) ) #join by rgn_id, habitat
+                       extent = hectare) ) %>% #join by rgn_id, habitat
+    full_join(layers$data[['cs_extent_trend']] %>%
+                select(-layer,
+                       trend = trend.score))
 
   # add habitat weight
   habitat.wt = c('saltmarshes' = 3,
@@ -653,31 +655,52 @@ CP = function(layers){
   m = m %>%
     mutate(weight = habitat.wt[habitat])
 
-#       rgn_id     habitat condition     extent weight
-#   1       1 saltmarshes       0.5 1188600.00      4
-#   2       2 saltmarshes       0.5   81551.00      4
-#   3       3 saltmarshes       0.5   76840.00      4
-#   4       4 saltmarshes       0.5  721275.00      4
-#   5       5 saltmarshes       0.5  363979.00      4
-#   6       6 saltmarshes       0.5   18314.80      4
-#   7       7 saltmarshes       0.5  164270.00      4
+#     rgn_id     habitat condition    extent    trend weight
+#   1      1 saltmarshes       0.5 1188600.0     -0.1      4
+#   2      2 saltmarshes       0.5   81551.0     -0.1      4
+#   3      3 saltmarshes       0.5   76840.0     -0.1      4
+#   4      4 saltmarshes       0.5  721275.0     -0.1      4
+#   5      5 saltmarshes       0.5  363979.0     -0.1      4
+#   6      6 saltmarshes       0.5   18314.8 -79960.2      4
 
 
-  # Calculate CP status based on the most recent year's data
+  # Current CP status
   # China model:
   # x = sum [ (Cc / Cr)  * (Wk / Wmax) * (Ak / Atotal) ]
   # x = sum [condition   * (Wk / Wmax) * (Extent_k / Total_extent))]
 
-  xCP = m %>%
+  r.status = m %>%
     group_by(rgn_id) %>%
-    mutate(total_extent = sum(extent)) %>%
-    ungroup() %>%
-    mutate(hab_score = condition * weight/4 * extent/total_extent,
-           rgn_score = sum(hab_score)) %>%
-    arrange(rgn_id)
+    summarize(score = pmin(1, sum(condition* weight/4*extent/sum(extent)) ) * 100,
+              dimension ='status',
+              goal = 'CP') %>%
+    rename(region_id = rgn_id) ; head(r.status)
 
-#ToDO: calculate xCP for each year, and trend
+#    region_id    score dimension goal
+# 1          1 49.99748    status   CP
+# 2          2 50.00000    status   CP
+# 3          3 50.00000    status   CP
 
+# Trend
+r.trend = m %>%
+  group_by(rgn_id) %>%
+  summarize(trend_raw = sum(weight * extent * trend) / (sum(extent) * max(weight)),
+            score = max(min(trend_raw, 1), -1)*100,
+            dimension = 'trend',
+            goal = 'CP') %>%
+  select(region_id = rgn_id,
+         score,
+         dimension,
+         goal) ; head(r.trend)
+#    region_id       score dimension goal
+# 1          1   -9.999159     trend   CP
+# 2          2  -10.000000     trend   CP
+# 3          3  -10.000000     trend   CP
+
+#combine status and trend
+scores_CP = rbind(r.status, r.trend)
+
+return(scores_CP)
 
 #################### below are the gl2014 codes #############################
 
@@ -762,7 +785,7 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 
   #library(dplyr)
   #library(tidyr)
-  # merge tourist + area into one frame
+  # Select data; calculate status score for each year in each region
   S = 0.787
   d = layers$data[['tr_tourist']] %>%
     left_join(layers$data[["tr_marinearea"]], by="rgn_id") %>%
@@ -775,17 +798,50 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
            tour_per_area_S_1 = tour_per_area_S +1,
            log = log10(tour_per_area_S_1),
            ref_point = max(log), #assume ref point is maximum log(tour_per_area_S)
-           xTR = log/ref_point); head(d); summary(d) ## really strange outcome. are the log supposed to be status score?
+           xTR = log/ref_point*100) %>%
+    round(2); head(d); summary(d)
 
-#       rgn_id year tourist    area tour_per_area tour_per_area_S tour_per_area_S_1      log ref_point       xTR
-#   1      1 2008 6487.79 2000000      3243.895        2552.945          2553.945 3.407212  6.762775 0.5038186
-#   2      1 2009 4223.38 2000000      2111.690        1661.900          1662.900 3.220866  6.762775 0.4762640
-#   3      1 2010 5503.80 2000000      2751.900        2165.745          2166.745 3.335808  6.762775 0.4932602
-#   4      1 2011 6775.49 2000000      3387.745        2666.155          2667.155 3.426048  6.762775 0.5066039
-#   5      2 2008  568.93  129300      4400.077        3462.861          3463.861 3.539560  6.762775 0.5233888
-#   6      2 2009  630.67  129300      4877.572        3838.649          3839.649 3.584292  6.762775 0.5300031
+#     rgn_id year tourist    area tour_per_area tour_per_area_S tour_per_area_S_1  log ref_point   xTR
+#   1      1 2008 6487.79 2000000       3243.89         2552.95           2553.95 3.41      6.76 50.38
+#   2      1 2009 4223.38 2000000       2111.69         1661.90           1662.90 3.22      6.76 47.63
+#   3      1 2010 5503.80 2000000       2751.90         2165.75           2166.75 3.34      6.76 49.33
+#   4      1 2011 6775.49 2000000       3387.74         2666.16           2667.16 3.43      6.76 50.66
 
-# TODO: add dimension, calculate trend (4 years)
+ # current TR status
+r.status = d %>%
+  filter(year == 2011) %>%
+   mutate(goal = 'TR',
+         dimension = 'status') %>%   #format
+   select(region_id = rgn_id,
+          goal,
+          dimension,
+          score = xTR); head(r.status)
+
+ # Trend: 4 years of data, 3 intervals
+r.trend = d %>%
+  group_by(rgn_id) %>%
+  do(dml = lm(xTR ~ year, data =.)) %>%
+  summarize(
+    region_id = rgn_id,
+    dimension = 'trend',
+    goal = 'TR',
+    score = max(min(coef(dml)[['year']] * 3, 1), -1)*100)
+
+#     region_id dimension goal  score
+# 1          1     trend   TR   76.2
+# 2          2     trend   TR  100.0
+# 3          3     trend   TR  100.0
+# 4          4     trend   TR  100.0
+# 5          5     trend   TR  100.0
+# 6          6     trend   TR  100.0
+# 7          7     trend   TR  100.0
+# 8          8     trend   TR  100.0
+# 9          9     trend   TR -100.0
+# 10        10     trend   TR  100.0
+# 11        11     trend   TR  100.0
+
+scores_TR = rbind(r.status, r.trend)
+return(scores_TR)
 
   ######################### gl2014 model############################
   # formula:
@@ -1125,9 +1181,7 @@ xLE =  xLIV %>%
 # 1      1 0.4694071 0.3173849 0.3933960
 # 2      2 0.2934375 0.1396828 0.2165602
 # 3      3 0.4784660 0.3660782 0.4222721
-# 4      4 0.6101937 0.8571307 0.7336622
-# 5      5 0.4671492 0.4302192 0.4486842
-# 6      6 0.6261573 0.6329888 0.6295731
+
 
  # trend calculation (2007-2010)
  # calculate status (xLE) of each year, then a linear model on status
