@@ -797,7 +797,7 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
            tour_per_area_S = tour_per_area * S,
            tour_per_area_S_1 = tour_per_area_S +1,
            log = log10(tour_per_area_S_1),
-           ref_point = max(log), #assume ref point is maximum log(tour_per_area_S)
+           ref_point = max(log), #assume ref point is maximum log(tour_per_area_S_1)
            xTR = log/ref_point*100) %>%
     round(2); head(d); summary(d)
 
@@ -821,11 +821,10 @@ r.status = d %>%
 r.trend = d %>%
   group_by(rgn_id) %>%
   do(dml = lm(xTR ~ year, data =.)) %>%
-  summarize(
-    region_id = rgn_id,
-    dimension = 'trend',
-    goal = 'TR',
-    score = max(min(coef(dml)[['year']] * 3, 1), -1)*100)
+  summarize(region_id = rgn_id,
+            dimension = 'trend',
+            goal = 'TR',
+            score = max(min(coef(dml)[['year']] * 3, 1), -1)*100)
 
 #     region_id dimension goal  score
 # 1          1     trend   TR   76.2
@@ -1096,23 +1095,8 @@ return(scores_TR)
 
 LIV_ECO = function(layers, subgoal){
 
-#   # select data ---> TO check later
-#   lyrs = c('le_livjob',
-#         'le_livwage',
-#         'le_eco')
-#   D =SelectLayersData(layers, lyrs); head(D); summary(D) # did not work, why? could it be because le_livjob has an extra column "datalayer"?
-     #   > head(D)
-     #   NULL
+# select data
 
-  ## but it works to load the individual data set.
-
-  # > layers$data[['le_livjob']]
-  # rgn_id                                              datalayer   value year     layer
-  # 1        3                                  beach placer industry     762 2007 le_livjob
-  # 2        3                                  beach placer industry     762 2008 le_livjob
-  # 3        3                                  beach placer industry     812 2009 le_livjob
-
-  ## load data layers separately:
  jobs = layers$data[['le_livjob']] %>%
    select(rgn_id, sector = datalayer, jobs = value, year); head(jobs)
 
@@ -1127,9 +1111,9 @@ LIV_ECO = function(layers, subgoal){
   # xECO = income / income_ref
   # xLE = (xLIV + xECO)/2
 
- # current LIV status:
+ #### LIV status:
 
- # find reference points: "from model description: the maximum quantity in each category has been
+ # reference points: "from model description: the maximum quantity in each category has been
  # used as the reference point". cross-region maximums:
   jobs_score = jobs %>%
    group_by(sector) %>%
@@ -1144,46 +1128,42 @@ LIV_ECO = function(layers, subgoal){
 
  xLIV_all_years = full_join(jobs_score,
                   select(wage_score, rgn_id, year, wage_score)) %>%
-                  mutate(xLIV = (jobs_score + wage_score)/2 )
+                  mutate(xLIV = (jobs_score + wage_score)/2*100 )
 
- xLIV = xLIV_all_years %>%
-   filter(year == 2011) ; head(xLIV) # pull out the most recent year's LIV status
+ LIV.status = xLIV_all_years %>%
+   filter(year == 2011) %>% # pull out the most recent year's LIV status
+   select(region_id = rgn_id,
+          score = xLIV) %>%
+   mutate(dimension = 'status',
+          goal = 'LIV')
 
-#     rgn_id year jobs_score wage_score      xLIV
-#  1      1 2011  0.3878582  0.5509561 0.4694071
-#  2      2 2011  0.1148219  0.4720532 0.2934375
-#  3      3 2011  0.2105070  0.7464249 0.4784660
-#  4      4 2011  0.6331043  0.5872831 0.6101937
-#  5      5 2011  0.2313507  0.7029477 0.4671492
-#  6      6 2011  0.2523145  1.0000000 0.6261573
+#      region_id    score dimension goal
+#  1          1 46.94071    status  LIV
+#  2          2 29.34375    status  LIV
+#  3          3 47.84660    status  LIV
 
-  # ECO status calculation
+  ### ECO status calculation
 xECO_all_years = income %>%
   mutate (eco_ref = max(income),
-          xECO = income/eco_ref); head(xECO_all_years)
+          xECO = income/eco_ref*100); head(xECO_all_years)
 
-xECO = xECO_all_years %>%
-  filter(year == 2010); head(xECO)
-
-  # current xLE status calculation:
-  # xLIV: 2011; xECO: 2010. Use these two scores for now; or should we use 2010 data only?
-xLE =  xLIV %>%
-  select(rgn_id, xLIV) %>%
-  left_join(select(xECO, rgn_id, xECO)) %>% #join xLIV and xECO
-  mutate(score = min(100, (xLIV + xECO)/2*100)) %>% #calculate LE status score
-  #format
+ECO.status = xECO_all_years %>%
+  filter(year == 2010) %>%
   select(region_id = rgn_id,
-         score) %>%
+         score = xECO) %>%
   mutate(dimension = 'status',
-         goal = "LIV"); head(xLE)
+         goal = 'ECO')  %>%
+  arrange(region_id)
 
-#   rgn_id      xLIV      xECO       xLE
-# 1      1 0.4694071 0.3173849 0.3933960
-# 2      2 0.2934375 0.1396828 0.2165602
-# 3      3 0.4784660 0.3660782 0.4222721
+#    region_id      score dimension goal
+# 1          1  31.738493    status  ECO
+# 2          2  13.968281    status  ECO
+# 3          3  36.607824    status  ECO
 
 
- # trend calculation (2007-2010)
+
+
+ # trend calculation (2007-2010): RE-DO needed
  # calculate status (xLE) of each year, then a linear model on status
 
 xLE_all_years = xLIV_all_years %>%
@@ -1466,7 +1446,18 @@ stopifnot(min(LE_trend$score) >= -1, max(LE_trend$score) <= 1); head(LE_trend) #
 
 
 LE = function(scores, layers){
+ ##need to work out after LE and ECO trend are calculated
+  r.status =  xLIV %>%
+    select(rgn_id, xLIV) %>%
+    left_join(select(xECO, rgn_id, xECO)) %>% #join xLIV and xECO
+    mutate(score = min(100, (xLIV + xECO)/2)) %>% #calculate LE status score
+    #format
+    select(region_id = rgn_id,
+           score) %>%
+    mutate(dimension = 'status',
+           goal = "LIV"); head(r.status)
 
+  ###################### gl2014 model ###########################
   # calculate LE scores
   scores.LE = scores %.%
     filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %.%
@@ -1531,6 +1522,9 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
 
   lyrs = list('lsp_cmpa',
               'lsp_marinearea')
+  d=SelectLayersData(layers, lyrs) ## didn't work, why?
+#   > d
+#   NULL
 
   # cast data ----
   cmpa = SelectLayersData(layers, layers='lsp_cmpa')
@@ -1548,28 +1542,48 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
   # Calculate status of each year in each province
   d = cmpa %>%
     left_join(marinearea)%>% #head(d)
-    mutate(reference = marinearea*0.3)%>%
+    mutate(reference = marinearea*0.3)%>% # 30% of jurisdictional marine area
     mutate(pct_cmpa = cmpa/marinearea*100)%>%
     mutate(status = pmin(pct_cmpa/30 *100, 100))
 
- # select status: year = 2012
-  status = filter(d, year == 2012)%>%
-   select(rgn_id, status)
+ # Current status: year = 2012
+  r.status = filter(d, year == 2012)%>%
+   mutate(dimension = 'status',
+          goal = "LSP") %>%
+   select(region_id = rgn_id,
+          score = status,
+          dimension,
+          goal) ; head(r.status)
 
- # calculate trend: not working. lm wrong: example: rgn 7: 12-14 --> coefficient too large
-  #  coef(lm(pct_cmpa ~ year, data=D))
-  #  (Intercept)          year
-  #  -1165.6904933     0.5864533
+#     region_id      score dimension goal
+#  1          1   4.275067    status  LSP
+#  2          2  30.852024    status  LSP
+#  3          3   5.959905    status  LSP
+#  4          4   4.595564    status  LSP
+#  5          5   3.440244    status  LSP
+#  6          6  31.273667    status  LSP
 
-  rgn_id = c(1:11)
+ #trend (2009 - 20112)
+ r.trend = d %>%
+   group_by(rgn_id) %>%
+   do(dlm = lm(status ~ year, data=.)) %>%
+   summarize(region_id = rgn_id,
+             score = max(min(coef(dml)[['year']]*3, 1) -1) *100,
+             dimension = 'trend',
+             goal = 'LSP') ; head(r.trend) # all 0's
 
- for (i in 1:11) {
-   D = filter(d, rgn_id == i)
-   trend = min(1, max(0, 4 * coef(lm(pct_cmpa ~ year, data=D))[['year']]))
-   trend2 = data.frame(rgn_id, trend)
-   return(trend2)
- } ## 0 for all provinces, eventhough for region 4,5, 7, and 8 show slight increase in cmpa; it is a rounding issue.
+#     region_id score dimension goal
+# 1          1     0     trend  LSP
+# 2          2     0     trend  LSP
+# 3          3     0     trend  LSP
+# 4          4     0     trend  LSP
+# 5          5     0     trend  LSP
+# 6          6     0     trend  LSP
 
+scores_LSP = rbind(r.status, r.trend)
+return(scores_LSP)
+
+############################ gl2014 model ######################################
 
 #   r  = rename(dcast(d, id_num ~ layer, value.var='val_num', subset = .(layer %in% names(lyrs[['r']]))),
 #               c('id_num'='region_id', lyrs[['r']]))
