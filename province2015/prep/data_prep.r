@@ -220,6 +220,10 @@ for (f_orig in ico_file_list) {
   d = rename(d, rgn_id = region_id); head(d)
   }
 
+  #to remove NA columns: count of NA in a column does not equal to the number of rows.
+  #there may be a better way to do this
+  d = d[, colSums(is.na(d)) !=nrow(d)]
+
   f_new = str_replace(f_orig, "6H_", "")
 
   write_csv(d, file.path(dir_f, f_new))

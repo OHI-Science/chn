@@ -66,6 +66,7 @@ Data sources:
 "HAB CS CP","cs_extent_trend","Area trend","Trend of area of each habitat in each province","trend.score","trend score","cs_extent_chn2015_HHM_trend.csv","rgn_id",,"habitat",,"trend.score",,TRUE,,,-79960.2,12535,FALSE,,,,11,FALSE
 "CP","cp_condition","Condition","Ratio of current status and reference status for each habitat","value","value","cp_condition_chn2015_zb.csv","rgn_id",,"habitat",,"value",,TRUE,,,0.45,0.8,TRUE,,,,11,FALSE
 "CP","cp_extent","Extent","Total area of habitats in each province ","Hectare","Hectare","cp_extent_chn2015_zb.csv","rgn_id",,"habitat","year","hectare",,TRUE,1997,2013,19.9,2513980,FALSE,,,,11,FALSE
+"ICO","ico_species","Species","Number of assessed species in threat category i","value","value","ico_species_chn2015_YWW.csv","rgn_id",,"category",,"value",,TRUE,,,1,10,FALSE,"x,x.1,x.2,x.3",,,11,FALSE
 "ICO","ico_spp_extinction_status","IUCN extinction risk category for iconic species","International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists
 
 Data sources:
