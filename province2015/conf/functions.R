@@ -1477,6 +1477,49 @@ LE = function(scores, layers){
 
 ICO = function(layers){
 
+  #cast data:
+  d = layers$data[['ico_species']] %>%
+    select(-layer) %>%
+    rename(count = value)
+
+  # lookup for weights status
+  w.risk_category = c('LC' = 0,
+                      'NT' = 0.2,
+                      'VU' = 0.4,
+                      'EN' = 0.6,
+                      'CR' = 0.8,
+                      'EX' = 1)
+  d = d %>%
+    mutate(risk.wt = w.risk_category[category]) ; head(d)
+
+#     rgn_id category count risk.wt
+#   1      1       VU     6     0.8
+#   2      1       NT     1     0.6
+#   3      1       LC     5     0.4
+#
+
+  #CHN model: xICO = sum(Si * Wi)/sum(Si)
+  #                = sum(count of species * weight.risk )/sum(count of species)
+
+  r.status = d %>%
+  mutate(count_wt = count * risk.wt) %>%
+  group_by(rgn_id) %>%
+  summarize(score = sum(count_wt)/sum(count)*100,
+            dimension = 'status',
+            goal = 'ICO') %>%
+  select(region_id = rgn_id, #format
+         score,
+         dimension,
+         goal)
+
+#   region_id    score dimension goal
+# 1          1 44.00000    status  ICO
+# 2          2 48.57143    status  ICO
+# 3          3 41.66667    status  ICO
+
+# Trend: can't calcuate yet b/c we don't have time series data: to ask CHN team
+
+######################## gl2014 model #################################
   # layers
   lyrs = c('ico_spp_extinction_status' = 'risk_category',
            'ico_spp_popn_trend'        = 'popn_trend')
