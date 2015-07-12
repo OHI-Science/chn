@@ -1563,11 +1563,9 @@ ICO = function(layers){
 
 LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years){
 
-  lyrs = list('lsp_cmpa',
-              'lsp_marinearea')
-  d=SelectLayersData(layers, lyrs) ## didn't work, why?
-#   > d
-#   NULL
+  #CHN model:
+  # xLSP = %cmpa / reference%
+  #      = (cmpa/total_marine_area) / 30%
 
   # cast data ----
   cmpa = SelectLayersData(layers, layers='lsp_cmpa')
