@@ -1748,6 +1748,58 @@ CW = function(layers){
 
 HAB = function(layers){
 
+  #cast data
+  lyrs = c('cs_condition',
+           'cs_extent',
+           'cs_extent_trend')
+
+  d = SelectLayersData(layers, layers = lyrs) %>%
+    select(region_id = id_num,
+           layer,
+           habitat = category,
+           val_num) %>%
+    tidyr::spread(layer, val_num) %>%   #spread(key=variable to become the column headings, value=data)
+    dplyr::rename(condition    = cs_condition,
+                  extent       = cs_extent,
+                  extent_trend = cs_extent_trend) ; head(d)
+
+  # status = 1/3(Csg + Csm + Cmg)
+  r.status = d %>%
+    group_by(region_id) %>%
+    summarize(score = mean(condition) * 100,
+              dimension = 'status',
+              goal = ' HAB') %>%
+    select(region_id,
+           score,
+           dimension,
+           goal) ; head(r.status)
+
+  #   region_id score dimension goal
+  # 1         1    80    status  HAB
+  # 2         2    80    status  HAB
+  # 3         3    80    status  HAB
+
+  # trend = sum(extent * extent_trend) / sum(extent)
+  r.trend = d %>%
+    group_by(region_id) %>%
+    summarize(trend_raw = sum(extent * extent_trend) / sum(extent),
+              score = max(min(trend_raw, 1), -1) * 100,
+              dimension = 'trend',
+              goal = 'HAB') %>%
+    select(region_id,
+           score,
+           dimension,
+           goal) ; head(r.trend)
+
+  #   region_id       score dimension goal
+  # 1         1   -9.999159     trend  HAB
+  # 2         2  -10.000000     trend  HAB
+  # 3         3  -10.000000     trend  HAB
+
+  scores_HAB = cbind(r.status, r.trend)
+  return(scores_HAB)
+
+  ############################## gl2014 model ##################################
   # get layer data
   d =
     join_all(
