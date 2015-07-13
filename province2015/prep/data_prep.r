@@ -277,3 +277,21 @@ for (f_orig in eco_file_list) {
   write_csv(dn, file.path(dir_layers, f_orig))
 }
 
+
+# SPP ----
+# testing by @jules32 July 13
+
+global_ico_trend = read.csv('~/github/ohiprep/globalprep/SpeciesDiversity/v2015/data/ico_trend.csv'); head(global_trend)
+china_spp = read.csv(file.path(dir_raw, 'spp_species_chn2015_LM.csv')); head(china_spp)
+
+d = china_spp %>%
+  rename(province_id = rgn_id,
+         sciname     = species_latin) %>%
+  filter(IUCN_class != '') %>%
+  semi_join(global_ico_trend, by='sciname'); head(d) # semi-join keeps all rows in A that have a match in B
+
+# Only 3 matches with the ICO list
+# province_id                    sciname                    species_common CHN_class IUCN_class value
+#          LN Balaenoptera acutorostrata                Common Minke Whale         2         LC   0.0
+#          LN      Balaenoptera borealis                         Sei Whale         2         EN   0.6
+#          ZJ        Lagenodelphis hosei Fraser's Dolphin, Sarawak Dolphin         2         VU   0.4
