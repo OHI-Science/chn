@@ -824,20 +824,7 @@ r.trend = d %>%
   summarize(region_id = rgn_id,
             dimension = 'trend',
             goal = 'TR',
-            score = max(min(coef(dml)[['year']] * 3, 1), -1)*100)
-
-#     region_id dimension goal  score
-# 1          1     trend   TR   76.2
-# 2          2     trend   TR  100.0
-# 3          3     trend   TR  100.0
-# 4          4     trend   TR  100.0
-# 5          5     trend   TR  100.0
-# 6          6     trend   TR  100.0
-# 7          7     trend   TR  100.0
-# 8          8     trend   TR  100.0
-# 9          9     trend   TR -100.0
-# 10        10     trend   TR  100.0
-# 11        11     trend   TR  100.0
+            score = max(min(coef(dml)[['year']] * 3, 1), -1))
 
 scores_TR = rbind(r.status, r.trend)
 return(scores_TR)
@@ -1111,9 +1098,9 @@ LIV_ECO = function(layers, subgoal){
   # xECO = income / income_ref
   # xLE = (xLIV + xECO)/2
 
- #### LIV status:
+ #LIV status:
 
- # reference points: "from model description: the maximum quantity in each category has been
+ # calculate job and wage score. find reference points: "from model description: the maximum quantity in each category has been
  # used as the reference point". cross-region maximums:
   jobs_score = jobs %>%
    group_by(sector) %>%
@@ -1126,10 +1113,10 @@ LIV_ECO = function(layers, subgoal){
  mutate(wage_ref = max(wage),
         wage_score = wage/wage_ref)
 
- xLIV_all_years = full_join(jobs_score,
+ xLIV_all_years = full_join(jobs_score, #calculate status scores for each year
                   select(wage_score, rgn_id, year, wage_score)) %>%
                   mutate(xLIV = (jobs_score + wage_score)/2*100 )
-
+ # current status
  LIV.status = xLIV_all_years %>%
    filter(year == 2011) %>% # pull out the most recent year's LIV status
    select(region_id = rgn_id,
@@ -1142,7 +1129,64 @@ LIV_ECO = function(layers, subgoal){
 #  2          2 29.34375    status  LIV
 #  3          3 47.84660    status  LIV
 
-  ### ECO status calculation
+# LIV trend
+# From SOM p. 29: trend was calculated as the slope in the individual sector values (not summed sectors)
+# over the most recent five years...
+# with the average weighted by the number of jobs in each sector
+# ... averaging slopes across sectors weighted by the revenue in each sector
+
+LIV.trend = left_join(jobs, wage) %>%
+  # get sector weight as total jobs across years for given region
+  arrange(rgn_id, year, sector) %>%
+  group_by(rgn_id, sector) %>%
+  mutate(
+    weight = sum(jobs, na.rm=T)) %>% #head(liv_trend)
+  # reshape into jobs and wages columns into single metric to get slope of both with one do() call
+  reshape2::melt(id=c('rgn_id','year','sector','weight'), variable='metric', value.name='value') %>%
+  mutate(
+    sector = as.character(sector),
+    metric = as.character(metric)) %>%
+  # get linear model coefficient per metric
+  group_by(metric, rgn_id, sector, weight) %>%
+  do(mdl = lm(value ~ year, data=.)) %>%
+  summarize(
+    metric = metric,
+    weight = weight,
+    rgn_id = rgn_id,
+    sector = sector,
+    sector_trend = pmax(-1, pmin(1, coef(mdl)[['year']] * 4))) %>% # 2007 - 2011: 4 intervals
+  arrange(rgn_id, metric, sector) %>%
+  # get weighted mean across sectors per region-metric
+  group_by(metric, rgn_id) %>%
+  summarize(
+    metric_trend = weighted.mean(sector_trend, weight, na.rm=T)) %>%
+  # get mean trend across metrics (jobs, wages) per region
+  group_by(rgn_id) %>%
+  summarize(
+    score = mean(metric_trend, na.rm=T)) %>%
+  # format
+  mutate(
+    goal      = 'LIV',
+    dimension = 'trend') %>%
+  select(region_id = rgn_id,
+         score,
+         dimension,
+         goal)
+
+#     region_id score dimension goal
+# 1          1     1     trend  LIV
+# 2          2     1     trend  LIV
+# 3          3     1     trend  LIV
+# 4          4     1     trend  LIV
+# 5          5     1     trend  LIV
+# 6          6     1     trend  LIV
+# 7          7     1     trend  LIV
+# 8          8     1     trend  LIV
+# 9          9     1     trend  LIV
+# 10        10     1     trend  LIV
+# 11        11     1     trend  LIV
+
+# ECO status calculation
 xECO_all_years = income %>%
   mutate (eco_ref = max(income),
           xECO = income/eco_ref*100); head(xECO_all_years)
@@ -1160,47 +1204,31 @@ ECO.status = xECO_all_years %>%
 # 2          2  13.968281    status  ECO
 # 3          3  36.607824    status  ECO
 
+# ECO trend
 
-
-
- # trend calculation (2007-2010): RE-DO needed
- # calculate status (xLE) of each year, then a linear model on status
-
-xLE_all_years = xLIV_all_years %>%
-                select(rgn_id, year, xLIV) %>%
-                filter(year < 2011) %>% #select only 2007:2010, b/c no xECO in 2011
-                full_join(select(xECO_all_years, rgn_id, year, xECO)) %>%
-                mutate(xLE = (xLIV + xECO)/2*100); head(xLE_all_years); summary(xLE_all_years)
-
-# LIV trend
-# From SOM p. 29: trend was calculated as the slope in the individual sector values (not summed sectors)
-# over the most recent five years...
-# with the average weighted by the number of jobs in each sector
-# ... averaging slopes across sectors weighted by the revenue in each sector
-
-LE_trend = xLE_all_years %>%
-  #group_by(rgn_id) %>%
-  filter(rgn_id == 1) %>%
-  do(mdl = lm(xLE ~ year, data=.)) %>%
-  summarize(rgn_id    = rgn_id,
+ECO.trend = xECO_all_years %>%
+  group_by(rgn_id) %>%
+  do(lmd = lm(xECO ~ year, data =.)) %>%
+  summarize(region_id = rgn_id,
+            score = pmax(pmin(coef(lmd)[['year']] *4, 1) ,-1),
             dimension = 'trend',
-            score = coef(mdl)[['year']] * 4)
-            #score     = max(-1, min(1, coef(mdl)[['year']] * 4)))
-stopifnot(min(LE_trend$score) >= -1, max(LE_trend$score) <= 1); head(LE_trend) #did not work...
+            goal = 'ECO')
 
-#   rgn_id dimension score
-# 1      1     trend     1
-# 2      2     trend     1
-# 3      3     trend     1
-# 4      4     trend     1
-# 5      5     trend     1
-# 6      6     trend     1
+#     region_id score dimension goal
+# 1          1     1     trend  ECO
+# 2          2    -1     trend  ECO
+# 3          3     1     trend  ECO
+# 4          4     1     trend  ECO
+# 5          5     1     trend  ECO
+# 6          6     1     trend  ECO
+# 7          7     1     trend  ECO
+# 8          8     1     trend  ECO
+# 9          9     1     trend  ECO
+# 10        10     1     trend  ECO
+# 11        11     1     trend  ECO
 
-#calculated for only region 1, score too high:
-#   rgn_id dimension    score
-# 1      1     trend 12.50322
-
-
+scores_LIV_ECO = rbind(LIV.status, LIV.trend, ECO.status, ECO.trend)
+return(scores_LIV_ECO)
 
   #################### gl2014 codes #########################
   ## read in all data:
@@ -1446,16 +1474,13 @@ stopifnot(min(LE_trend$score) >= -1, max(LE_trend$score) <= 1); head(LE_trend) #
 
 
 LE = function(scores, layers){
- ##need to work out after LE and ECO trend are calculated
-  r.status =  xLIV %>%
-    select(rgn_id, xLIV) %>%
-    left_join(select(xECO, rgn_id, xECO)) %>% #join xLIV and xECO
-    mutate(score = min(100, (xLIV + xECO)/2)) %>% #calculate LE status score
-    #format
-    select(region_id = rgn_id,
-           score) %>%
-    mutate(dimension = 'status',
-           goal = "LIV"); head(r.status)
+
+ r.status = scores_LIV_ECO %>%
+   spread(goal, score) %>%
+   mutate(score = rowMeans(cbind(ECO, LIV, na.rm=T))) %>%
+   select(region_id, score, dimension) %>%
+   mutate(goal = 'LE')
+
 
   ###################### gl2014 model ###########################
   # calculate LE scores
