@@ -257,6 +257,21 @@ for (f_orig in liv_file_list) {
   dir_f = file.path(dir_chn_prep, "6.1_LIV")
   d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
 
+  if(f_orig == "le_livjob_chn2015_zb.csv") {
+    d = d %>%
+    mutate(datalayer = str_replace_all(datalayer, "beach placer industry", 'beach_placer'),
+           datalayer = str_replace_all(datalayer, "coastal tourism", 'tourism'),
+           datalayer = str_replace_all(datalayer, "marein engineering architecture", 'egineering_arch'),
+           datalayer = str_replace_all(datalayer, "marine biomedicine", 'biomedicine'),
+           datalayer = str_replace_all(datalayer, "marine chemical industry", 'chemical'),
+           datalayer = str_replace_all(datalayer, "marine communication and trasportation industry", 'comm_transport'),
+           datalayer = str_replace_all(datalayer, "maren electric power and seawater utilization industry", 'electric'),
+           datalayer = str_replace_all(datalayer, "marine fishery and the related industries", 'fishing'),
+           datalayer = str_replace_all(datalayer, "marine shipbuilting industry", 'ship_building'),
+           datalayer = str_replace_all(datalayer, "offshore oil and natural gas industry", 'oil_gas'),
+           datalayer = str_replace_all(datalayer, "sea salt industry", 'seasalt'))
+    }
+
   dn = add_rgn_id(d, fld_name = "province")
 
   write_csv(dn, file.path(dir_f, f_orig))
