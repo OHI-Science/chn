@@ -1101,13 +1101,33 @@ LIV_ECO = function(layers, subgoal){
  #LIV status:
 
  # calculate job and wage score. find reference points: "from model description: the maximum quantity in each category has been
- # used as the reference point". cross-region maximums:
+ # used as the reference point".
+
+ #jobs multipliers were added. fishing: 1.582 was used (Table S10 from Halpern et al 2012 SOM, commercial fishing)
+ # while the rest of the indsutries were set to be 1, as a place holder, to be updated in the future
+ jobs_multiplier = c('beach_placer' = 1,
+                      'tourism' = 1,
+                      'egineering_arch' = 1,
+                      'biomedicine' = 1,
+                      'chemical' = 1,
+                      'comm_transport' = 1,
+                      'electric' = 1,
+                      'fishing' = 1.582,
+                      'ship_building' = 1,
+                      'oil_gas' = 1,
+                      'seasalt' = 1)
+
+  jobs = jobs %>%
+  mutate(multiplier = jobs_multiplier[sector],
+         jobs_adj = jobs * multiplier)
+
+ # calculate jobs, wages scores, and then status of all years
   jobs_score = jobs %>%
    group_by(sector) %>%
-   mutate(jobs_ref = max(jobs)) %>% #find reference point for each industry, across all regions and all years (2007-2011)
+   mutate(jobs_ref = max(jobs_adj)) %>% #find reference point for each industry, across all regions and all years (2007-2011)
    ungroup() %>%
    group_by(rgn_id, year) %>%
-   summarize(jobs_score = sum(jobs)/sum(jobs_ref)); head(jobs_score)
+   summarize(jobs_score = sum(jobs_adj)/sum(jobs_ref)); head(jobs_score)
 
  wage_score = wage %>%
  mutate(wage_ref = max(wage),
@@ -1118,11 +1138,11 @@ LIV_ECO = function(layers, subgoal){
                   mutate(xLIV = (jobs_score + wage_score)/2*100 )
  # current status
  LIV.status = xLIV_all_years %>%
-   filter(year == 2011) %>% # pull out the most recent year's LIV status
+   filter(year == max(year)) %>% # pull out the most recent year's LIV status
    select(region_id = rgn_id,
           score = xLIV) %>%
    mutate(dimension = 'status',
-          goal = 'LIV')
+          goal = 'LIV') ; head(LIV.status)
 
 #      region_id    score dimension goal
 #  1          1 46.94071    status  LIV
@@ -1140,7 +1160,7 @@ LIV.trend = left_join(jobs, wage) %>%
   arrange(rgn_id, year, sector) %>%
   group_by(rgn_id, sector) %>%
   mutate(
-    weight = sum(jobs, na.rm=T)) %>% #head(liv_trend)
+    weight = sum(jobs_adj, na.rm=T)) %>%
   # reshape into jobs and wages columns into single metric to get slope of both with one do() call
   reshape2::melt(id=c('rgn_id','year','sector','weight'), variable='metric', value.name='value') %>%
   mutate(
@@ -1173,18 +1193,18 @@ LIV.trend = left_join(jobs, wage) %>%
          dimension,
          goal)
 
-#     region_id score dimension goal
-# 1          1     1     trend  LIV
-# 2          2     1     trend  LIV
-# 3          3     1     trend  LIV
-# 4          4     1     trend  LIV
-# 5          5     1     trend  LIV
-# 6          6     1     trend  LIV
-# 7          7     1     trend  LIV
-# 8          8     1     trend  LIV
-# 9          9     1     trend  LIV
-# 10        10     1     trend  LIV
-# 11        11     1     trend  LIV
+#    region_id score dimension goal
+# 1          1  0.75     trend  LIV
+# 2          2  0.75     trend  LIV
+# 3          3  0.75     trend  LIV
+# 4          4  0.75     trend  LIV
+# 5          5  0.75     trend  LIV
+# 6          6  0.75     trend  LIV
+# 7          7  0.75     trend  LIV
+# 8          8  0.75     trend  LIV
+# 9          9  0.75     trend  LIV
+# 10        10  0.75     trend  LIV
+# 11        11  0.75     trend  LIV
 
 # ECO status calculation
 xECO_all_years = income %>%
@@ -1374,10 +1394,24 @@ return(scores_LIV_ECO)
         # TODO: consider how the units affect trend; should these be normalized? cap per sector or later?
         sector_trend = pmax(-1, pmin(1, coef(mdl)[['year']] * 5))) %>%
       arrange(rgn_id, metric, sector) %>%
+
+#       metric   weight rgn_id sector sector_trend
+#     1   employed 12824037      1     cf            1
+#     2   employed  8176120      1   tour            1
+#     3       jobs 12824037      1     cf           -1
+#     4       jobs  8176120      1   tour            1
+#     5   jobs_adj 12824037      1     cf           -1
+#     6   jobs_adj  8176120      1   tour            1
+#     7   jobs_all 12824037      1     cf            1
+#     8   jobs_all  8176120      1   tour            1
+#     9  jobs_mult 12824037      1     cf           -1
+#     10 jobs_mult  8176120      1   tour            1
+
       # get weighted mean across sectors per region-metric
       group_by(metric, rgn_id) %>%
       summarize(
-        metric_trend = weighted.mean(sector_trend, weight, na.rm=T)) %>%
+        metric_trend = weighted.mean(sector_trend, weight, na.rm=T)) %>% ## ning: calculated trend of all metrix: employed, jobs, jobs_adj, jobs_multi etc (see line 1398 -)
+                                                                          # why? should we just use jobs_adj?
       # get mean trend across metrics (jobs, wages) per region
       group_by(rgn_id) %>%
       summarize(
@@ -1789,6 +1823,7 @@ HAB = function(layers){
                   extent_trend = cs_extent_trend) ; head(d)
 
   # status = 1/3(Csg + Csm + Cmg)
+
   r.status = d %>%
     group_by(region_id) %>%
     summarize(score = mean(condition) * 100,
@@ -1799,10 +1834,13 @@ HAB = function(layers){
            dimension,
            goal) ; head(r.status)
 
-  #   region_id score dimension goal
-  # 1         1    80    status  HAB
-  # 2         2    80    status  HAB
-  # 3         3    80    status  HAB
+#     region_id score dimension goal
+#   1         1    80    status  HAB
+#   2         2    80    status  HAB
+#   3         3    80    status  HAB
+#   4         4    80    status  HAB
+#   5         5    80    status  HAB
+#   6         6    80    status  HAB
 
   # trend = sum(extent * extent_trend) / sum(extent)
   r.trend = d %>%
