@@ -296,17 +296,45 @@ for (f_orig in eco_file_list) {
 # SPP ----
 # testing by @jules32 July 13
 
-global_ico_trend = read.csv('~/github/ohiprep/globalprep/SpeciesDiversity/v2015/data/ico_trend.csv'); head(global_trend)
+# gl_spp_trend = read.csv('/Volumes/data_edit/git-annex/globalprep/SpeciesDiversity/v2015/intermediate/spp_all_cleaned.csv'); head(gl_spp_trend)
+# write.csv(gl_spp_trend, 'tmp/gl_spp_all.csv', row.names=F)
+gl_spp_trend = read.csv(file.path(dir_chn_prep, 'tmp/gl_spp_all.csv')); head(gl_spp_trend)
+
 china_spp = read.csv(file.path(dir_raw, 'spp_species_chn2015_LM.csv')); head(china_spp)
 
 d = china_spp %>%
   rename(province_id = rgn_id,
          sciname     = species_latin) %>%
+  select(-species_common) %>%
   filter(IUCN_class != '') %>%
-  semi_join(global_ico_trend, by='sciname'); head(d) # semi-join keeps all rows in A that have a match in B
+  left_join(gl_spp_trend %>%
+              select(sciname,
+                     popn_category,
+                     popn_trend,
+                     trend_score), by='sciname'); head(d)
 
-# Only 3 matches with the ICO list
-# province_id                    sciname                    species_common CHN_class IUCN_class value
-#          LN Balaenoptera acutorostrata                Common Minke Whale         2         LC   0.0
-#          LN      Balaenoptera borealis                         Sei Whale         2         EN   0.6
-#          ZJ        Lagenodelphis hosei Fraser's Dolphin, Sarawak Dolphin         2         VU   0.4
+d2 = d %>%
+  filter(!is.na(trend_score)); d2
+
+# prep to save
+
+# d2save = d2 %>%
+#   select( # Ning, I didn't know offhand which columns you'd need but then save this file as a layer
+# and incorporate into the SPP and ICO models.
+#
+write_csv(d2save, 'spp_iucn_trends.csv')
+
+# only 11 of these in 6 provinces have a trend score.
+#    province_id                    sciname CHN_class IUCN_class value popn_category popn_trend trend_score
+# 1           LN Balaenoptera acutorostrata         2         LC   0.0            LC     Stable         0.0
+# 2           LN       Haliaeetus pelagicus         1         VU   0.4            VU Decreasing        -0.5
+# 3           LN         Egretta eulophotes         2         VU   0.4            VU Decreasing        -0.5
+# 4           LN            Larus saundersi        NA         VU   0.4            VU Decreasing        -0.5
+# 5           LN             Platalea minor         2         EN   0.6            EN     Stable         0.0
+# 6           TJ             Larus relictus         1         VU   0.4            VU Decreasing        -0.5
+# 7           SD         Egretta eulophotes         2         VU   0.4            VU Decreasing        -0.5
+# 8           JS         Egretta eulophotes         2         VU   0.4            VU Decreasing        -0.5
+# 9           FJ          Pelecanus crispus         2         VU   0.4            VU Decreasing        -0.5
+# 10          HN         Montipora stellata        NA         EN   0.6            LC Decreasing        -0.5
+# 11          HN            Holothuria atra        NA         EN   0.6            LC     Stable         0.0
+
