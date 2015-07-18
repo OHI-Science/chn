@@ -1,6 +1,5 @@
 "rgn_id","sciname","CHN_class","IUCN_class","value"
-1,"Acipenser sinensis Gray
-",1,"",0.46
+1,"Acipenser sinensis",1,"",0.46
 1,"Pseudorca crassidens",2,"",0.17
 1,"Eumetopias jubatus ",2,"VU",0.4
 1,"Balaenoptera borealis",2,"EN",0.6
@@ -19,43 +18,43 @@
 1,"Glyptocidaris crenularis",NA,"EN",0.6
 1,"Strongylocentrotus nuda ",NA,"EN",0.6
 1,"Hemicentrotus pulcherrimus ",NA,"EN",0.6
-2,"",2,"",0.17
+2,"Pseudorca crassidens",2,"",0.17
 2,"Tursiops truncatus ",2,"",0.17
 2,"Larus minutus Pallas ",2,"",0.17
 2,"Balaenoptera brydei",2,"DD",0.17
 2,"Mycteria leucocephala",2,"",0.17
 2,"Physeter catodon Linnaeus",2,"",0.17
-2,"",2,"",0.17
+2,"Cephalochordata",2,"",0.17
 2,"Delphinus delphis ",2,"LC",0
 2,"Chlidonias niger",2,"",0.17
 2,"Chlidonias niger",1,"",0.46
-2,"",NA,"EN",0.6
-2,"",NA,"EN",0.6
+2,"Coelomactra antiquata",NA,"EN",0.6
+2,"Fenneropenaeus chinensis",NA,"EN",0.6
 2,"Nihonotrypaea harmandi ",NA,"EN",0.6
 2,"Nihonotrypaea japonica ",NA,"EN",0.6
 2,"Upogebia major ",NA,"EN",0.6
 2,"Branchiostoma japonicus ",2,"",0.17
 2,"Hemicentrotus pulcherrimus ",NA,"EN",0.6
-3,"",2,"",0.17
+3,"Pseudorca crassidens",2,"",0.17
 3,"Tursiops truncatus ",2,"",0.17
 3,"Physeter catodon Linnaeus",2,"",0.17
 3,"Delphinus delphis ",2,"LC",0
 3,"Chlidonias niger",2,"",0.17
 3,"Larus relictus",1,"VU",0.4
-3,"",NA,"EN",0.6
+3,"Fenneropenaeus chinensis",NA,"EN",0.6
 3,"Nihonotrypaea harmandi ",NA,"EN",0.6
 3,"Nihonotrypaea japonica ",NA,"EN",0.6
 3,"Upogebia major ",NA,"EN",0.6
 3,"Strongylocentrotus nuda ",NA,"EN",0.6
 3,"Hemicentrotus pulcherrimus ",NA,"EN",0.6
-4,"",1,"",0.46
-4,"",2,"",0.17
+4,"Acipenser sinensis",1,"",0.46
+4,"Pseudorca crassidens",2,"",0.17
 4,"Hemiprocne coronata",2,"",0.17
 4,"Tursiops truncatus ",2,"",0.17
-4,"",2,"LC",0
+4,"Balaenoptera acutorostrata",2,"LC",0
 4,"Megaptera novaeangliae ",2,"LC",0
 4,"Physeter catodon Linnaeus",2,"",0.17
-4,"",2,"",0.17
+4,"Cephalochordata",2,"",0.17
 4,"Dermochelys coriacea ",2,"",0.17
 4,"Phalacrocorax pelagicus",2,"",0.17
 4,"Hirundapus cochinchinensis ",2,"",0.17
@@ -64,155 +63,145 @@
 4,"Ciconia ciconia ",1,"",0.46
 4,"Delphinus delphis ",2,"LC",0
 4,"Egretta eulophotes",2,"VU",0.4
-4,"",NA,"EN",0.6
-4,"",NA,"EN",0.6
+4,"Coelomactra antiquata",NA,"EN",0.6
+4,"Fenneropenaeus chinensis",NA,"EN",0.6
 4,"Nihonotrypaea harmandi ",NA,"EN",0.6
 4,"Nihonotrypaea japonica ",NA,"EN",0.6
 4,"Upogebia major ",NA,"EN",0.6
-4,"",NA,"EN",0.6
+4,"Elamenopsis sinensis",NA,"EN",0.6
 4,"Glyptocidaris crenularis",NA,"EN",0.6
 4,"Strongylocentrotus nuda ",NA,"EN",0.6
 4,"Hemicentrotus pulcherrimus ",NA,"EN",0.6
-4,"",NA,"EN",0.6
+4,"Hydrolagus tsengi",NA,"EN",0.6
 4,"Heterodontus japonicus ",NA,"EN",0.6
-5,"",1,"",0.46
-5,"",2,"",0.17
+5,"Acipenser sinensis",1,"",0.46
+5,"Pseudorca crassidens",2,"",0.17
 5,"Eumetopias jubatus ",2,"VU",0.4
-5,"",2,"",0.17
+5,"Lepidochelys olivacea",2,"",0.17
 5,"Lagenorhynchus obliquidens ",2,"LC",0
 5,"Tursiops truncatus ",2,"",0.17
-5,"",2,"",0.17
+5,"Hydrocoloeus minutus",2,"",0.17
 5,"Megaptera novaeangliae ",2,"LC",0
 5,"Mycteria leucocephala",1,"",0.46
 5,"Physeter catodon Linnaeus",2,"",0.17
 5,"Ziphius cavirostris",2,"",0.17
 5,"Hirundapus cochinchinensis ",2,"",0.17
 5,"Haliaeetus albicilla ",1,"",0.46
-5,"",1,"",0.46
+5,"Lipotes vexillifer",1,"",0.46
 5,"Ciconia ciconia ",1,"",0.46
 5,"Delphinus delphis ",2,"LC",0
 5,"Steno bredanensis ",2,"",0.17
 5,"Chelonia mydas ",2,"",0.17
 5,"Egretta eulophotes",2,"VU",0.4
 5,"Chlidonias niger",2,"",0.17
-5,"",NA,"EN",0.6
-5,"",NA,"EN",0.6
-5,"",NA,"EN",0.6
+5,"Coelomactra antiquata",NA,"EN",0.6
+5,"Fenneropenaeus chinensis",NA,"EN",0.6
+5,"Metapenaeus joyneri",NA,"EN",0.6
 5,"Palaemon yamashitai ",NA,"EN",0.6
 5,"Hemicentrotus pulcherrimus ",NA,"EN",0.6
-6,"",1,"",0.46
-6,"",1,"",0.46
-6,"",2,"",0.17
-6,"",2,"",0.17
-6,"",2,"",0.17
+6,"Sousa chinensis",1,"",0.46
+6,"Acipenser sinensis",1,"",0.46
+6,"Pseudorca crassidens",2,"",0.17
+6,"Hippocampus kelloggi",2,"",0.17
+6,"Lepidochelys olivacea",2,"",0.17
 6,"Lagenorhynchus obliquidens ",2,"LC",0
 6,"Tursiops truncatus ",2,"",0.17
-6,"",NA,"DD",0
-6,"",2,"LC",0
+6,"Kogia breviceps",NA,"DD",0
+6,"Balaenoptera acutorostrata",2,"LC",0
 6,"Megaptera novaeangliae ",2,"LC",0
 6,"Mycteria leucocephala",1,"",0.46
 6,"Physeter catodon Linnaeus",2,"",0.17
 6,"Hirundapus cochinchinensis ",2,"",0.17
 6,"Platalea leucorodia",2,"",0.17
-6,"",1,"",0.46
+6,"Lipotes vexillifer",1,"",0.46
 6,"Ciconia ciconia ",1,"",0.46
 6,"Delphinus delphis ",2,"LC",0
 6,"Steno bredanensis ",2,"",0.17
-6,"",NA,"EN",0.6
-6,"",NA,"EN",0.6
+6,"Metapenaeus joyneri",NA,"EN",0.6
+6,"Elamenopsis introversus",NA,"EN",0.6
 6,"Hemicentrotus pulcherrimus ",NA,"EN",0.6
 6,"Heterodontus japonicus ",NA,"EN",0.6
-7,"",1,"",0.46
-7,"",1,"",0.46
-7,"",2,"",0.17
-7,"",2,"",0.17
-7,"",2,"",0.17
+7,"Sousa chinensis",1,"",0.46
+7,"Acipenser sinensis",1,"",0.46
+7,"Pseudorca crassidens",2,"",0.17
+7,"Hippocampus kelloggi",2,"",0.17
+7,"Lepidochelys olivacea",2,"",0.17
 7,"Lagenorhynchus obliquidens ",2,"LC",0
 7,"Tursiops truncatus ",2,"",0.17
-7,"",2,"LC",0
+7,"Balaenoptera acutorostrata",2,"LC",0
 7,"Megaptera novaeangliae ",2,"LC",0
 7,"Physeter catodon Linnaeus",2,"",0.17
 7,"Lagenodelphis hosei",2,"VU",0.4
 7,"Hirundapus cochinchinensis ",2,"",0.17
-7,"Grampus Griseus 
- 
-",NA,"LC",0
+7,"Grampus griseus",NA,"LC",0
 7,"Haliaeetus albicilla ",1,"",0.46
 7,"Ciconia ciconia ",1,"",0.46
 7,"Delphinus delphis ",2,"LC",0
 7,"Steno bredanensis ",2,"",0.17
 7,"Chelonia mydas ",2,"",0.17
-7,"",1,"VU",0.4
+7,"Larus relictus",1,"VU",0.4
 7,"Fenneropenaeus penicillatus ",NA,"EN",0.6
-7,"",NA,"EN",0.6
-7,"",NA,"EN",0.6
-7,"",NA,"EN",0.6
+7,"Metapenaeus joyneri",NA,"EN",0.6
+7,"Tachpleus tridentatus",NA,"EN",0.6
+7,"Panulirus stimposoni Holthuis",NA,"EN",0.6
 7,"Hemicentrotus pulcherrimus ",NA,"EN",0.6
-7,"Anthocidaris crassispina 
-",NA,"EN",0.6
-7,"",NA,"EN",0.6
+7,"Anthocidaris crassispina",NA,"EN",0.6
+7,"Hydrolagus tsengi",NA,"EN",0.6
 8,"Tursiops aduncus ",2,"",0.17
-8,"",1,"",0.46
-8,"",1,"",0.46
-8,"",2,"",0.17
-8,"Dugong dugon 
- 
-",1,"",0.46
-8,"",2,"",0.17
+8,"Sousa chinensis",1,"",0.46
+8,"Acipenser sinensis",1,"",0.46
+8,"Pseudorca crassidens",2,"",0.17
+8,"Dugong dugon",1,"",0.46
+8,"Hippocampus kelloggi ",2,"",0.17
 8,"Hemiprocne coronata ",2,"",0.17
 8,"Lagenorhynchus obliquidens ",2,"LC",0
 8,"Tursiops truncatus ",2,"",0.17
-8,"",2,"LC",0
+8,"Balaenoptera acutorostrata",2,"LC",0
 8,"Megaptera novaeangliae ",2,"LC",0
 8,"Physeter catodon Linnaeus",2,"",0.17
-8,"",2,"",0.17
+8,"Cephalochordata",2,"",0.17
 8,"Stenella coeruleoalba ",2,"",0.17
 8,"Ziphius cavirostris",2,"",0.17
 8,"Dermochelys coriacea ",2,"",0.17
 8,"Phalacrocorax pelagicus",2,"",0.17
-8,"Stenella frontalis
-",2,"",0.17
+8,"Stenella frontalis",2,"",0.17
 8,"Haliaeetus albicilla ",1,"",0.46
 8,"Platalea leucorodia",2,"",0.17
 8,"Ciconia ciconia ",1,"",0.46
 8,"Delphinus delphis ",2,"LC",0
 8,"Steno bredanensis ",2,"",0.17
 8,"Chelonia mydas ",2,"",0.17
-8,"",1,"VU",0.4
+8,"Larus relictus",1,"VU",0.4
 8,"Stenella longirostris ",2,"",0.17
 8,"Pelecanus crispus",2,"VU",0.4
 8,"Thalasseus bernsteini ",2,"CR",0.8
-8,"",NA,"EN",0.6
-8,"",NA,"EN",0.6
+8,"Tachpleus tridentatus",NA,"EN",0.6
+8,"Bellamya turritus",NA,"EN",0.6
 8,"Atrina vexillum ",NA,"EN",0.6
 8,"Pinna bicolor ",NA,"EN",0.6
-8,"",NA,"EN",0.6
+8,"Coelomactra antiquata",NA,"EN",0.6
 8,"Fenneropenaeus merguiensis",NA,"EN",0.6
 8,"Fenneropenaeus penicillatus ",NA,"EN",0.6
-8,"",NA,"EN",0.6
-8,"Panulirus japonicus 
- 
-",NA,"EN",0.6
-8,"",NA,"EN",0.6
+8,"Metapenaeus joyneri",NA,"EN",0.6
+8,"Panulirus japonicus ",NA,"EN",0.6
+8,"Panulirus stimposoni Holthuis",NA,"EN",0.6
 8,"Philyra sagittifera ",NA,"EN",0.6
-8,"",NA,"EN",0.6
-8,"",NA,"EN",0.6
+8,"Leucosia sinica",NA,"EN",0.6
+8,"Elamera longidactylis",NA,"EN",0.6
 8,"Halicarcinus longipes ",NA,"EN",0.6
-8,"",NA,"EN",0.6
+8,"Holothuria leucospilota",NA,"EN",0.6
 8,"Holothuria moebii ",NA,"EN",0.6
 8,"Colochirus anceps ",NA,"EN",0.6
 8,"Colochirus quadrangularis ",NA,"EN",0.6
 8,"Hemicentrotus pulcherrimus ",NA,"EN",0.6
-8,"Anthocidaris crassispina 
- 
-",NA,"EN",0.6
+8,"Anthocidaris crassispina",NA,"EN",0.6
 8,"Branchiostoma belcheri Gray",NA,"EN",0.6
-9,"",1,"",0.46
-9,"",2,"",0.17
-9,"",2,"",0.17
+9,"Sousa chinensis",1,"",0.46
+9,"Pseudorca crassidens",2,"",0.17
+9,"Lepidochelys olivacea",2,"",0.17
 9,"Lagenorhynchus obliquidens ",2,"LC",0
 9,"Tursiops truncatus ",2,"",0.17
-9,"",2,"LC",0
+9,"Balaenoptera acutorostrata",2,"LC",0
 9,"Megaptera novaeangliae ",2,"LC",0
 9,"Mycteria leucocephala",1,"",0.46
 9,"Physeter catodon Linnaeus",2,"",0.17
@@ -223,90 +212,84 @@
 9,"Fregata andrewsi ",1,"",0.46
 9,"Ciconia ciconia ",1,"",0.46
 9,"Steno bredanensis ",2,"",0.17
-9,"",2,"",0.17
-9,"",1,"",0.46
+9,"Cypraea tigris",2,"",0.17
+9,"Ichthyaetus relictus",1,"",0.46
 9,"Thalasseus bernsteini ",2,"CR",0.8
-9,"",NA,"EN",0.6
+9,"Tachpleus tridentatus",NA,"EN",0.6
 9,"Turbinaria crater ",NA,"EN",0.6
-9,"Acropora cytherea 
- 
-",NA,"EN",0.6
+9,"Acropora cytherea",NA,"EN",0.6
 9,"Pavona decussata ",NA,"EN",0.6
-9,"",NA,"EN",0.6
+9,"Pavona frondifera Lamarck",NA,"EN",0.6
 9,"Echinophyllia aspera ",NA,"EN",0.6
-9,"",NA,"EN",0.6
+9,"Oliva oliva",NA,"EN",0.6
 9,"Atrina vexillum ",NA,"EN",0.6
 9,"Fenneropenaeus merguiensis",NA,"EN",0.6
 9,"Fenneropenaeus penicillatus ",NA,"EN",0.6
-9,"",NA,"EN",0.6
-9,"",NA,"EN",0.6
-9,"Panulirus japonicus 
- 
-",NA,"EN",0.6
-9,"",NA,"EN",0.6
+9,"Coelomactra antiquata",NA,"EN",0.6
+9,"Metapenaeus joyneri",NA,"EN",0.6
+9,"Panulirus japonicus",NA,"EN",0.6
+9,"Panulirus stimposoni Holthuis",NA,"EN",0.6
 9,"Philyra tuberculosa ",NA,"EN",0.6
-9,"",NA,"EN",0.6
-9,"",NA,"EN",0.6
+9,"Elamera longidactylis Yang & Sun",NA,"EN",0.6
+9,"Elamenopsis sinensis",NA,"EN",0.6
 9,"Halicarcinus unidentatus ",NA,"EN",0.6
 9,"Halicarcinus setirostris ",NA,"EN",0.6
-9,"",NA,"EN",0.6
+9,"Huenia proteus De Haan",NA,"EN",0.6
 9,"Maja compressipes ",NA,"EN",0.6
-9,"",NA,"EN",0.6
+9,"Carcinoscorpius rotundicauda",NA,"EN",0.6
 9,"Actinopyga echinites ",NA,"EN",0.6
 9,"Holothuria insignis",NA,"EN",0.6
-9,"",NA,"EN",0.6
+9,"Holothuria leucospilota",NA,"EN",0.6
 9,"Holothuria scabra ",NA,"EN",0.6
 9,"Holothuria martensi ",NA,"EN",0.6
 9,"Holothuria moebii ",NA,"EN",0.6
-9,"",NA,"EN",0.6
+9,"Holothuria sinica Liao",NA,"EN",0.6
 9,"Holothuria cinerascens ",NA,"EN",0.6
-9,"",NA,"EN",0.6
+9,"Holothuria ocellata",NA,"EN",0.6
 9,"Holothuria spinifera ",NA,"EN",0.6
 9,"Stichopus variegatus ",NA,"EN",0.6
 9,"Mensamaria intercedens ",NA,"EN",0.6
 9,"Colochirus anceps ",NA,"EN",0.6
 9,"Colochirus quadrangularis ",NA,"EN",0.6
-9,"Anthocidaris crassispina 
- 
-",NA,"EN",0.6
+9,"Anthocidaris crassispina",NA,"EN",0.6
 9,"Branchiostoma belcheri Gray",NA,"EN",0.6
-10,"",1,"",0.46
-10,"",2,"",0.17
-10,"",2,"",0.17
-10,"",2,"",0.17
+10,"Sousa chinensis",1,"",0.46
+10,"Pseudorca crassidens",2,"",0.17
+10,"Hippocampus kelloggi",2,"",0.17
+10,"Lepidochelys olivacea",2,"",0.17
 10,"Lagenorhynchus obliquidens ",2,"LC",0
 10,"Tursiops truncatus ",2,"",0.17
-10,"",2,"LC",0
+10,"Balaenoptera acutorostrata",2,"LC",0
 10,"Mycteria leucocephala",1,"",0.46
 10,"Physeter catodon Linnaeus",2,"",0.17
 10,"Hirundapus cochinchinensis ",2,"",0.17
 10,"Haliaeetus albicilla ",1,"",0.46
 10,"Ciconia ciconia ",1,"",0.46
 10,"Steno bredanensis ",2,"",0.17
-10,"",1,"VU",0.4
+10,"Ichthyaetus relictus",1,"VU",0.4
 10,"Stenella longirostris ",2,"",0.17
 10,"Stenella longirostris ",2,"DD",0.17
 10,"Chlidonias niger",1,"",0.46
-10,"",NA,"EN",0.6
+10,"Tachpleus tridentatus",NA,"EN",0.6
 10,"Pavona decussata ",NA,"EN",0.6
-10,"",NA,"EN",0.6
-10,"",NA,"EN",0.6
+10,"Pavona frondifera Lamarck",NA,"EN",0.6
+10,"Oliva miniacea",NA,"EN",0.6
 10,"Atrina vexillum ",NA,"EN",0.6
 10,"Fenneropenaeus merguiensis",NA,"EN",0.6
 10,"Fenneropenaeus penicillatus ",NA,"EN",0.6
-10,"",NA,"EN",0.6
-10,"",NA,"EN",0.6
+10,"Metapenaeus joyneri",NA,"EN",0.6
+10,"Panulirus stimposoni Holthuis",NA,"EN",0.6
 10,"Nuciops modesta ",NA,"EN",0.6
-10,"",NA,"EN",0.6
-10,"",NA,"EN",0.6
-10,"",NA,"EN",0.6
-10,"",NA,"EN",0.6
-10,"",NA,"EN",0.6
+10,"Myra coalita Hilgendof",NA,"EN",0.6
+10,"Leucosia pulchra Shen & Chen",NA,"EN",0.6
+10,"Leucosia sinica Shen & Chen",NA,"EN",0.6
+10,"Tachypleus gigas",NA,"EN",0.6
+10,"Carcinoscorpius rotundicauda",NA,"EN",0.6
 10,"Holothuria insignis",NA,"EN",0.6
 10,"Holothuria fuscocinerea ",NA,"EN",0.6
 10,"Holothuria scabra ",NA,"EN",0.6
 10,"Holothuria martensi ",NA,"EN",0.6
-10,"",NA,"EN",0.6
+10,"Holothuria ocellata",NA,"EN",0.6
 10,"Holothuria hilla ",NA,"EN",0.6
 10,"Holothuria rigidus ",NA,"EN",0.6
 10,"Stichopus flaccus ",NA,"EN",0.6
@@ -314,14 +297,12 @@
 10,"Mensamaria intercedens ",NA,"EN",0.6
 10,"Colochirus anceps ",NA,"EN",0.6
 10,"Colochirus quadrangularis ",NA,"EN",0.6
-10,"Anthocidaris crassispina 
- 
-",NA,"EN",0.6
-11,"",2,"",0.17
-11,"",2,"",0.17
+10,"Anthocidaris crassispina",NA,"EN",0.6
+11,"Pseudorca crassidens",2,"",0.17
+11,"Hippocampus kelloggi",2,"",0.17
 11,"Cassis cornuta ",2,"",0.17
 11,"Pinctada maxima ",2,"",0.17
-11,"",2,"",0.17
+11,"Lepidochelys olivacea",2,"",0.17
 11,"Lagenorhynchus obliquidens ",2,"LC",0
 11,"Tursiops truncatus ",2,"",0.17
 11,"Tridacna gigas ",1,"VU",0.4
@@ -336,44 +317,42 @@
 11,"Steno bredanensis ",2,"",0.17
 11,"Cypraea tigris Linnaeus",2,"EN",0.6
 11,"Stenella longirostris ",2,"DD",0.17
-11,"",1,"",0.46
-11,"",NA,"EN",0.6
+11,"Nautilidae",1,"",0.46
+11,"Tachpleus tridentatus",NA,"EN",0.6
 11,"Turbinaria crater ",NA,"EN",0.6
 11,"Acropora cerealis ",NA,"EN",0.6
-11,"Acropora cytherea 
- 
-",NA,"EN",0.6
+11,"Acropora cytherea",NA,"EN",0.6
 11,"Acropora florida ",NA,"EN",0.6
 11,"Acropora formosa ",NA,"EN",0.6
 11,"Acropora hyacinthus ",NA,"EN",0.6
 11,"Acropora lutkeni ",NA,"EN",0.6
 11,"Acropora pulchra ",NA,"EN",0.6
 11,"Acropora robusta ",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Montipora digitata",NA,"EN",0.6
+11,"Montipora foliosa",NA,"EN",0.6
 11,"Montipora gaimardi ",NA,"EN",0.6
 11,"Montipora stellata",NA,"EN",0.6
 11,"Pavona decussata ",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Pavona frondifera Lamarck",NA,"EN",0.6
 11,"Fungia fungites ",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Fungia paumotensis Stutchbury",NA,"EN",0.6
 11,"Podabacia crustacea ",NA,"EN",0.6
 11,"Merulina scabricula ",NA,"EN",0.6
 11,"Scapophyllia cylindrica ",NA,"EN",0.6
 11,"Acanthastrea echinata ",NA,"EN",0.6
 11,"Lobophyllia corymbosa ",NA,"EN",0.6
 11,"Echinophyllia aspera ",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Pectinia lactuca",NA,"EN",0.6
+11,"Pocillopora verrucosa",NA,"EN",0.6
 11,"Psammocora contigua ",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Haliotis asinina Linnaeus",NA,"EN",0.6
+11,"Haliotis ovina Gmelin",NA,"EN",0.6
+11,"Haliotis varia Linnaeus",NA,"EN",0.6
 11,"Cypraea carneola ",NA,"EN",0.6
 11,"Ovula ovum ",NA,"EN",0.6
 11,"Lambis chiragra ",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Lambis lambis ",NA,"EN",0.6
+11,"Oliva mustelina concavospira Sowerby",NA,"EN",0.6
 11,"Atrina vexillum ",NA,"EN",0.6
 11,"Tridacna maxima ",NA,"EN",0.6
 11,"Tridacna squamosa ",NA,"EN",0.6
@@ -381,37 +360,37 @@
 11,"Coelomactra cumingii ",NA,"EN",0.6
 11,"Fenneropenaeus merguiensis",NA,"EN",0.6
 11,"Fenneropenaeus penicillatus ",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Metapenaeus joyneri",NA,"EN",0.6
+11,"Panulirus stimposoni Holthuis",NA,"EN",0.6
+11,"Lauridromia indica",NA,"EN",0.6
 11,"Stimdromia longipedalis ",NA,"EN",0.6
 11,"Cryptodromia protuberum ",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Heteronucia elegans Chen & Turkay",NA,"EN",0.6
+11,"Heteronucia tuberculata Chen & Turkay ",NA,"EN",0.6
+11,"Heteronucia xincunensis Chen & Turkay",NA,"EN",0.6
 11,"Heteronucia mesanensis ",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Arcania sagamiensis Sakai",NA,"EN",0.6
+11,"Leucosia pulchra Shen & Chen",NA,"EN",0.6
+11,"Leucosia sinica Shen & Chen",NA,"EN",0.6
+11,"Paratymolus sexspinosus Miers",NA,"EN",0.6
+11,"Libystes nitidus A.Milne Edwards",NA,"EN",0.6
 11,"Portunus brockii",NA,"EN",0.6
 11,"Portunus rubromarginatus ",NA,"EN",0.6
 11,"Portunus tridentatus ",NA,"EN",0.6
 11,"Thalamita spinimera ",NA,"EN",0.6
 11,"Thalamita procorrugata ",NA,"EN",0.6
 11,"Thalamita platypodis ",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Carcinoscorpius rotundicauda",NA,"EN",0.6
 11,"Actinopyga echinites ",NA,"EN",0.6
 11,"Actinopyga mauritiana ",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Actinopyga miliaris",NA,"EN",0.6
 11,"Bohadschia argus ",NA,"EN",0.6
 11,"Bohadschia marmorata ",NA,"EN",0.6
 11,"Holothuria atra",NA,"EN",0.6
 11,"Holothuria edulis ",NA,"EN",0.6
 11,"Holothuria pardalis ",NA,"EN",0.6
 11,"Holothuria fuscocinerea ",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Holothuria leucospilota",NA,"EN",0.6
 11,"Holothuria pervicax ",NA,"EN",0.6
 11,"Holothuria scabra ",NA,"EN",0.6
 11,"Holothuria albiventer ",NA,"EN",0.6
@@ -419,7 +398,7 @@
 11,"Holothuria nobilis ",NA,"EN",0.6
 11,"Holothuria difficilis ",NA,"EN",0.6
 11,"Holothuria moebii ",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Holothuria sinica Liao",NA,"EN",0.6
 11,"Holothuria cinerascens ",NA,"EN",0.6
 11,"Holothuria flavomaculata ",NA,"EN",0.6
 11,"Holothuria olivacea ",NA,"EN",0.6
@@ -434,16 +413,14 @@
 11,"Colochirus anceps ",NA,"EN",0.6
 11,"Colochirus quadrangularis ",NA,"EN",0.6
 11,"Ohshimella ehrenbergi ",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"",NA,"EN",0.6
+11,"Cladolabes schmeltzi",NA,"EN",0.6
+11,"Protoreaster nodosus",NA,"EN",0.6
 11,"Culcita novaeguineae ",NA,"EN",0.6
 11,"Linckia laevigata ",NA,"EN",0.6
 11,"Asteropsis carinifera ",NA,"EN",0.6
 11,"Stomopneustes variolaris ",NA,"EN",0.6
-11,"",NA,"EN",0.6
-11,"Anthocidaris crassispina 
- 
-",NA,"EN",0.6
+11,"Tripneustes gratilla ",NA,"EN",0.6
+11,"Anthocidaris crassispina",NA,"EN",0.6
 11,"Heterocentrotus mammillatus ",NA,"EN",0.6
 11,"Eucidaris metularia ",NA,"EN",0.6
 11,"Branchiostoma belcheri Gray",NA,"EN",0.6

@@ -79,6 +79,7 @@ Data sources:
 
 - [International Union for Conservation of Nature (IUCN)](http://www.iucnredlist.org/technical-documents/classification-schemes/threats-classification-scheme)
 ","popn_trend","trend score","ico_spp_popn_trend_gl2014.csv","rgn_id",,"sciname",,,"popn_trend",TRUE,,,,,FALSE,,,,11,
+"ICO SPP","spp_iucn_trends","IUCN population trends","International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists","trend_score","score","spp_iucn_trends_chn2015.csv","rgn_id",,"sciname",,"trend_score",,TRUE,,,-0.5,0,FALSE,,,,11,FALSE
 "LE","le_gdp","GDP","Gross Domestic Product (GDP) data (reported in 2012 US dollars) from The World Bank.
 
 Data sources:
@@ -176,25 +177,11 @@ Data sources:
 
 - [International Union for Conservation of Nature (IUCN)](http://www.iucnredlist.org/technical-documents/classification-schemes/threats-classification-scheme)
 ","score","trend score","spp_trend_gl2014.csv","rgn_id",,,,"score",,TRUE,,,-0.254331358915499,-0.254331358915499,FALSE,,,,11,FALSE
-"TR","tr_jobs_total","Total labor force","Total labor force (number of people 15 years old and older who can supply labor for the production of goods and services) from World Bank assessments.
-
-Data sources:
-
-- [The World Bank](http://data.worldbank.org/indicator/SL.TLF.TOTL.IN)
-","count","jobs","tr_jobs_total_sc2014-popn-inland25km.csv","rgn_id",,,"year","count",,TRUE,1990,2012,5566587.10743865,266826151.733338,FALSE,,,,11,FALSE
-"TR","tr_jobs_tourism","Direct employment in tourism","Direct employment in tourism (WTTC).
-
-Data sources:
-
-- [World Travel and Tourism Council (WTTC)](http://www.wttc.org/research/economic-data-search-tool/)
-","count","jobs","tr_jobs_tourism_sc2014-popn-inland25km.csv","rgn_id",,,"year","count",,TRUE,1988,2013,101206.289199695,7748931.45201248,FALSE,,,,11,FALSE
-"TR","tr_sustainability","Sustainability index","Tourism Competitiveness Index (TTCI) from the World Economic Forum","score","score","tr_sustainability_gl2014.csv","rgn_id",,,,"score",,TRUE,,,5.11,5.11,FALSE,,,,11,FALSE
-"TR","tr_unemployment","Percent unemployment","Percent unemployment (The World Bank).
-
-Data sources:
-
-- [The World Bank](http://data.worldbank.org/indicator/SL.UEM.TOTL.ZS)
-","percent","percent unemployed","tr_unemployment_gl2014.csv","rgn_id",,,"year","percent",,TRUE,1980,2012,1.80723015392074,5.08167855752408,FALSE,,,,11,FALSE
+"SPP","spp_species","Species lists, China and IUCN threat categories as a proxy for iconic species trend","China's protected species list, and International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists.","value","value","spp_species_chn2015_LM.csv","rgn_id",,"sciname",,"value",,TRUE,,,0,0.8,TRUE,"chn_class,iucn_class",,2,11,FALSE
+"TR","tr_jobs_total","Total labor force","","count","jobs","tr_jobs_total_sc2014-popn-inland25km.csv","rgn_id",,,"year","count",,TRUE,1990,2012,5566587.10743865,266826151.733338,FALSE,,,,11,FALSE
+"TR","tr_jobs_tourism","Direct employment in tourism","Data sources:","count","jobs","tr_jobs_tourism_sc2014-popn-inland25km.csv","rgn_id",,,"year","count",,TRUE,1988,2013,101206.289199695,7748931.45201248,FALSE,,,,11,FALSE
+"TR","tr_sustainability","Sustainability index","","score","score","tr_sustainability_gl2014.csv","rgn_id",,,,"score",,TRUE,,,5.11,5.11,FALSE,,,,11,FALSE
+"TR","tr_unemployment","Percent unemployment","- [International Union for Conservation of Nature (IUCN)](http://www.iucnredlist.org/technical-documents/classification-schemes/threats-classification-scheme)","percent","percent unemployed","tr_unemployment_gl2014.csv","rgn_id",,,"year","percent",,TRUE,1980,2012,1.80723015392074,5.08167855752408,FALSE,,,,11,FALSE
 "TR","tr_marinearea","Marine area","Area of sea within jurisdiction of each province","km2","km2","tr_marinearea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,3000,2e+06,FALSE,,,,11,FALSE
 "TR","tr_tourist","Number of tourists ","number of tourists in year t","million","millions","tr_tourist_chn2015_YWW.csv","rgn_id",,,"year","million",,TRUE,2008,2011,568.93,229472,FALSE,,,,11,FALSE
 "pressures","cc_acid","Ocean acidification","Modeled distribution of the aragonite saturation state (AAS) of the ocean in pre-industrial (~1870) and modern times (2000-2009) (Halpern et al. 2008).
