@@ -1930,22 +1930,37 @@ HAB = function(layers){
 
 
 SPP = function(layers){
-  species = layers$data[['spp_species_chn2015_LM']]
+  # cast data
+  species = layers$data[['spp_species']] %>%
+    select(rgn_id, risk.wt = value)
 
-  trend = layers$data[['spp_iucn_trends_chn2015']] %>%
+  trend = layers$data[['spp_iucn_trends']] %>%
     select(rgn_id, trend_score)
 
-  spp.trend = d2 %>%
+  # status = 1 - sum(risk.wt)/number of species = 1 - mean(risk.wt)
+  r.status = species %>%
+    group_by(rgn_id) %>%
+    summarize(score = (1- mean(risk.wt)) *100) %>%
+    rename(region_id = rgn_id) %>%
+    mutate(dimension = 'status',
+           goal = 'SPP')
+
+  # trend
+  spp.trend = trend %>%
     group_by(rgn_id) %>%
     summarize(score = mean(trend_score))
 
-  NA.trend = data.frame(rgn_id = c(2, 6, 7, 9, 10), score = 'NA') ## assign NA to the rest of the provinces
+  NA.trend = data.frame(rgn_id = c(2, 6, 7, 9, 10), score = 'NA') ## assign NA to provinces without trend data
 
   r.trend = rbind(spp.trend, NA.trend) %>%
     arrange(rgn_id) %>%
     rename(region_id = rgn_id) %>%
     mutate(dimension = 'trend',
-           goal = 'ICO')
+           goal = 'SPP')
+
+  # combine status and trend scores
+  scores_SPP = rbind(r.status, r.trend)
+  return(scores_SPP)
 
   #################### gl2014 model ###############################
   # scores
