@@ -1947,6 +1947,7 @@ SPP = function(layers){
 
   # Trend: the same as SPP trend. Data from gl2014. only contains 11 species in 6 provinces.
   # the other provinces will be given NA for now.
+
   spp.trend = trend %>%
     group_by(rgn_id) %>%
     summarize(score = mean(trend_score))
