@@ -1576,7 +1576,25 @@ ICO = function(layers){
 # 2          2 48.57143    status  ICO
 # 3          3 41.66667    status  ICO
 
-# Trend: can't calcuate yet b/c we don't have time series data: to ask CHN team
+# Trend: the same as SPP trend. Data from gl2014. only contains 11 species in 6 provinces.
+# the other provinces will be given NA for now.
+d2 = layers$data[['spp_iucn_trends_chn2015']] %>%
+  select(rgn_id, trend_score)
+
+spp.trend = d2 %>%
+  group_by(rgn_id) %>%
+  summarize(score = mean(trend_score))
+
+NA.trend = data.frame(rgn_id = c(2, 6, 7, 9, 10), score = 'NA') ## assign NA to the rest of the provinces
+
+r.trend = rbind(spp.trend, NA.trend) %>%
+  arrange(rgn_id) %>%
+  rename(region_id = rgn_id) %>%
+  mutate(dimension = 'trend',
+         goal = 'ICO')
+
+scores_ICO = rbind(r.status, r.trend)
+return(scores_ICO)
 
 ######################## gl2014 model #################################
   # layers
