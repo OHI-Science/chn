@@ -1,0 +1,12 @@
+"rgn_id","sciname","risk.wt","IUCN_class","popn_trend","trend_score"
+1,"Balaenoptera acutorostrata",0,"LC","Stable",0
+1,"Haliaeetus pelagicus",0.4,"VU","Decreasing",-0.5
+1,"Egretta eulophotes",0.4,"VU","Decreasing",-0.5
+1,"Larus saundersi",0.4,"VU","Decreasing",-0.5
+1,"Platalea minor",0.6,"EN","Stable",0
+3,"Larus relictus",0.4,"VU","Decreasing",-0.5
+4,"Egretta eulophotes",0.4,"VU","Decreasing",-0.5
+5,"Egretta eulophotes",0.4,"VU","Decreasing",-0.5
+8,"Pelecanus crispus",0.4,"VU","Decreasing",-0.5
+11,"Montipora stellata",0.6,"EN","Decreasing",-0.5
+11,"Holothuria atra",0.6,"EN","Stable",0

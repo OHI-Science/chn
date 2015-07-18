@@ -294,11 +294,10 @@ for (f_orig in eco_file_list) {
 
 
 # SPP ----
-# testing by @jules32 July 13
 
 # gl_spp_trend = read.csv('/Volumes/data_edit/git-annex/globalprep/SpeciesDiversity/v2015/intermediate/spp_all_cleaned.csv'); head(gl_spp_trend)
-# write.csv(gl_spp_trend, 'tmp/gl_spp_all.csv', row.names=F)
-gl_spp_trend = read.csv(file.path(dir_chn_prep, 'tmp/gl_spp_all.csv')); head(gl_spp_trend)
+# write.csv(gl_spp_trend, '10.1_SPP/gl_spp_all.csv', row.names=F)
+gl_spp_trend = read.csv(file.path(dir_chn_prep, '10.1_SPP/gl_spp_all.csv')); head(gl_spp_trend)
 
 china_spp = read.csv(file.path(dir_raw, 'spp_species_chn2015_LM.csv')); head(china_spp)
 
@@ -306,35 +305,38 @@ d = china_spp %>%
   rename(province_id = rgn_id,
          sciname     = species_latin) %>%
   select(-species_common) %>%
+  add_rgn_id(fld_name = "province_id")
+
+dir_f = file.path(dir_chn_prep, "10.1_SPP")
+write_csv(d, file.path(dir_f, 'spp_species_chn2015_LM.csv'))
+write_csv(d, file.path(dir_layers, 'spp_species_chn2015_LM.csv'))
+
+d2 = d %>%
   filter(IUCN_class != '') %>%
   left_join(gl_spp_trend %>%
               select(sciname,
                      popn_category,
                      popn_trend,
-                     trend_score), by='sciname'); head(d)
+                     trend_score), by='sciname') %>%
+  filter(!is.na(trend_score)) %>%
+  select(rgn_id, sciname, risk.wt = value, IUCN_class, popn_trend, trend_score)
 
-d2 = d %>%
-  filter(!is.na(trend_score)); d2
-
-# prep to save
-
-# d2save = d2 %>%
-#   select( # Ning, I didn't know offhand which columns you'd need but then save this file as a layer
-# and incorporate into the SPP and ICO models.
-#
-write_csv(d2save, 'spp_iucn_trends.csv')
+dir_f = file.path(dir_chn_prep, "10.1_SPP")
+write_csv(d2, file.path(dir_f, 'spp_iucn_trends_chn2015.csv'))
+write_csv(d2, file.path(dir_layers, 'spp_iucn_trends_chn2015.csv'))
 
 # only 11 of these in 6 provinces have a trend score.
-#    province_id                    sciname CHN_class IUCN_class value popn_category popn_trend trend_score
-# 1           LN Balaenoptera acutorostrata         2         LC   0.0            LC     Stable         0.0
-# 2           LN       Haliaeetus pelagicus         1         VU   0.4            VU Decreasing        -0.5
-# 3           LN         Egretta eulophotes         2         VU   0.4            VU Decreasing        -0.5
-# 4           LN            Larus saundersi        NA         VU   0.4            VU Decreasing        -0.5
-# 5           LN             Platalea minor         2         EN   0.6            EN     Stable         0.0
-# 6           TJ             Larus relictus         1         VU   0.4            VU Decreasing        -0.5
-# 7           SD         Egretta eulophotes         2         VU   0.4            VU Decreasing        -0.5
-# 8           JS         Egretta eulophotes         2         VU   0.4            VU Decreasing        -0.5
-# 9           FJ          Pelecanus crispus         2         VU   0.4            VU Decreasing        -0.5
-# 10          HN         Montipora stellata        NA         EN   0.6            LC Decreasing        -0.5
-# 11          HN            Holothuria atra        NA         EN   0.6            LC     Stable         0.0
+
+# rgn_id                    sciname risk.wt IUCN_class popn_trend trend_score
+# 1       1 Balaenoptera acutorostrata     0.0         LC     Stable         0.0
+# 2       1       Haliaeetus pelagicus     0.4         VU Decreasing        -0.5
+# 3       1         Egretta eulophotes     0.4         VU Decreasing        -0.5
+# 4       1            Larus saundersi     0.4         VU Decreasing        -0.5
+# 5       1             Platalea minor     0.6         EN     Stable         0.0
+# 6       3             Larus relictus     0.4         VU Decreasing        -0.5
+# 7       4         Egretta eulophotes     0.4         VU Decreasing        -0.5
+# 8       5         Egretta eulophotes     0.4         VU Decreasing        -0.5
+# 9       8          Pelecanus crispus     0.4         VU Decreasing        -0.5
+# 10     11         Montipora stellata     0.6         EN Decreasing        -0.5
+# 11     11            Holothuria atra     0.6         EN     Stable         0.0
 
