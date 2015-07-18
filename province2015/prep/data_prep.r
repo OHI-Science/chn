@@ -319,7 +319,8 @@ d2 = d %>%
                      popn_trend,
                      trend_score), by='sciname') %>%
   filter(!is.na(trend_score)) %>%
-  select(rgn_id, sciname, risk.wt = value, IUCN_class, popn_trend, trend_score)
+  select(rgn_id, sciname, #risk.wt = value, IUCN_class, popn_trend,
+         trend_score)
 
 dir_f = file.path(dir_chn_prep, "10.1_SPP")
 write_csv(d2, file.path(dir_f, 'spp_iucn_trends_chn2015.csv'))
@@ -327,16 +328,21 @@ write_csv(d2, file.path(dir_layers, 'spp_iucn_trends_chn2015.csv'))
 
 # only 11 of these in 6 provinces have a trend score.
 
-# rgn_id                    sciname risk.wt IUCN_class popn_trend trend_score
-# 1       1 Balaenoptera acutorostrata     0.0         LC     Stable         0.0
-# 2       1       Haliaeetus pelagicus     0.4         VU Decreasing        -0.5
-# 3       1         Egretta eulophotes     0.4         VU Decreasing        -0.5
-# 4       1            Larus saundersi     0.4         VU Decreasing        -0.5
-# 5       1             Platalea minor     0.6         EN     Stable         0.0
-# 6       3             Larus relictus     0.4         VU Decreasing        -0.5
-# 7       4         Egretta eulophotes     0.4         VU Decreasing        -0.5
-# 8       5         Egretta eulophotes     0.4         VU Decreasing        -0.5
-# 9       8          Pelecanus crispus     0.4         VU Decreasing        -0.5
-# 10     11         Montipora stellata     0.6         EN Decreasing        -0.5
-# 11     11            Holothuria atra     0.6         EN     Stable         0.0
+#   rgn_id                    sciname trend_score
+# 1       1 Balaenoptera acutorostrata           0
+# 2       1       Haliaeetus pelagicus        -0.5
+# 3       1         Egretta eulophotes        -0.5
+# 4       1            Larus saundersi        -0.5
+# 5       1             Platalea minor           0
+# 6       3             Larus relictus        -0.5
+# 7       4         Egretta eulophotes        -0.5
+# 8       5         Egretta eulophotes        -0.5
+# 9       8          Pelecanus crispus        -0.5
+# 10     11         Montipora stellata        -0.5
+# 11     11            Holothuria atra           0
+# 12      2                         NA          NA
+# 13      6                         NA          NA
+# 14      7                         NA          NA
+# 15      9                         NA          NA
+# 16     10                         NA          NA
 
