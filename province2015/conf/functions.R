@@ -496,9 +496,6 @@ NP <- function(layers){
     filter(!is.na(status)) %>% # 1/0 produces NaN
     ungroup()
 
-  # Question for OHI-China team:
-  # 2. Should the np_weight be based on production value? What do these weights mean?
-
   ### get current status
   np_status_current <- np_status_all %>%
     filter(year == max(year) & !is.na(status)) %>%
@@ -635,7 +632,9 @@ CS = function(layers){
 
 CP = function(layers){
 
-  # select data, combine cp_condition and cs_extent (ie. most rencent year)
+  # select data, combine cp_condition, cs_extent_maxyr (ie. most rencent year. but not the same year for
+  # all regions and habitats ), and cs_extent_trend for trend calculation b/c there were very few and uneven years
+  #of data for each region
 
   m = layers$data[['cp_condition']] %>%
     select(rgn_id,
@@ -645,7 +644,9 @@ CP = function(layers){
                 select(-layer,
                        -year,
                        extent = hectare) ) %>% #join by rgn_id, habitat
-     group_by(rgn_id) #?? didn't change the table. why? see below
+    full_join(layers$data[['cs_extent_trend']] %>%
+                select(-layer,
+                       trend = trend.score))
 
   # add habitat weight
   habitat.wt = c('saltmarshes' = 3,
@@ -654,26 +655,52 @@ CP = function(layers){
   m = m %>%
     mutate(weight = habitat.wt[habitat])
 
-#       rgn_id     habitat condition     extent weight
-#   1       1 saltmarshes       0.5 1188600.00      4
-#   2       2 saltmarshes       0.5   81551.00      4
-#   3       3 saltmarshes       0.5   76840.00      4
-#   4       4 saltmarshes       0.5  721275.00      4
-#   5       5 saltmarshes       0.5  363979.00      4
-#   6       6 saltmarshes       0.5   18314.80      4
-#   7       7 saltmarshes       0.5  164270.00      4
+#     rgn_id     habitat condition    extent    trend weight
+#   1      1 saltmarshes       0.5 1188600.0     -0.1      4
+#   2      2 saltmarshes       0.5   81551.0     -0.1      4
+#   3      3 saltmarshes       0.5   76840.0     -0.1      4
+#   4      4 saltmarshes       0.5  721275.0     -0.1      4
+#   5      5 saltmarshes       0.5  363979.0     -0.1      4
+#   6      6 saltmarshes       0.5   18314.8 -79960.2      4
 
 
-  # Calculate CP status based on the most recent year's data
+  # Current CP status
   # China model:
   # x = sum [ (Cc / Cr)  * (Wk / Wmax) * (Ak / Atotal) ]
   # x = sum [condition   * (Wk / Wmax) * (Extent_k / Total_extent))]
 
-  xCP = m %>%
+  r.status = m %>%
     group_by(rgn_id) %>%
-    summarize(total_extent = sum(extent), ## ?? did not work...
-              hab_score = condition * weight/4 * extent/A_total,
-              rgn_score = sum(hab_score))
+    summarize(score = pmin(1, sum(condition* weight/4*extent/sum(extent)) ) * 100,
+              dimension ='status',
+              goal = 'CP') %>%
+    rename(region_id = rgn_id) ; head(r.status)
+
+#    region_id    score dimension goal
+# 1          1 49.99748    status   CP
+# 2          2 50.00000    status   CP
+# 3          3 50.00000    status   CP
+
+# Trend
+r.trend = m %>%
+  group_by(rgn_id) %>%
+  summarize(trend_raw = sum(weight * extent * trend) / (sum(extent) * max(weight)),
+            score = max(min(trend_raw, 1), -1)*100,
+            dimension = 'trend',
+            goal = 'CP') %>%
+  select(region_id = rgn_id,
+         score,
+         dimension,
+         goal) ; head(r.trend)
+#    region_id       score dimension goal
+# 1          1   -9.999159     trend   CP
+# 2          2  -10.000000     trend   CP
+# 3          3  -10.000000     trend   CP
+
+#combine status and trend
+scores_CP = rbind(r.status, r.trend)
+
+return(scores_CP)
 
 #################### below are the gl2014 codes #############################
 
@@ -758,7 +785,7 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 
   #library(dplyr)
   #library(tidyr)
-  # merge tourist + area into one frame
+  # Select data; calculate status score for each year in each region
   S = 0.787
   d = layers$data[['tr_tourist']] %>%
     left_join(layers$data[["tr_marinearea"]], by="rgn_id") %>%
@@ -769,17 +796,40 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
     mutate(tour_per_area = tourist*1000000/area,
            tour_per_area_S = tour_per_area * S,
            tour_per_area_S_1 = tour_per_area_S +1,
-           log = log10(tour_per_area_S_1)); head(d); summary(d) ## really strange outcome. are the log supposed to be status score?
+           log = log10(tour_per_area_S_1),
+           ref_point = max(log), #assume ref point is maximum log(tour_per_area_S_1)
+           xTR = log/ref_point*100) %>%
+    round(2); head(d); summary(d)
 
-# rgn_id year tourist    area tour_per_area tour_per_area_S tour_per_area_S_1          log
-#   1      1 2008 6487.79 2000000   0.003243895     0.002552945          1.002553 0.0011073172
-#   2      1 2009 4223.38 2000000   0.002111690     0.001661900          1.001662 0.0007211549
-#   3      1 2010 5503.80 2000000   0.002751900     0.002165745          1.002166 0.0009395542
-#   4      1 2011 6775.49 2000000   0.003387745     0.002666155          1.002666 0.0011563557
-#   5      2 2008  568.93  129300   0.004400077     0.003462861          1.003463 0.0015013035
-#   6      2 2009  630.67  129300   0.004877572     0.003838649          1.003839 0.0016639124
+#     rgn_id year tourist    area tour_per_area tour_per_area_S tour_per_area_S_1  log ref_point   xTR
+#   1      1 2008 6487.79 2000000       3243.89         2552.95           2553.95 3.41      6.76 50.38
+#   2      1 2009 4223.38 2000000       2111.69         1661.90           1662.90 3.22      6.76 47.63
+#   3      1 2010 5503.80 2000000       2751.90         2165.75           2166.75 3.34      6.76 49.33
+#   4      1 2011 6775.49 2000000       3387.74         2666.16           2667.16 3.43      6.76 50.66
 
-  # PREVIOUS:
+ # current TR status
+r.status = d %>%
+  filter(year == 2011) %>%
+   mutate(goal = 'TR',
+         dimension = 'status') %>%   #format
+   select(region_id = rgn_id,
+          goal,
+          dimension,
+          score = xTR); head(r.status)
+
+ # Trend: 4 years of data, 3 intervals
+r.trend = d %>%
+  group_by(rgn_id) %>%
+  do(dml = lm(xTR ~ year, data =.)) %>%
+  summarize(region_id = rgn_id,
+            dimension = 'trend',
+            goal = 'TR',
+            score = max(min(coef(dml)[['year']] * 3, 1), -1))
+
+scores_TR = rbind(r.status, r.trend)
+return(scores_TR)
+
+  ######################### gl2014 model############################
   # formula:
   #   E = Ed / (L - (L*U))
   #   Sr = (S-1)/5
@@ -1032,36 +1082,173 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
 
 LIV_ECO = function(layers, subgoal){
 
-  # select data
-  lyrs = c(#'le_livjob',
-        'le_livwage',
-        'le_eco')
-  D =SelectLayersData(layers, lyrs); head(D); summary(D) # did not work:
-     #   > head(D)
-     #   NULL
+# select data
 
-  ## but it works to load the individual data set. could it be because le_livjob has an extra column "datalayer"?
-
-  # > layers$data[['le_livjob']]
-  # rgn_id                                              datalayer   value year     layer
-  # 1        3                                  beach placer industry     762 2007 le_livjob
-  # 2        3                                  beach placer industry     762 2008 le_livjob
-  # 3        3                                  beach placer industry     812 2009 le_livjob
-
-  ## load individual data layer separately instead:
  jobs = layers$data[['le_livjob']] %>%
-   select(rgn_id, sector = datalayer, jobs = value, year) #head(jobs)
+   select(rgn_id, sector = datalayer, jobs = value, year); head(jobs)
 
  wage = layers$data[['le_livwage']] %>%
-   select(rgn_id, wage = value, year) #head(wage)
+   select(rgn_id, wage = value, year); head(wage)
 
  income = layers$data[['le_eco']] %>%
-   select(rgn_id, income = value, year) #head(income)
+   select(rgn_id, income = value, year); head(income)
 
+  # China model:
+  # xLIV = ( sum(jobs) / sum(jobs_ref) + wage / wage_ref) /2
+  # xECO = income / income_ref
+  # xLE = (xLIV + xECO)/2
 
+ #LIV status:
 
+ # calculate job and wage score. find reference points: "from model description: the maximum quantity in each category has been
+ # used as the reference point".
 
+ #jobs multipliers were added. fishing: 1.582 was used (Table S10 from Halpern et al 2012 SOM, commercial fishing)
+ # while the rest of the indsutries were set to be 1, as a place holder, to be updated in the future
+ jobs_multiplier = c('beach_placer' = 1,
+                      'tourism' = 1,
+                      'egineering_arch' = 1,
+                      'biomedicine' = 1,
+                      'chemical' = 1,
+                      'comm_transport' = 1,
+                      'electric' = 1,
+                      'fishing' = 1.582,
+                      'ship_building' = 1,
+                      'oil_gas' = 1,
+                      'seasalt' = 1)
 
+  jobs = jobs %>%
+  mutate(multiplier = jobs_multiplier[sector],
+         jobs_adj = jobs * multiplier)
+
+ # calculate jobs, wages scores, and then status of all years
+  jobs_score = jobs %>%
+   group_by(sector) %>%
+   mutate(jobs_ref = max(jobs_adj)) %>% #find reference point for each industry, across all regions and all years (2007-2011)
+   ungroup() %>%
+   group_by(rgn_id, year) %>%
+   summarize(jobs_score = sum(jobs_adj)/sum(jobs_ref)); head(jobs_score)
+
+ wage_score = wage %>%
+ mutate(wage_ref = max(wage),
+        wage_score = wage/wage_ref)
+
+ xLIV_all_years = full_join(jobs_score, #calculate status scores for each year
+                  select(wage_score, rgn_id, year, wage_score)) %>%
+                  mutate(xLIV = (jobs_score + wage_score)/2*100 )
+ # current status
+ LIV.status = xLIV_all_years %>%
+   filter(year == max(year)) %>% # pull out the most recent year's LIV status
+   select(region_id = rgn_id,
+          score = xLIV) %>%
+   mutate(dimension = 'status',
+          goal = 'LIV') ; head(LIV.status)
+
+#      region_id    score dimension goal
+#  1          1 46.94071    status  LIV
+#  2          2 29.34375    status  LIV
+#  3          3 47.84660    status  LIV
+
+# LIV trend
+# From SOM p. 29: trend was calculated as the slope in the individual sector values (not summed sectors)
+# over the most recent five years...
+# with the average weighted by the number of jobs in each sector
+# ... averaging slopes across sectors weighted by the revenue in each sector
+
+LIV.trend = left_join(jobs, wage) %>%
+  # get sector weight as total jobs across years for given region
+  arrange(rgn_id, year, sector) %>%
+  group_by(rgn_id, sector) %>%
+  mutate(
+    weight = sum(jobs_adj, na.rm=T)) %>%
+  # reshape into jobs and wages columns into single metric to get slope of both with one do() call
+  reshape2::melt(id=c('rgn_id','year','sector','weight'), variable='metric', value.name='value') %>%
+  mutate(
+    sector = as.character(sector),
+    metric = as.character(metric)) %>%
+  # get linear model coefficient per metric
+  group_by(metric, rgn_id, sector, weight) %>%
+  do(mdl = lm(value ~ year, data=.)) %>%
+  summarize(
+    metric = metric,
+    weight = weight,
+    rgn_id = rgn_id,
+    sector = sector,
+    sector_trend = pmax(-1, pmin(1, coef(mdl)[['year']] * 4))) %>% # 2007 - 2011: 4 intervals
+  arrange(rgn_id, metric, sector) %>%
+  # get weighted mean across sectors per region-metric
+  group_by(metric, rgn_id) %>%
+  summarize(
+    metric_trend = weighted.mean(sector_trend, weight, na.rm=T)) %>%
+  # get mean trend across metrics (jobs, wages) per region
+  group_by(rgn_id) %>%
+  summarize(
+    score = mean(metric_trend, na.rm=T)) %>%
+  # format
+  mutate(
+    goal      = 'LIV',
+    dimension = 'trend') %>%
+  select(region_id = rgn_id,
+         score,
+         dimension,
+         goal)
+
+#    region_id score dimension goal
+# 1          1  0.75     trend  LIV
+# 2          2  0.75     trend  LIV
+# 3          3  0.75     trend  LIV
+# 4          4  0.75     trend  LIV
+# 5          5  0.75     trend  LIV
+# 6          6  0.75     trend  LIV
+# 7          7  0.75     trend  LIV
+# 8          8  0.75     trend  LIV
+# 9          9  0.75     trend  LIV
+# 10        10  0.75     trend  LIV
+# 11        11  0.75     trend  LIV
+
+# ECO status calculation
+xECO_all_years = income %>%
+  mutate (eco_ref = max(income),
+          xECO = income/eco_ref*100); head(xECO_all_years)
+
+ECO.status = xECO_all_years %>%
+  filter(year == 2010) %>%
+  select(region_id = rgn_id,
+         score = xECO) %>%
+  mutate(dimension = 'status',
+         goal = 'ECO')  %>%
+  arrange(region_id)
+
+#    region_id      score dimension goal
+# 1          1  31.738493    status  ECO
+# 2          2  13.968281    status  ECO
+# 3          3  36.607824    status  ECO
+
+# ECO trend
+
+ECO.trend = xECO_all_years %>%
+  group_by(rgn_id) %>%
+  do(lmd = lm(xECO ~ year, data =.)) %>%
+  summarize(region_id = rgn_id,
+            score = pmax(pmin(coef(lmd)[['year']] *4, 1) ,-1),
+            dimension = 'trend',
+            goal = 'ECO')
+
+#     region_id score dimension goal
+# 1          1     1     trend  ECO
+# 2          2    -1     trend  ECO
+# 3          3     1     trend  ECO
+# 4          4     1     trend  ECO
+# 5          5     1     trend  ECO
+# 6          6     1     trend  ECO
+# 7          7     1     trend  ECO
+# 8          8     1     trend  ECO
+# 9          9     1     trend  ECO
+# 10        10     1     trend  ECO
+# 11        11     1     trend  ECO
+
+scores_LIV_ECO = rbind(LIV.status, LIV.trend, ECO.status, ECO.trend)
+return(scores_LIV_ECO)
 
   #################### gl2014 codes #########################
   ## read in all data:
@@ -1207,10 +1394,24 @@ LIV_ECO = function(layers, subgoal){
         # TODO: consider how the units affect trend; should these be normalized? cap per sector or later?
         sector_trend = pmax(-1, pmin(1, coef(mdl)[['year']] * 5))) %>%
       arrange(rgn_id, metric, sector) %>%
+
+#       metric   weight rgn_id sector sector_trend
+#     1   employed 12824037      1     cf            1
+#     2   employed  8176120      1   tour            1
+#     3       jobs 12824037      1     cf           -1
+#     4       jobs  8176120      1   tour            1
+#     5   jobs_adj 12824037      1     cf           -1
+#     6   jobs_adj  8176120      1   tour            1
+#     7   jobs_all 12824037      1     cf            1
+#     8   jobs_all  8176120      1   tour            1
+#     9  jobs_mult 12824037      1     cf           -1
+#     10 jobs_mult  8176120      1   tour            1
+
       # get weighted mean across sectors per region-metric
       group_by(metric, rgn_id) %>%
       summarize(
-        metric_trend = weighted.mean(sector_trend, weight, na.rm=T)) %>%
+        metric_trend = weighted.mean(sector_trend, weight, na.rm=T)) %>% ## ning: calculated trend of all metrix: employed, jobs, jobs_adj, jobs_multi etc (see line 1398 -)
+                                                                          # why? should we just use jobs_adj?
       # get mean trend across metrics (jobs, wages) per region
       group_by(rgn_id) %>%
       summarize(
@@ -1308,6 +1509,14 @@ LIV_ECO = function(layers, subgoal){
 
 LE = function(scores, layers){
 
+ r.status = scores_LIV_ECO %>%
+   spread(goal, score) %>%
+   mutate(score = rowMeans(cbind(ECO, LIV, na.rm=T))) %>%
+   select(region_id, score, dimension) %>%
+   mutate(goal = 'LE')
+
+
+  ###################### gl2014 model ###########################
   # calculate LE scores
   scores.LE = scores %.%
     filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %.%
@@ -1327,6 +1536,67 @@ LE = function(scores, layers){
 
 ICO = function(layers){
 
+  #cast data:
+  d = layers$data[['ico_species']] %>%
+    select(-layer) %>%
+    rename(count = value)
+
+  # lookup for weights status
+  w.risk_category = c('LC' = 0,
+                      'NT' = 0.2,
+                      'VU' = 0.4,
+                      'EN' = 0.6,
+                      'CR' = 0.8,
+                      'EX' = 1)
+  d = d %>%
+    mutate(risk.wt = w.risk_category[category]) ; head(d)
+
+#     rgn_id category count risk.wt
+#   1      1       VU     6     0.8
+#   2      1       NT     1     0.6
+#   3      1       LC     5     0.4
+#
+
+  #CHN model: xICO = sum(Si * Wi)/sum(Si)
+  #                = sum(count of species * weight.risk )/sum(count of species)
+
+  r.status = d %>%
+  mutate(count_wt = count * risk.wt) %>%
+  group_by(rgn_id) %>%
+  summarize(score = sum(count_wt)/sum(count)*100,
+            dimension = 'status',
+            goal = 'ICO') %>%
+  select(region_id = rgn_id, #format
+         score,
+         dimension,
+         goal)
+
+#   region_id    score dimension goal
+# 1          1 44.00000    status  ICO
+# 2          2 48.57143    status  ICO
+# 3          3 41.66667    status  ICO
+
+# Trend: the same as SPP trend. Data from gl2014. only contains 11 species in 6 provinces.
+# the other provinces will be given NA for now.
+d2 = layers$data[['spp_iucn_trends_chn2015']] %>%
+  select(rgn_id, trend_score)
+
+spp.trend = d2 %>%
+  group_by(rgn_id) %>%
+  summarize(score = mean(trend_score))
+
+NA.trend = data.frame(rgn_id = c(2, 6, 7, 9, 10), score = 'NA') ## assign NA to the rest of the provinces
+
+r.trend = rbind(spp.trend, NA.trend) %>%
+  arrange(rgn_id) %>%
+  rename(region_id = rgn_id) %>%
+  mutate(dimension = 'trend',
+         goal = 'ICO')
+
+scores_ICO = rbind(r.status, r.trend)
+return(scores_ICO)
+
+######################## gl2014 model #################################
   # layers
   lyrs = c('ico_spp_extinction_status' = 'risk_category',
            'ico_spp_popn_trend'        = 'popn_trend')
@@ -1370,8 +1640,9 @@ ICO = function(layers){
 
 LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years){
 
-  lyrs = list('lsp_cmpa',
-              'lsp_marinearea')
+  #CHN model:
+  # xLSP = %cmpa / reference%
+  #      = (cmpa/total_marine_area) / 30%
 
   # cast data ----
   cmpa = SelectLayersData(layers, layers='lsp_cmpa')
@@ -1389,28 +1660,48 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
   # Calculate status of each year in each province
   d = cmpa %>%
     left_join(marinearea)%>% #head(d)
-    mutate(reference = marinearea*0.3)%>%
+    mutate(reference = marinearea*0.3)%>% # 30% of jurisdictional marine area
     mutate(pct_cmpa = cmpa/marinearea*100)%>%
     mutate(status = pmin(pct_cmpa/30 *100, 100))
 
- # select status: year = 2012
-  status = filter(d, year == 2012)%>%
-   select(rgn_id, status)
+ # Current status: year = 2012
+  r.status = filter(d, year == 2012)%>%
+   mutate(dimension = 'status',
+          goal = "LSP") %>%
+   select(region_id = rgn_id,
+          score = status,
+          dimension,
+          goal) ; head(r.status)
 
- # calculate trend: not working. lm wrong: example: rgn 7: 12-14 --> coefficient too large
-  #  coef(lm(pct_cmpa ~ year, data=D))
-  #  (Intercept)          year
-  #  -1165.6904933     0.5864533
+#     region_id      score dimension goal
+#  1          1   4.275067    status  LSP
+#  2          2  30.852024    status  LSP
+#  3          3   5.959905    status  LSP
+#  4          4   4.595564    status  LSP
+#  5          5   3.440244    status  LSP
+#  6          6  31.273667    status  LSP
 
-  rgn_id = c(1:11)
+ #trend (2009 - 20112)
+ r.trend = d %>%
+   group_by(rgn_id) %>%
+   do(dlm = lm(status ~ year, data=.)) %>%
+   summarize(region_id = rgn_id,
+             score = max(min(coef(dml)[['year']]*3, 1) -1) *100,
+             dimension = 'trend',
+             goal = 'LSP') ; head(r.trend) # all 0's
 
- for (i in 1:11) {
-   D = filter(d, rgn_id == i)
-   trend = min(1, max(0, 4 * coef(lm(pct_cmpa ~ year, data=D))[['year']]))
-   trend2 = data.frame(rgn_id, trend)
-   return(trend2)
- } ## 0 for all provinces, eventhough for region 4,5, 7, and 8 show slight increase in cmpa; it is a rounding issue.
+#     region_id score dimension goal
+# 1          1     0     trend  LSP
+# 2          2     0     trend  LSP
+# 3          3     0     trend  LSP
+# 4          4     0     trend  LSP
+# 5          5     0     trend  LSP
+# 6          6     0     trend  LSP
 
+scores_LSP = rbind(r.status, r.trend)
+return(scores_LSP)
+
+############################ gl2014 model ######################################
 
 #   r  = rename(dcast(d, id_num ~ layer, value.var='val_num', subset = .(layer %in% names(lyrs[['r']]))),
 #               c('id_num'='region_id', lyrs[['r']]))
@@ -1534,6 +1825,62 @@ CW = function(layers){
 
 HAB = function(layers){
 
+  #cast data
+  lyrs = c('cs_condition',
+           'cs_extent',
+           'cs_extent_trend')
+
+  d = SelectLayersData(layers, layers = lyrs) %>%
+    select(region_id = id_num,
+           layer,
+           habitat = category,
+           val_num) %>%
+    tidyr::spread(layer, val_num) %>%   #spread(key=variable to become the column headings, value=data)
+    dplyr::rename(condition    = cs_condition,
+                  extent       = cs_extent,
+                  extent_trend = cs_extent_trend) ; head(d)
+
+  # status = 1/3(Csg + Csm + Cmg)
+
+  r.status = d %>%
+    group_by(region_id) %>%
+    summarize(score = mean(condition) * 100,
+              dimension = 'status',
+              goal = ' HAB') %>%
+    select(region_id,
+           score,
+           dimension,
+           goal) ; head(r.status)
+
+#     region_id score dimension goal
+#   1         1    80    status  HAB
+#   2         2    80    status  HAB
+#   3         3    80    status  HAB
+#   4         4    80    status  HAB
+#   5         5    80    status  HAB
+#   6         6    80    status  HAB
+
+  # trend = sum(extent * extent_trend) / sum(extent)
+  r.trend = d %>%
+    group_by(region_id) %>%
+    summarize(trend_raw = sum(extent * extent_trend) / sum(extent),
+              score = max(min(trend_raw, 1), -1) * 100,
+              dimension = 'trend',
+              goal = 'HAB') %>%
+    select(region_id,
+           score,
+           dimension,
+           goal) ; head(r.trend)
+
+  #   region_id       score dimension goal
+  # 1         1   -9.999159     trend  HAB
+  # 2         2  -10.000000     trend  HAB
+  # 3         3  -10.000000     trend  HAB
+
+  scores_HAB = cbind(r.status, r.trend)
+  return(scores_HAB)
+
+  ############################## gl2014 model ##################################
   # get layer data
   d =
     join_all(
@@ -1583,7 +1930,41 @@ HAB = function(layers){
 
 
 SPP = function(layers){
+  # cast data
+  species = layers$data[['spp_species']] %>%
+    select(rgn_id, risk.wt = value)
 
+  trend = layers$data[['spp_iucn_trends']] %>%
+    select(rgn_id, trend_score)
+
+  # status = 1 - sum(risk.wt)/number of species = 1 - mean(risk.wt)
+  r.status = species %>%
+    group_by(rgn_id) %>%
+    summarize(score = (1- mean(risk.wt)) *100) %>%
+    rename(region_id = rgn_id) %>%
+    mutate(dimension = 'status',
+           goal = 'SPP')
+
+  # Trend: the same as SPP trend. Data from gl2014. only contains 11 species in 6 provinces.
+  # the other provinces will be given NA for now.
+
+  spp.trend = trend %>%
+    group_by(rgn_id) %>%
+    summarize(score = mean(trend_score))
+
+  NA.trend = data.frame(rgn_id = c(2, 6, 7, 9, 10), score = 'NA') ## assign NA to provinces without trend data
+
+  r.trend = rbind(spp.trend, NA.trend) %>%
+    arrange(rgn_id) %>%
+    rename(region_id = rgn_id) %>%
+    mutate(dimension = 'trend',
+           goal = 'SPP')
+
+  # combine status and trend scores
+  scores_SPP = rbind(r.status, r.trend)
+  return(scores_SPP)
+
+  #################### gl2014 model ###############################
   # scores
   scores = cbind(rename(SelectLayersData(layers, layers=c('spp_status'='status','spp_trend'='trend'), narrow=T),
                         c(id_num='region_id', layer='dimension', val_num='score')),

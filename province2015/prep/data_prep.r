@@ -220,6 +220,10 @@ for (f_orig in ico_file_list) {
   d = rename(d, rgn_id = region_id); head(d)
   }
 
+  #to remove NA columns: count of NA in a column does not equal to the number of rows.
+  #there may be a better way to do this
+  d = d[, colSums(is.na(d)) !=nrow(d)]
+
   f_new = str_replace(f_orig, "6H_", "")
 
   write_csv(d, file.path(dir_f, f_new))
@@ -253,6 +257,21 @@ for (f_orig in liv_file_list) {
   dir_f = file.path(dir_chn_prep, "6.1_LIV")
   d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
 
+  if(f_orig == "le_livjob_chn2015_zb.csv") {
+    d = d %>%
+    mutate(datalayer = str_replace_all(datalayer, "beach placer industry", 'beach_placer'),
+           datalayer = str_replace_all(datalayer, "coastal tourism", 'tourism'),
+           datalayer = str_replace_all(datalayer, "marein engineering architecture", 'egineering_arch'),
+           datalayer = str_replace_all(datalayer, "marine biomedicine", 'biomedicine'),
+           datalayer = str_replace_all(datalayer, "marine chemical industry", 'chemical'),
+           datalayer = str_replace_all(datalayer, "marine communication and trasportation industry", 'comm_transport'),
+           datalayer = str_replace_all(datalayer, "maren electric power and seawater utilization industry", 'electric'),
+           datalayer = str_replace_all(datalayer, "marine fishery and the related industries", 'fishing'),
+           datalayer = str_replace_all(datalayer, "marine shipbuilting industry", 'ship_building'),
+           datalayer = str_replace_all(datalayer, "offshore oil and natural gas industry", 'oil_gas'),
+           datalayer = str_replace_all(datalayer, "sea salt industry", 'seasalt'))
+    }
+
   dn = add_rgn_id(d, fld_name = "province")
 
   write_csv(dn, file.path(dir_f, f_orig))
@@ -266,9 +285,64 @@ for (f_orig in eco_file_list) {
   dir_f = file.path(dir_chn_prep, "6.2_ECO")
   d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
 
-  dn = add_rgn_id(d, fld_name = "province")
+  dn = add_rgn_id(d, fld_name = "province") %>%
+  mutate(value = str_replace(value, ',',''))
 
   write_csv(dn, file.path(dir_f, f_orig))
   write_csv(dn, file.path(dir_layers, f_orig))
 }
+
+
+# SPP ----
+
+# gl_spp_trend = read.csv('/Volumes/data_edit/git-annex/globalprep/SpeciesDiversity/v2015/intermediate/spp_all_cleaned.csv'); head(gl_spp_trend)
+# write.csv(gl_spp_trend, '10.1_SPP/gl_spp_all.csv', row.names=F)
+gl_spp_trend = read.csv(file.path(dir_chn_prep, '10.1_SPP/gl_spp_all.csv')); head(gl_spp_trend)
+
+china_spp = read.csv(file.path(dir_raw, 'spp_species_chn2015_LM.csv')); head(china_spp)
+
+d = china_spp %>%
+  rename(province_id = rgn_id,
+         sciname     = species_latin) %>%
+  select(-species_common) %>%
+  add_rgn_id(fld_name = "province_id")
+
+dir_f = file.path(dir_chn_prep, "10.1_SPP")
+write_csv(d, file.path(dir_f, 'spp_species_chn2015_LM.csv'))
+write_csv(d, file.path(dir_layers, 'spp_species_chn2015_LM.csv'))
+
+d2 = d %>%
+  filter(IUCN_class != '') %>%
+  left_join(gl_spp_trend %>%
+              select(sciname,
+                     popn_category,
+                     popn_trend,
+                     trend_score), by='sciname') %>%
+  filter(!is.na(trend_score)) %>%
+  select(rgn_id, sciname, #risk.wt = value, IUCN_class, popn_trend,
+         trend_score)
+
+dir_f = file.path(dir_chn_prep, "10.1_SPP")
+write_csv(d2, file.path(dir_f, 'spp_iucn_trends_chn2015.csv'))
+write_csv(d2, file.path(dir_layers, 'spp_iucn_trends_chn2015.csv'))
+
+# only 11 of these in 6 provinces have a trend score.
+
+#   rgn_id                    sciname trend_score
+# 1       1 Balaenoptera acutorostrata           0
+# 2       1       Haliaeetus pelagicus        -0.5
+# 3       1         Egretta eulophotes        -0.5
+# 4       1            Larus saundersi        -0.5
+# 5       1             Platalea minor           0
+# 6       3             Larus relictus        -0.5
+# 7       4         Egretta eulophotes        -0.5
+# 8       5         Egretta eulophotes        -0.5
+# 9       8          Pelecanus crispus        -0.5
+# 10     11         Montipora stellata        -0.5
+# 11     11            Holothuria atra           0
+# 12      2                         NA          NA
+# 13      6                         NA          NA
+# 14      7                         NA          NA
+# 15      9                         NA          NA
+# 16     10                         NA          NA
 
