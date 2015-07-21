@@ -25,10 +25,10 @@ devtools:install_github("rmarkdown", "rstudio")
 
 # setup for dopying WebApp template files
 library(httr)
-dir_gh  = '~/github/chn/gh-pages_templates'
+dir_gh  = '~/github/chn/webapps_templates'
 url_loc = 'https://raw.githubusercontent.com/OHI-Science/ohi-webapps/master/results'
 
-# create a gh-pages_templates folder
+# create a webapps_templates folder
 dir.create(dir_gh, recursive=T, showWarnings=F)
 
 # download template files
