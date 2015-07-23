@@ -137,8 +137,7 @@ for (f_orig in cp_file_list) {
 fis_file_list = c("6A_fis_ft.xlsx",
                  "6A_fis_mmsy.xlsx",
                  "6A_fis_tc.xlsx",
-                 "6A_fis_ut.xlsx",
-                 "6A_fp_w.xlsx")
+                 "6A_fis_ct.xlsx")
 
 for (f_orig in fis_file_list) {
   dir_f = file.path(dir_chn_prep, "1.1_FIS")
@@ -155,7 +154,6 @@ for (f_orig in fis_file_list) {
 ## MAR ====
 mar_file_list = c("6A_mar_ac.xlsx",
                   "6A_mar_smk.xlsx",
-                  "6A_mar_yc.xlsx",
                   "6A_mar_yk.xlsx")
 
 for (f_orig in mar_file_list) { # f_orig = "6A_mar_yk.xlsx"
