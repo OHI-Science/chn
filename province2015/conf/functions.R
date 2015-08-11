@@ -685,17 +685,18 @@ CP = function(layers){
 r.trend = m %>%
   group_by(rgn_id) %>%
   summarize(trend_raw = sum(weight * extent * trend) / (sum(extent) * max(weight)),
-            score = max(min(trend_raw, 1), -1)*100,
+            score = max(min(trend_raw, 1), -1),
             dimension = 'trend',
             goal = 'CP') %>%
   select(region_id = rgn_id,
          score,
          dimension,
          goal) ; head(r.trend)
-#    region_id       score dimension goal
-# 1          1   -9.999159     trend   CP
-# 2          2  -10.000000     trend   CP
-# 3          3  -10.000000     trend   CP
+
+# region_id       score dimension goal
+# 1         1 -0.09999159     trend   CP
+# 2         2 -0.10000000     trend   CP
+# 3         3 -0.10000000     trend   CP
 
 #combine status and trend
 scores_CP = rbind(r.status, r.trend)

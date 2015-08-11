@@ -16,7 +16,8 @@ dir_layers = '~/github/chn/province2015/layers'
 
 # paths: '~/' means '/Users/julialowndes/' for Julie
 
-dir_raw = c('ningningj'='~/Google Drive/OHI China 2015/model_data/',
+dir_raw = c('mendes'='~/Google Drive/OHI China 2015/model_data/',
+            'ningningj'='~/Google Drive/OHI China 2015/model_data/',
             'OmarPro'='~/github/Google_Drive/OHI_China_2015/model_data',
             'julialowndes'='~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/',
             'jstewart'    ='~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/')[Sys.info()["user"]]
