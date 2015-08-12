@@ -205,6 +205,87 @@ FIS = function(layers, status_year){
 }
 
 MAR = function(layers, status_years){
+  # CHN model: Yc = sum(harvest * msi) / area
+  #         status= log10(Yc+1)
+
+  # cast data
+  mar_msi = layers$data[['mar_smk']]
+  mar_area = layers$data[['mar_ac']] #1994-2013
+  mar_harvest = layers$data[['mar_yk']] #1994-2013
+
+# can't use b/c 1 of 3 data sets (msi) doesn't have year... anyway around it?
+#   lyrs = c('mar_smk', #MSI: maricutlure sustainability index
+#            'mar_ac',  #area
+#            'mar_yk')  #catch
+#   D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
+#
+# #       id_num year val_num  layer id_name val_name category_name                    flds category
+# #     1      1 1994  125620 mar_ac  rgn_id      km2          <NA> id_num | year | val_num     <NA>
+# #     2      1 1995  141410 mar_ac  rgn_id      km2          <NA> id_num | year | val_num     <NA>
+# #     3      1 1996  155003 mar_ac  rgn_id      km2          <NA> id_num | year | val_num     <NA>
+#
+#   rk = D %>%
+#     select(region_id = id_num,
+#            year,
+#            val_num,
+#            layer) %>%
+#   spread(layer, val_num) # didn't work b/c smi doesn't have years. got error message "duplicate identifiers.." b/c years were all NA.
+#
+
+D = full_join(mar_msi, mar_harvest, by=c("rgn_id", 'species' )) %>%
+  select(rgn_id,
+         species,
+         year,
+         harvest = tonnes,
+         msi = score) %>%
+  left_join(mar_area) %>%
+  select(-layer,
+         area = km2)
+
+# status - all years from word document equations
+# aggregate all weighted timeseries per province (group by province and year), and divide by area
+mar.status.all.years =
+    D %>%
+      filter(!(area == 0)) %>% # exclude cases where no harvest and no allowable area (rgn_id 6) #  should be filter(!(area == 0 & harvest == 0))
+      group_by(rgn_id, year) %>%
+      summarize(yc = sum(harvest*msi/area),
+                yc.log = log10(yc+1)) %>%
+      ungroup(); head(mar.status.all.years); summary(mar.status.all.years); sapply(mar.status.all.years, class)
+
+# set reference point the highest region in the most recent (max) year
+ref_data = mar.status.all.years %>%
+  filter(year == 2013); ref_data
+
+ref_pt_info <- ref_data %>% filter(yc.log == max(yc.log, na.rm=TRUE))
+ref_pt <- ref_pt_info$yc.log
+cat(sprintf('reference point for MAR is: %s (region %s)\n', ref_pt, ref_pt_info$rgn_id)) # display reference point
+
+mar.status.all.years = mar.status.all.years %>%
+  mutate(x.mar = ifelse(yc.log / ref_pt > 1,
+                        1,
+                        yc.log / ref_pt)); head(mar.status.all.years); summary(mar.status.all.years)
+
+# current status
+mar.status = mar.status.all.years %>%
+  filter(year == max(year)) %>%
+  mutate(score = round(x.mar*100,2)) %>%
+  select(rgn_id,
+         score) %>%
+  rbind(data.frame(rgn_id = 6, #SH[6] has no MAR from 2007-2013, social preference to have no more mariculture. Add back as NA
+                   score  = NA)) %>%
+  arrange(rgn_id) %>%
+  mutate(dimension = 'status',
+         goal = 'MAR') %>%
+  select(goal,
+         dimension,
+         region_id = rgn_id,
+         score)
+
+
+# trend
+
+
+  ###################### gl 2014 ##################################
   # layers used: mar_harvest_tonnes, mar_harvest_species, mar_sustainability_score, mar_coastalpopn_inland25km, mar_trend_years
   harvest_tonnes = rename(
     SelectLayersData(layers, layers='mar_harvest_tonnes', narrow=T),
@@ -1407,6 +1488,7 @@ return(scores_LIV_ECO)
         metric_trend = weighted.mean(sector_trend, weight, na.rm=T)) %>% ## ning: calculated trend of all metrix: employed, jobs, jobs_adj, jobs_multi etc (see line 1398 -)
                                                                           # why? should we just use jobs_adj?
       # get mean trend across metrics (jobs, wages) per region
+      filter(metric == jobs_adj | metric == wages) %>%   ##
       group_by(rgn_id) %>%
       summarize(
         score = mean(metric_trend, na.rm=T)) %>%
