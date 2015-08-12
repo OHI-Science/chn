@@ -1213,17 +1213,18 @@ xECO_all_years = income %>%
           xECO = income/eco_ref*100); head(xECO_all_years)
 
 ECO.status = xECO_all_years %>%
-  filter(year == 2010) %>%
+  filter(year == max(year)) %>%
   select(region_id = rgn_id,
          score = xECO) %>%
   mutate(dimension = 'status',
          goal = 'ECO')  %>%
-  arrange(region_id)
+  arrange(region_id) ; head(ECO.status)
 
-#    region_id      score dimension goal
-# 1          1  31.738493    status  ECO
-# 2          2  13.968281    status  ECO
-# 3          3  36.607824    status  ECO
+#   region_id    score dimension goal
+# 1         1 32.28161    status  ECO
+# 2         2 15.43792    status  ECO
+# 3         3 37.49262    status  ECO
+# 4         4 85.39489    status  ECO
 
 # ECO trend
 
@@ -1233,20 +1234,12 @@ ECO.trend = xECO_all_years %>%
   summarize(region_id = rgn_id,
             score = pmax(pmin(coef(lmd)[['year']] *4, 1) ,-1),
             dimension = 'trend',
-            goal = 'ECO')
+            goal = 'ECO'); head(ECO.trend)
 
-#     region_id score dimension goal
-# 1          1     1     trend  ECO
-# 2          2    -1     trend  ECO
-# 3          3     1     trend  ECO
-# 4          4     1     trend  ECO
-# 5          5     1     trend  ECO
-# 6          6     1     trend  ECO
-# 7          7     1     trend  ECO
-# 8          8     1     trend  ECO
-# 9          9     1     trend  ECO
-# 10        10     1     trend  ECO
-# 11        11     1     trend  ECO
+#    region_id score dimension goal
+# 1         1     1     trend  ECO
+# 2         2     1     trend  ECO
+# 3         3     1     trend  ECO
 
 scores_LIV_ECO = rbind(LIV.status, LIV.trend, ECO.status, ECO.trend)
 return(scores_LIV_ECO)
