@@ -173,9 +173,12 @@ for (f_orig in mar_file_list) { # f_orig = "6A_mar_yk.xlsx"
 
 #AO ----
 
-ao_file_list = c("6B_ao_pp.xlsx",
-                 "6B_ao_oao.xlsx",
-                 "6B_ao_du.xlsx")
+ao_file_list = c("6B_ao_aec.xlsx",
+                 "6B_ao_aer.xlsx",
+                 "6B_ao_afc.xlsx",
+                 "6B_ao_afr.xlsx",
+                 "6B_ao_apc.xlsx",
+                 "6B_ao_apr.xlsx")
 
 for (f_orig in ao_file_list) {
   dir_f = file.path(dir_chn_prep, "2_AO")
