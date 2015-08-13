@@ -213,25 +213,6 @@ MAR = function(layers, status_years){
   mar_area = layers$data[['mar_ac']] #1994-2013
   mar_harvest = layers$data[['mar_yk']] #1994-2013
 
-# can't use b/c 1 of 3 data sets (msi) doesn't have year... anyway around it?
-#   lyrs = c('mar_smk', #MSI: maricutlure sustainability index
-#            'mar_ac',  #area
-#            'mar_yk')  #catch
-#   D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
-#
-# #       id_num year val_num  layer id_name val_name category_name                    flds category
-# #     1      1 1994  125620 mar_ac  rgn_id      km2          <NA> id_num | year | val_num     <NA>
-# #     2      1 1995  141410 mar_ac  rgn_id      km2          <NA> id_num | year | val_num     <NA>
-# #     3      1 1996  155003 mar_ac  rgn_id      km2          <NA> id_num | year | val_num     <NA>
-#
-#   rk = D %>%
-#     select(region_id = id_num,
-#            year,
-#            val_num,
-#            layer) %>%
-#   spread(layer, val_num) # didn't work b/c smi doesn't have years. got error message "duplicate identifiers.." b/c years were all NA.
-#
-
 D = full_join(mar_msi, mar_harvest, by=c("rgn_id", 'species' )) %>%
   select(rgn_id,
          species,
@@ -246,7 +227,7 @@ D = full_join(mar_msi, mar_harvest, by=c("rgn_id", 'species' )) %>%
 # aggregate all weighted timeseries per province (group by province and year), and divide by area
 mar.status.all.years =
     D %>%
-      filter(!(area == 0)) %>% # exclude cases where no harvest and no allowable area (rgn_id 6) #  should be filter(!(area == 0 & harvest == 0))
+      filter(!area == 0) %>% # exclude cases where no harvest and no allowable area (rgn_id 6) #  should be filter(!(area == 0 & harvest == 0))
       group_by(rgn_id, year) %>%
       summarize(yc = sum(harvest*msi/area),
                 yc.log = log10(yc+1)) %>%
@@ -283,6 +264,18 @@ mar.status = mar.status.all.years %>%
 
 
 # trend
+r.trend = mar.status.all.years %>%
+  select(rgn_id, year, x.mar) %>%
+  group_by(rgn_id) %>%
+  filter(year == (max(year)-4):max(year)) %>% #the most recent 5 years of data
+  do(dml = lm(x.mar ~ year, data=.)) %>%
+  mutate(score = pmax(-1, pmin(1, coef(dml)[['year']]*4))) %>% # 4 intervals
+  select(region_id = rgn_id,
+         score) %>%
+  rbind(data.frame(region_id = 6, score = NA)) %>% # rgn 6 (SH), again doesn't have a trend as there is no more MAR
+  mutate(dimension = 'trend',
+         goal = 'MAR')
+
 
 
   ###################### gl 2014 ##################################
