@@ -18,7 +18,6 @@ dir_layers = '~/github/chn/province2015/layers'
 
 dir_raw = c('mendes'='~/Google Drive/OHI China 2015/model_data/',
             'ningningj'='~/Google Drive/OHI China 2015/model_data/',
-            'OmarPro'='~/github/Google_Drive/OHI_China_2015/model_data',
             'julialowndes'='~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/',
             'jstewart'    ='~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/')[Sys.info()["user"]]
 
@@ -180,9 +179,14 @@ ao_file_list = c("6B_ao_aec.xlsx",
                  "6B_ao_apc.xlsx",
                  "6B_ao_apr.xlsx")
 
-for (f_orig in ao_file_list) {
+for (f_orig in ao_file_list) { # f_orig = ao_file_list[5]
   dir_f = file.path(dir_chn_prep, "2_AO")
   d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
+  names(d)[names(d) == "RMB/L"] = 'rmb_l' ##change the ao_aec and ao_aer (gas price) column name to rmb_l; R can't deal with /
+
+  if ("NO." %in% names(d)) {
+    d = rename(d, count = NO.)
+  } ## change ao_apc and ao_apr (port) column name to count
 
   dn = add_rgn_id(d, fld_name = "province_id")
 
@@ -193,7 +197,6 @@ for (f_orig in ao_file_list) {
   write_csv(dn, file.path(dir_layers, paste0(f_new, "_chn2015_LZH.csv")))
 }
 
-
 # TR ----
 
 tr_file_list = c("6G_tr_marinearea_chn2015_YWW.csv",
@@ -202,7 +205,7 @@ tr_file_list = c("6G_tr_marinearea_chn2015_YWW.csv",
 for (f_orig in tr_file_list) {
   dir_f = file.path(dir_chn_prep, "7_TR")
   d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
-  d = filter(d,!is.na(rgn_id)); head(d); # View(d)
+  d = filter(d,!is.na(rgn_id)); head(d);
   f_new = str_replace(f_orig, "6G_", "")
 
   write_csv(d, file.path(dir_f, f_new))
