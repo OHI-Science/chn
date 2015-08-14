@@ -40,8 +40,8 @@ Data sources:
 ","trend.score","trend score","cw_pesticide_trend_gl2014.csv","rgn_id",,,,"trend.score",,TRUE,,,0.127015383706281,0.127015383706281,TRUE,,,,11,FALSE
 "CW","cw_phosphate","Inorganic phosphate pollution ","Together with nitrogen and COD form an integrated indicator of nutrients and chemical pollutants","score","score","cw_phosphate_chn2015_LM.csv",,"rgn_id",,"year","score",,TRUE,2011,2013,0.1414,0.9998,TRUE,,,,11,FALSE
 "CW","cw_nitrogen","In organic nitrogen pollution","Together with phosphate and COD form an integrated indicator of nutrients and chemical pollutants","score","score","cw_nitrogen_chn2015_LM.csv",,"rgn_id",,"year","score",,TRUE,2011,2013,0.0209,1,TRUE,,,,11,FALSE
-"CW","cw_cod","Chemical oxygen demand","Together with nitrogen and phosphateform an integrated indicator of nutrients and chemical pollutants","score","score","cw_cod_chn2015_LM.csv",,"rgn_id","cod","year",,,TRUE,2011,2013,,,FALSE,,"NA score",,11,
-"CW","cw_oil","Oil pollution","Oil pollution","score","score","cw_oil_chn2015_LM.csv",,"rgn_id","oil","year",,,TRUE,2011,2013,,,FALSE,,"NA score",,11,
+"CW","cw_cod","Chemical oxygen demand","Together with nitrogen and phosphateform an integrated indicator of nutrients and chemical pollutants","score","score","cw_cod_chn2015_LM.csv",,"rgn_id",,"year","score",,TRUE,2011,2013,0.5895,1,TRUE,,,,11,FALSE
+"CW","cw_oil","Oil pollution","Oil pollution","score","score","cw_oil_chn2015_LM.csv",,"rgn_id",,"year","score",,TRUE,2011,2013,0.6282,0.9003,TRUE,,,,11,FALSE
 "FIS","fis_b_bmsy","B/Bmsy estimates obtained using the catch-MSY method","The ratio of population abundance compared to the abundance required to deliver maximum sustainable yield, obtained from the catch-MSY model (Martell & Froese, 2013).
 
 Data sources:

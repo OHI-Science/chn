@@ -367,10 +367,13 @@ cw_file_list = c('cw_phosphate_chn2015_LM.csv',
                  'cw_nitrogen_chn2015_LM.csv',
                  'cw_cod_chn2015_LM.csv',
                  'cw_oil_chn2015_LM.csv')
+
 for (f_orig in cw_file_list) {
 dir_f = file.path(dir_chn_prep, "8_CW")
 d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
 
-write_csv(d, file.path(dir_f, f_orig))
-write_csv(d, file.path(dir_layers, f_orig)) }
+dn = add_rgn_id(d, fld_name = 'rgn_id')
+
+write_csv(dn, file.path(dir_f, f_orig))
+write_csv(dn, file.path(dir_layers, f_orig)) }
 
