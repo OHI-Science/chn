@@ -2003,6 +2003,8 @@ SPP = function(layers){
   species = layers$data[['spp_species']] %>%
     select(rgn_id, risk.wt = value)
 
+  ## iucn_trends created by NCEAS from global SPP trend data. But only 11 species in 6 provinces have trend score.
+  ## used for now. will need updates later. See data_prep.r --> SPP for how to obtain the trend scores.
   trend = layers$data[['spp_iucn_trends']] %>%
     select(rgn_id, trend_score)
 
