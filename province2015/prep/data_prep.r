@@ -358,3 +358,16 @@ write_csv(d2, file.path(dir_layers, 'spp_iucn_trends_chn2015.csv'))
 # 15      9                         NA          NA
 # 16     10                         NA          NA
 
+
+# CW ----
+## all pollutants data are in one file.
+cw_file_list = c('cw_phosphate_chn2015_LM.csv',
+                 'cw_nitrogen_chn2015_LM.csv',
+                 'cw_cod_chn2015_LM.csv',
+                 'cw_oil_chn2015_LM.csv')
+for (f_orig in cw_file_list) {
+dir_f = file.path(dir_chn_prep, "8_CW")
+d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+
+write_csv(d, file.path(dir_f, f_orig))
+write_csv(d, file.path(dir_layers, f_orig)) }
