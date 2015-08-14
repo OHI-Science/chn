@@ -360,7 +360,9 @@ write_csv(d2, file.path(dir_layers, 'spp_iucn_trends_chn2015.csv'))
 
 
 # CW ----
-## all pollutants data are in one file.
+## in original data set, all pollutants are in one file. I have already separated each pollutant into
+## an individual data set and saved as a .csv
+
 cw_file_list = c('cw_phosphate_chn2015_LM.csv',
                  'cw_nitrogen_chn2015_LM.csv',
                  'cw_cod_chn2015_LM.csv',
@@ -371,3 +373,4 @@ d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
 
 write_csv(d, file.path(dir_f, f_orig))
 write_csv(d, file.path(dir_layers, f_orig)) }
+
