@@ -358,3 +358,12 @@ write_csv(d2, file.path(dir_layers, 'spp_iucn_trends_chn2015.csv'))
 # 15      9                         NA          NA
 # 16     10                         NA          NA
 
+
+# CW ----
+## all pollutants data are in one file.
+f_orig = "cw_po_chn2015_LM.xlsx"
+dir_f = file.path(dir_chn_prep, "8_CW")
+d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
+
+write_csv(d, file.path(dir_f, f_orig))
+write_csv(d, file.path(dir_layers, f_orig))
