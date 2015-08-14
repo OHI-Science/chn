@@ -11,7 +11,7 @@ Data sources:
 - The World Bank [GDP per capita, PPP (current international $)](http://data.worldbank.org/indicator/NY.GDP.PCAP.PP.CD)","value","value","ao_need_gl2014.csv","rgn_id",,,"year","value",,TRUE,1990,2013,0.0146203816305177,0.0924064512899154,TRUE,,,,11,FALSE
 "AO","ao_port","Port","Number of ports","count","value","ao_apc_chn2015_LZH.csv","rgn_id",,,,"count",,TRUE,,,3,290,FALSE,,,,11,FALSE
 "AO","ao_port_ref","Port reference","Reference point for number of ports","count","value","ao_apr_chn2015_LZH.csv","rgn_id",,,,"count",,TRUE,,,290,290,FALSE,,,,11,FALSE
-"AO","ao_men","Fishermen","Number of fishermen","individual","value","ao_afc_chn2015_LZH.csv","rgn_id",,,"year",,"individual",TRUE,2003,2013,,,FALSE,,,,11,
+"AO","ao_men","Fishermen","Number of fishermen","individual","value","ao_afc_chn2015_LZH.csv","rgn_id",,,"year","individual",,TRUE,2003,2013,3312,902792,FALSE,,,,11,FALSE
 "AO","ao_men_ref","Fishermen reference","Reference point for number of fishermen","individual","value","ao_afr_chn2015_LZH.csv","rgn_id",,,"year","individual",,TRUE,2003,2013,818372,902792,FALSE,,,,11,FALSE
 "AO","ao_gas","Gas price","Gas price","rmb_l","RMB/L","ao_aec_chn2015_LZH.csv","rgn_id",,,"year","rmb_l",,TRUE,2010,2014,6.05,7.92,FALSE,,,,11,FALSE
 "AO","ao_gas_ref","Gas price reference","Reference point for gas price","rmb_l","RMB/L","ao_aer_chn2015_LZH.csv","rgn_id",,,"year","rmb_l",,TRUE,2010,2014,6.5,7.92,FALSE,,,,11,FALSE
