@@ -185,7 +185,7 @@ Data sources:
 
 - [International Union for Conservation of Nature (IUCN)](http://www.iucnredlist.org/technical-documents/classification-schemes/threats-classification-scheme)
 ","score","trend score","spp_trend_gl2014.csv","rgn_id",,,,"score",,TRUE,,,-0.254331358915499,-0.254331358915499,FALSE,,,,11,FALSE
-"SPP","spp_species","Species lists, China and IUCN threat categories as a proxy for iconic species trend","China's protected species list, and International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists.","value","value","spp_species_chn2015_LM.csv","rgn_id",,"sciname",,"value",,TRUE,,,0,0.8,TRUE,"chn_class,iucn_class",,2,11,FALSE
+"SPP","spp_species","Species lists, China and IUCN threat categories as a proxy for iconic species trend","China's protected species list, and International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists.","value","value","spp_species_chn2015_LM.csv","rgn_id",,"sciname",,"value",,TRUE,,,0,0.8,TRUE,"chn_class,iucn_class",,,11,FALSE
 "TR","tr_jobs_total","Total labor force","","count","jobs","tr_jobs_total_sc2014-popn-inland25km.csv","rgn_id",,,"year","count",,TRUE,1990,2012,5566587.10743865,266826151.733338,FALSE,,,,11,FALSE
 "TR","tr_jobs_tourism","Direct employment in tourism","Data sources:","count","jobs","tr_jobs_tourism_sc2014-popn-inland25km.csv","rgn_id",,,"year","count",,TRUE,1988,2013,101206.289199695,7748931.45201248,FALSE,,,,11,FALSE
 "TR","tr_sustainability","Sustainability index","","score","score","tr_sustainability_gl2014.csv","rgn_id",,,,"score",,TRUE,,,5.11,5.11,FALSE,,,,11,FALSE
