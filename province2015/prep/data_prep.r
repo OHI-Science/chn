@@ -181,12 +181,19 @@ ao_file_list = c("6B_ao_aec.xlsx",
 
 for (f_orig in ao_file_list) { # f_orig = ao_file_list[5]
   dir_f = file.path(dir_chn_prep, "2_AO")
-  d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
-  names(d)[names(d) == "RMB/L"] = 'rmb_l' ##change the ao_aec and ao_aer (gas price) column name to rmb_l; R can't deal with /
 
+  # ao_afc (number of fishermen) last col was set as "date". Need to change to "numeric" for calculation:
+  d = if (f_orig == "6B_ao_afc.xlsx") {
+    read_excel(file.path(dir_raw, f_orig), col_types = c('text', 'numeric', 'numeric'))
+  } else {read_excel(file.path(dir_raw, f_orig))} ; head(d) ; summary(d)
+
+  # change the ao_aec and ao_aer (gas price) column name to rmb_l; R can't deal with /
+  names(d)[names(d) == "RMB/L"] = 'rmb_l'
+
+  # change ao_apc and ao_apr (port) column name to count
   if ("NO." %in% names(d)) {
     d = rename(d, count = NO.)
-  } ## change ao_apc and ao_apr (port) column name to count
+  }
 
   dn = add_rgn_id(d, fld_name = "province_id")
 
@@ -350,4 +357,23 @@ write_csv(d2, file.path(dir_layers, 'spp_iucn_trends_chn2015.csv'))
 # 14      7                         NA          NA
 # 15      9                         NA          NA
 # 16     10                         NA          NA
+
+
+# CW ----
+## in original data set, all pollutants are in one file. I have already separated each pollutant into
+## an individual data set and saved as a .csv
+
+cw_file_list = c('cw_phosphate_chn2015_LM.csv',
+                 'cw_nitrogen_chn2015_LM.csv',
+                 'cw_cod_chn2015_LM.csv',
+                 'cw_oil_chn2015_LM.csv')
+
+for (f_orig in cw_file_list) {
+dir_f = file.path(dir_chn_prep, "8_CW")
+d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+
+dn = add_rgn_id(d, fld_name = 'rgn_id')
+
+write_csv(dn, file.path(dir_f, f_orig))
+write_csv(dn, file.path(dir_layers, f_orig)) }
 

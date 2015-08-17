@@ -1915,6 +1915,62 @@ SP = function(scores){
 
 CW = function(layers){
 
+  # cast data: 8/14: CHN manual showed 2010-2014 calculations. but I only have 2011 - 2013. Have emailed
+  # Mian for more data.
+ lyrs = c('cw_phosphate', 'cw_nitrogen', 'cw_cod', 'cw_oil')
+ d = SelectLayersData(layers, layers = lyrs); head(d) ; summary(d)
+
+ D = d%>%
+   select(rgn_id = id_num,
+          year,
+          val_num,
+          layer) %>%
+   spread(layer, val_num) %>% #head(D)
+   rename(phosphate = cw_phosphate,
+          nitrogen = cw_nitrogen,
+          cod = cw_cod,
+          oil = cw_oil)
+
+ # status
+ # model = 4throot (mean(pollutant_scores))
+
+ cw.status.all.years = D %>%
+   group_by(rgn_id, year) %>%
+   mutate(cw = (sum(phosphate, nitrogen, cod, oil)/4)^(1/4)) %>%
+   ungroup %>%
+   mutate(cw.ref = max(cw[year==max(year)])) %>% # reference point: not specified in OHI manual yet. choose the highest cw.score of all regions
+                                                   # in most recent year as a ref point for now
+   mutate(x.cw = cw/cw.ref*100)
+
+ # current status
+ r.status = cw.status.all.years %>%
+   mutate(goal = 'CW',
+          dimension = 'status') %>%
+   filter(year == max(year)) %>%
+   select(goal,
+          dimension,
+          region_id = rgn_id,
+          score = x.cw); head(r.status)
+
+  # trend
+ r.trend = cw.status.all.years %>%
+   group_by(rgn_id) %>%
+   do(dml = lm(x.cw ~ year, data = .)) %>%
+   summarize(region_id = rgn_id,
+             trend = max(-1, min(1, coef(dml)[['year']]))) %>%
+   mutate(goal = 'CW',
+          dimension = 'trend') %>%
+   select(goal,
+          dimension,
+          region_id,
+          score = trend)
+
+ scores = rbind(r.status, r.trend)
+
+
+
+
+###################### gl 2014 #################################
   # layers
   lyrs = c('po_pathogens' = 'a',
            'po_nutrients' = 'u',
@@ -2073,6 +2129,8 @@ SPP = function(layers){
   species = layers$data[['spp_species']] %>%
     select(rgn_id, risk.wt = value)
 
+  ## iucn_trends created by NCEAS from global SPP trend data. But only 11 species in 6 provinces have trend score.
+  ## used for now. will need updates later. See data_prep.r --> SPP for how to obtain the trend scores.
   trend = layers$data[['spp_iucn_trends']] %>%
     select(rgn_id, trend_score)
 
