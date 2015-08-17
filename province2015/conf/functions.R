@@ -19,32 +19,85 @@ FIS = function(layers, status_year){
            ct = tonnes)
 
   # status:
-  # Bt = Ct / ft
+  # Bt = ut/q
 
   # delta_Bt:    0,              if mmsy_ref-Bt<0.05*mmsy_ref
   #              |mmsy_ref-Bt|,  if  |mmsy_ref-Bt|<mmsy_ref
   #              mmsy_ref,       otherwise.
   # xFIS = (1 - delta_Bt/mmsy_ref) * Tc
 
-D = ft %>%
+    # before calculating status, we need to obtain r, K, and q:
+    # first, calcualte Ut = Ct/ft, and Ut+1
+    # then, run a multiple linear regression in the form of:
+    # Ut+1 - Ut - 1 = r - [r/(Kq)]*Ut - q*ft
+    # obtain r, K, q from linear model coefficients
+
+D1 = ft %>%
   left_join(ct, by = c("rgn_id", "year")) %>%
   mutate(ut = ct/ft) %>%
   group_by(rgn_id) %>%
-  mutate(ut_plus1 = c(ut[-1], NA),
+  mutate(ut_plus1 = c(ut[-1], NA), # lag: start from year 1, last year 2013 set as NA.
+                                   # Q: lost the most recent year's info
          y = ut_plus1/ut - 1) %>%
-  do(dlm = lm(y ~ ut + ft, data = D)) %>%
-  mutate(#r = dlm$coefficients[1],
-         q = coef(dlm)[['ft']])
+  filter(!year=='2013')
 
+D2 = D1 %>%
+  do(dlm = lm(y ~ ut + ft, data = .)) %>%
+  # calculating r, q, and K from multiple linear regression
+  mutate(r = coef(dlm)[["(Intercept)"]],
+         r_Kq = -coef(dlm)[['ut']], # = r/Kq
+         q = -coef(dlm)[['ft']],
+         K = r/r_Kq/q,
+         mmsy = r*K/4,
+         mmsy_r = mmsy*0.75)  %>%
+  select(-dlm) %>%
+  ungroup; head(D); summary(D)
 
+## Q?: some K and mmsy are negative numbers. cross checked with CHN's mmsy data layer, only rgn 1 and 4
+## have the same mmsy values. contacted CHN team (Yang Yang) with my data.
+## To export table to contact CHN team for comparison:
+write_csv(D, file.path(dir_raw, "fis_test.csv"))
 
+# status
+status.all.years = D2 %>%
+  select(rgn_id, q) %>%
+  full_join(
+    select(D1, rgn_id, year, ut), by = 'rgn_id') %>%
+  mutate(Bt = ut/q) %>%
+  full_join(
+    select(D2, rgn_id, mmsy_r), by = 'rgn_id') %>%
+  mutate(abs = abs(mmsy_r - Bt), #absolute value of (mmsy_r - Bt)
 
+         d_Bt = if (abs< 0.05*mmsy_r) {
+           0
+         } else if ( abs > 0.05*mmsy_r | abs < mmsy_r) {
+                       abs
+         } else mmsy_r ) %>%
+  full_join (tc, by = 'rgn_id') %>%
+  mutate(x.fis = max(0, min(1, (1 - d_Bt/mmsy_r)*tc))*100) ## Q? all status are 0
 
+# current status
+r.status = status.all.years %>%
+  filter(year==max(year)) %>% # year = 2012
+  mutate(goal = "FIH",
+         dimension = 'status') %>%
+  select(goal,
+         dimension,
+         region_id = rgn_id,
+         score = x.fis)
 
-
-
-
-
+# trend
+r.trend = status.all.years %>%
+  group_by(rgn_id) %>%
+  filter(year == (max(year) - 4) : max(year)) %>% # most recent 5 years of data
+  do(dml = lm(x.fis ~ year, data =.)) %>%
+  mutate(trend = coef(dml)[['year']]*4,  # can't calculate now b/c all 0's
+         goal = 'FIS',
+         dimension = 'trend') %>%
+  select(goal,
+         dimension,
+         region_id = rgn_id,
+         score = trend)
 
 
   ######################### gl 2014 ######################################
