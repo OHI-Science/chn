@@ -1,4 +1,53 @@
 FIS = function(layers, status_year){
+
+  #CHN model:
+  ft = layers$data[['fis_ft']] %>% # fishing efforts
+    select(-layer,
+           ft = kilowatt)
+
+  mmsy = layers$data[['fis_mmsy']] %>% #maximum sustainable yield
+    select(rgn_id,
+           mmsy = tonnes)
+
+  tc = layers$data[['fis_tc']] %>% #normalizing factor
+    select(rgn_id,
+           tc = score)
+
+  ct = layers$data[['fis_ct']] %>% # total catch
+    select(rgn_id,
+           year,
+           ct = tonnes)
+
+  # status:
+  # Bt = Ct / ft
+
+  # delta_Bt:    0,              if mmsy_ref-Bt<0.05*mmsy_ref
+  #              |mmsy_ref-Bt|,  if  |mmsy_ref-Bt|<mmsy_ref
+  #              mmsy_ref,       otherwise.
+  # xFIS = (1 - delta_Bt/mmsy_ref) * Tc
+
+D = ft %>%
+  left_join(ct, by = c("rgn_id", "year")) %>%
+  mutate(ut = ct/ft) %>%
+  group_by(rgn_id) %>%
+  mutate(ut_plus1 = c(ut[-1], NA),
+         y = ut_plus1/ut - 1) %>%
+  do(dlm = lm(y ~ ut + ft, data = D)) %>%
+  mutate(#r = dlm$coefficients[1],
+         q = coef(dlm)[['ft']])
+
+
+
+
+
+
+
+
+
+
+
+
+  ######################### gl 2014 ######################################
   # layers used: fis_meancatch, fis_b_bmsy, fis_proparea_saup2rgn
 
   # catch data
@@ -432,6 +481,27 @@ AO = function(layers,
               year_max,
               year_min=max(min(layers_data$year, na.rm=T), year_max - 10),
               Sustainability=1.0){
+
+  # CHN model:
+  # cast data
+  lyrs = c('ao_port',
+          'ao_port_ref',
+          'ao_men',
+          'ao_men_ref',
+          'ao_gas',
+          'ao_gas_ref')
+  D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
+
+  D = D %>%
+    select(region_id = id_num,
+           year,
+           val_num,
+           layer) %>%
+    spread(layer, val_num)
+
+
+
+  ######################## gl 2014 #######################################
 
   # cast data
   layers_data = SelectLayersData(layers, targets='AO')
