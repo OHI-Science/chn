@@ -384,7 +384,12 @@ r.trend = mar.status.all.years %>%
          score) %>%
   rbind(data.frame(region_id = 6, score = NA)) %>% # rgn 6 (SH), again doesn't have a trend as there is no more MAR
   mutate(dimension = 'trend',
-         goal = 'MAR')
+         goal = 'MAR') %>%
+  select(goal,
+         dimension,
+         region_id,
+         score) %>%
+  arrange(region_id)
 
 scores = rbind(r.status, r.trend)
 
@@ -795,7 +800,7 @@ CS = function(layers){
            'cs_extent_trend')
   D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
   # SelectLayerData 从数据层中选所需文件
-  # head: 头6横行行数据
+  # head: 头6横行数据
   # summary: 总结
 
   # spread data so layers are columns
