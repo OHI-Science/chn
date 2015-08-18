@@ -1728,10 +1728,10 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
 
   # Calculate status of each year in each province
   d = cmpa %>%
-    left_join(marinearea)%>% #head(d)
-    mutate(reference = marinearea*0.3)%>% # 30% of jurisdictional marine area
+    left_join(marinearea, by = 'rgn_id') %>% #head(d)
+    mutate(reference = marinearea*0.05)%>% # ref is 5% of jurisdictional marine area
     mutate(pct_cmpa = cmpa/marinearea*100)%>%
-    mutate(status = pmin(pct_cmpa/30 *100, 100))
+    mutate(status = pmin(pct_cmpa/5 *100, 100))
 
  # Current status: year = 2012
   r.status = filter(d, year == 2012)%>%
