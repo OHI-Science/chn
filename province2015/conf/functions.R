@@ -788,7 +788,7 @@ CS = function(layers){
 #     library(dplyr)
 #     library(tidyr)
 
-  # identify and select layers 调出所需文件, 文件名字用 layers.csv 中设置的段名字
+  # identify and select layers 调出所需文件, 文件名字用 layers.csv 中设置的短名字
   lyrs = c('cs_condition',
            'cs_contribution',
            'cs_extent',
