@@ -312,18 +312,18 @@ MAR = function(layers, status_years){
   # CHN model: Yc = sum(harvest * msi) / area
   #         status= log10(Yc+1)
 
-  # cast data
+  # cast data 取数据
   mar_msi = layers$data[['mar_smk']]
   mar_area = layers$data[['mar_ac']] #1994-2013
   mar_harvest = layers$data[['mar_yk']] #1994-2013
 
-D = full_join(mar_msi, mar_harvest, by=c("rgn_id", 'species' )) %>%
+D = full_join(mar_msi, mar_harvest, by=c("rgn_id", 'species' )) %>% # 合并数据
   select(rgn_id,
          species,
          year,
          harvest = tonnes,
          msi = score) %>%
-  left_join(mar_area) %>%
+  left_join(mar_area, by=c("rgn_id", "year")) %>%
   select(-layer,
          area = km2)
 
@@ -338,12 +338,16 @@ mar.status.all.years =
       ungroup(); head(mar.status.all.years); summary(mar.status.all.years); sapply(mar.status.all.years, class)
 
 # set reference point the highest region in the most recent (max) year
-ref_data = mar.status.all.years %>%
-  filter(year == 2013); ref_data
+# 参考点的取值，暂时取用最近一年最高 yc.log 值为参考点； 在文件叙述中没有表明。需要讨论。
 
-ref_pt_info <- ref_data %>% filter(yc.log == max(yc.log, na.rm=TRUE))
+ref_data = mar.status.all.years %>%
+  filter(year == 2013); ref_data #选最近一年
+
+ref_pt_info <- ref_data %>% filter(yc.log == max(yc.log, na.rm=TRUE)) #选最高yc.log 为参考点
 ref_pt <- ref_pt_info$yc.log
-cat(sprintf('reference point for MAR is: %s (region %s)\n', ref_pt, ref_pt_info$rgn_id)) # display reference point
+cat(sprintf('reference point for MAR is: %s (region %s)\n', ref_pt, ref_pt_info$rgn_id))
+# display reference point
+# 直接显示／打印标题内容 cat(sprintf('.... %s ...%s..'), 取代第一个%s, 取代第二个%s)
 
 mar.status.all.years = mar.status.all.years %>%
   mutate(x.mar = ifelse(yc.log / ref_pt > 1,
@@ -372,8 +376,10 @@ r.trend = mar.status.all.years %>%
   select(rgn_id, year, x.mar) %>%
   group_by(rgn_id) %>%
   filter(year == (max(year)-4):max(year)) %>% #the most recent 5 years of data
-  do(dml = lm(x.mar ~ year, data=.)) %>%
-  mutate(score = pmax(-1, pmin(1, coef(dml)[['year']]*4))) %>% # 4 intervals
+  do(dml = lm(x.mar ~ year, data=.)) %>% # lm 线性方程
+  mutate(score = pmax(-1, pmin(1, coef(dml)[['year']]*4))) %>% # 4 intervals 4个间隔；year的系数
+                                                               # pmin(1, ...): 最大不超过1
+                                                               # pmax(-1, ...): 最小不超过－1
   select(region_id = rgn_id,
          score) %>%
   rbind(data.frame(region_id = 6, score = NA)) %>% # rgn 6 (SH), again doesn't have a trend as there is no more MAR
@@ -778,16 +784,19 @@ NP <- function(layers){
 
 CS = function(layers){
 
-  # temporary libraries to load while testing
+  # temporary libraries to load while testing （工具包）
 #     library(dplyr)
 #     library(tidyr)
 
-  # identify and select layers
+  # identify and select layers 调出所需文件
   lyrs = c('cs_condition',
            'cs_contribution',
            'cs_extent',
            'cs_extent_trend')
   D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
+  # SelectLayerData 从数据层中选所需文件
+  # head: 头6横行行数据
+  # summary: 总结
 
   # spread data so layers are columns
   rk = D %>%
@@ -795,8 +804,8 @@ CS = function(layers){
            layer,
            habitat = category,
            val_num) %>%
-    tidyr::spread(layer, val_num) %>%   #spread(key=variable to become the column headings, value=data)
-    dplyr::rename(contribution = cs_contribution,
+    tidyr::spread(layer, val_num) %>%   #spread(key=variable to become the column headings, value=data) 展开
+    dplyr::rename(contribution = cs_contribution, #另命名
                   condition    = cs_condition,
                   extent       = cs_extent,
                   extent_trend = cs_extent_trend); head(rk)
@@ -812,33 +821,35 @@ CS = function(layers){
 
   # limit to CS habitats (since only some habitats contribute to CS, but all are included in BD)
   rk = rk %>%
-    filter(habitat %in% c('mangroves','saltmarshes','seagrasses'))
+    filter(habitat %in% c('mangroves','saltmarshes','seagrasses')) # 过滤，只选想要的数据横行
 
 
-  ## status model calculations
+  ## status model calculations 现状
   #  for each region, for each habitat, it's the (sum of extent*condition*contribution)/sum(extent)
   #  xCS = sum(ck           * Cc/Cr     * Ak) / At
   #  xCS = sum(contribution * condition * extent_per_habitat) / total_extent_all_habitats
 
   xCS = rk %>%
-    mutate(c_c_a = contribution * condition * extent) %>%  #calculate for each region, each habitat
+    mutate(c_c_a = contribution * condition * extent) %>%  # 另加 calculate for each region, each habitat
     group_by(region_id) %>%
     summarize(sum_c_c_a  = sum(c_c_a),          # summarize will act based on group_by; aggregate for each region
               total_extent = sum(extent)) %>%   # compare by substituting 'mutate' in place of 'summarize'; summarize
                                                 # gives one aggregated sum_c_c_a to each region, while mutate would simply add
                                                 # one new column and give one sum_c_c_a to each region and habitat
+                                                # 摘要，和另加相似，但会聚集一组数据，结果指给一个
     ungroup() %>% #always a good practice to ungroup before next operation
     mutate(xCS_calc = sum_c_c_a/total_extent,
            score = min(1,xCS_calc) * 100); head(xCS) #score can't exceed 100
 
   # format to combine with other goals **variable must be called r.status with the proper formatting**
+  # 一定要取名：r.status (和r.trend)
     r.status = xCS %>%
     mutate(goal      = 'CS',
            dimension = 'status') %>%
-    select(region_id,
-           goal,
+    select(goal, # 选择,只选需要的竖行
            dimension,
-           score); head(r.status)
+           region_id,
+           score); head(r.status) #一定要是这个顺序
 
   # r.status formatting
   #   region_id goal dimension    score
@@ -847,7 +858,7 @@ CS = function(layers){
   #            3   CS    status 68.25393
 
 
-  # trend calculations
+  # trend calculations 趋势计算
   trendCS = rk %>%
     group_by(region_id) %>%
     summarize(trend_raw = sum(extent * extent_trend) / sum(extent),
@@ -857,9 +868,9 @@ CS = function(layers){
   r.trend = trendCS %>%
     mutate(goal      = 'CS',
            dimension = 'trend') %>%
-    select(region_id,
-           goal,
+    select(goal,
            dimension,
+           region_id,
            score)
 
   # r.trend formatting
@@ -870,7 +881,7 @@ CS = function(layers){
 
 
   # return scores
-  scores = rbind(r.status, r.trend)
+  scores = rbind(r.status, r.trend) #合并所有横行
   return(scores)
 }
 
