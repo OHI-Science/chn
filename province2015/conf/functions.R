@@ -56,7 +56,7 @@ D2 = D1 %>%
 ## Q?: some K and mmsy are negative numbers. cross checked with CHN's mmsy data layer, only rgn 1 and 4
 ## have the same mmsy values. contacted CHN team (Yang Yang) with my data.
 ## To export table to contact CHN team for comparison:
-write_csv(D, file.path(dir_raw, "fis_test.csv"))
+## write_csv(D, file.path(dir_raw, "fis_test.csv")) -> fis_test1 & fis_test2
 
 # status
 status.all.years = D2 %>%
@@ -91,7 +91,7 @@ r.trend = status.all.years %>%
   group_by(rgn_id) %>%
   filter(year == (max(year) - 4) : max(year)) %>% # most recent 5 years of data
   do(dml = lm(x.fis ~ year, data =.)) %>%
-  mutate(trend = coef(dml)[['year']]*4,  # can't calculate now b/c all 0's
+  mutate(trend = coef(dml)[['year']]*4,  # can't calculate now b/c all status are 0's
          goal = 'FIS',
          dimension = 'trend') %>%
   select(goal,
@@ -99,6 +99,8 @@ r.trend = status.all.years %>%
          region_id = rgn_id,
          score = trend)
 
+fis_scores = rbind(r.status, r.trend)
+return(fis_scores)
 
   ######################### gl 2014 ######################################
   # layers used: fis_meancatch, fis_b_bmsy, fis_proparea_saup2rgn
@@ -378,6 +380,7 @@ r.trend = mar.status.all.years %>%
   mutate(dimension = 'trend',
          goal = 'MAR')
 
+scores = rbind(r.status, r.trend)
 
 
   ###################### gl 2014 ##################################
@@ -536,22 +539,66 @@ AO = function(layers,
               Sustainability=1.0){
 
   # CHN model:
-  # cast data
-  lyrs = c('ao_port',
-          'ao_port_ref',
-          'ao_men',
-          'ao_men_ref',
-          'ao_gas',
-          'ao_gas_ref')
-  D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
+  # xAO = (APc/APr + AFc/AFr + AEc/AEr) / 3
 
-  D = D %>%
-    select(region_id = id_num,
+  # cast data
+  lyrs = c(#'ao_port',
+           #'ao_port_ref', # no year. couldn't join port data with the men and gas data properly
+          'ao_men',       #2003-2013
+          'ao_men_ref',
+          'ao_gas',       #2010-2014
+          'ao_gas_ref')
+  d = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
+
+  D = d %>%
+    select(rgn_id = id_num,
            year,
            val_num,
            layer) %>%
-    spread(layer, val_num)
+    spread(layer, val_num) %>%
+    select(rgn_id,
+           year,
+           gas = ao_gas,
+           gas_ref = ao_gas_ref,
+           fishermen = ao_men,
+           fishermen_ref = ao_men_ref) %>%
+    full_join(layers$data[['ao_port']] %>%
+                select(rgn_id, port = count), by = 'rgn_id') %>% # join with port and port_ref data
+    full_join(layers$data[['ao_port_ref']] %>%
+                select(rgn_id, port_ref = count), by = 'rgn_id')
 
+  # status
+  status.all.years = D %>%
+    group_by(rgn_id) %>%
+    filter(!is.na(gas) & !is.na(fishermen)) %>% # NA prevents further calculations
+    mutate(x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen_ref + gas/gas_ref)/3))*100 )
+  ## Q for CHN: only 2010-2013 have data in all three categories (port, fishermen, gas), and thus only those
+  ## years have status scores. do you want to see score for 2014, using only gas and port data?
+
+  # current status: 2013
+  r.status = status.all.years %>%
+    filter(year == 2013) %>%
+    mutate(goal = 'AO',
+           dimension = 'status') %>%
+    select(goal,
+           dimension,
+           region_id = rgn_id,
+           score = x.ao)
+
+  # trend calculation: 2010-2013
+  r.trend = status.all.years %>%
+    group_by(rgn_id) %>%
+    do(dml = lm(x.ao ~ year, data =.)) %>%
+    mutate(trend = coef(dml)[['year']]*3,  # 4 years, 3 intervals
+           goal = "AO",
+           dimension = "trend") %>%
+    select(goal,
+           dimension,
+           region_id = rgn_id,
+           score = trend)
+
+
+  scores = rbind(r.status, r.trend)
 
 
   ######################## gl 2014 #######################################
