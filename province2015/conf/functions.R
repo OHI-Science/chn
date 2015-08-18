@@ -575,6 +575,9 @@ AO = function(layers,
   ## Q for CHN: only 2010-2013 have data in all three categories (port, fishermen, gas), and thus only those
   ## years have status scores. do you want to see score for 2014, using only gas and port data?
 
+  ## Ref point: ref points for each year in provided data. shouldn'd we use one ref point for each region
+  ## (ie. highest number of fishermen in rgn 1 across all years)
+
   # current status: 2013
   r.status = status.all.years %>%
     filter(year == 2013) %>%
@@ -807,9 +810,7 @@ CS = function(layers){
 #            4  seagrasses          0.5       0.8     289         -0.1
 
 
-  # limit to CS habitats (since only some habitats contribute to CS, but all are included in BD) -> not really needed
-  # here b/c only these three habitats are included in the dataset. But good to pay attention to it, and if needed,
-  # use filter as such:
+  # limit to CS habitats (since only some habitats contribute to CS, but all are included in BD)
   rk = rk %>%
     filter(habitat %in% c('mangroves','saltmarshes','seagrasses'))
 
@@ -884,18 +885,21 @@ CP = function(layers){
     select(rgn_id,
            habitat,
            condition=value) %>%
-    full_join(layers$data[['cs_extent']] %>%
+    full_join(layers$data[['cp_extent']] %>%
                 select(-layer,
                        -year,
-                       extent = hectare) ) %>% #join by rgn_id, habitat
+                       extent = hectare),
+              by = c('rgn_id', 'habitat')) %>% #join by rgn_id, habitat
     full_join(layers$data[['cs_extent_trend']] %>%
                 select(-layer,
-                       trend = trend.score))
+                       trend = trend.score),
+              by = c('rgn_id', 'habitat'))
 
   # add habitat weight
   habitat.wt = c('saltmarshes' = 3,
                  'mangroves' = 4,
-                 'seagrasses' = 1)
+                 'seagrasses' = 1,
+                 'coral' = 4)
   m = m %>%
     mutate(weight = habitat.wt[habitat])
 
@@ -920,10 +924,6 @@ CP = function(layers){
               goal = 'CP') %>%
     rename(region_id = rgn_id) ; head(r.status)
 
-#    region_id    score dimension goal
-# 1          1 49.99748    status   CP
-# 2          2 50.00000    status   CP
-# 3          3 50.00000    status   CP
 
 # Trend
 r.trend = m %>%
@@ -936,11 +936,6 @@ r.trend = m %>%
          score,
          dimension,
          goal) ; head(r.trend)
-
-# region_id       score dimension goal
-# 1         1 -0.09999159     trend   CP
-# 2         2 -0.10000000     trend   CP
-# 3         3 -0.10000000     trend   CP
 
 #combine status and trend
 scores_CP = rbind(r.status, r.trend)
