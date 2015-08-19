@@ -1,4 +1,4 @@
-FIS = function(layers, status_year){
+FIS = function(layers){
 
   #CHN model:
   ft = layers$data[['fis_ft']] %>% # fishing efforts
@@ -32,283 +32,92 @@ FIS = function(layers, status_year){
     # Ut+1 - Ut - 1 = r - [r/(Kq)]*Ut - q*ft
     # obtain r, K, q from linear model coefficients
 
-D1 = ft %>%
-  left_join(ct, by = c("rgn_id", "year")) %>%
-  mutate(ut = ct/ft) %>%
-  group_by(rgn_id) %>%
-  mutate(ut_plus1 = c(ut[-1], NA), # lag: start from year 1, last year 2013 set as NA.
-                                   # Q: lost the most recent year's info
-         y = ut_plus1/ut - 1) %>%
-  filter(!year=='2013')
+  ### To Mian: Real calculation of status. but results are all 0's, which screwed up trend calcualtion in the next step.
+  ### So I made a place holder status data set after this session (line 101 -). You should check on this.
 
-D2 = D1 %>%
-  do(dlm = lm(y ~ ut + ft, data = .)) %>%
-  # calculating r, q, and K from multiple linear regression
-  mutate(r = coef(dlm)[["(Intercept)"]],
-         r_Kq = -coef(dlm)[['ut']], # = r/Kq
-         q = -coef(dlm)[['ft']],
-         K = r/r_Kq/q,
-         mmsy = r*K/4,
-         mmsy_r = mmsy*0.75)  %>%
-  select(-dlm) %>%
-  ungroup; head(D); summary(D)
+# D1 = ft %>%
+#   left_join(ct, by = c("rgn_id", "year")) %>%
+#   mutate(ut = ct/ft) %>%
+#   group_by(rgn_id) %>%
+#   mutate(ut_plus1 = c(ut[-1], NA), # lag: start from year 1, last year 2013 set as NA.
+#                                    # Q: lost the most recent year's info
+#          y = ut_plus1/ut - 1) %>%
+#   filter(!year=='2013')
+#
+# D2 = D1 %>%
+#   do(dlm = lm(y ~ ut + ft, data = .)) %>%
+#   # calculating r, q, and K from multiple linear regression
+#   mutate(r = coef(dlm)[["(Intercept)"]],
+#          r_Kq = -coef(dlm)[['ut']], # = r/Kq
+#          q = -coef(dlm)[['ft']],
+#          K = r/r_Kq/q,
+#          mmsy = r*K/4,
+#          mmsy_r = mmsy*0.75)  %>%
+#   select(-dlm) %>%
+#   ungroup; head(D2); summary(D2)
 
-## Q?: some K and mmsy are negative numbers. cross checked with CHN's mmsy data layer, only rgn 1 and 4
-## have the same mmsy values. contacted CHN team (Yang Yang) with my data.
-## To export table to contact CHN team for comparison:
-## write_csv(D, file.path(dir_raw, "fis_test.csv")) -> fis_test1 & fis_test2
+## status:
+# fis.status.all.years = D2 %>%
+#   select(rgn_id, q) %>%
+#   full_join(
+#     select(D1, rgn_id, year, ut), by = 'rgn_id') %>%
+#   mutate(Bt = ut/q) %>%
+#   full_join(
+#     select(D2, rgn_id, mmsy_r), by = 'rgn_id') %>%
+#   mutate(abs = abs(mmsy_r - Bt), #absolute value of (mmsy_r - Bt)
+#
+#          d_Bt = if (abs< 0.05*mmsy_r) {
+#            0
+#          } else if ( abs > 0.05*mmsy_r | abs < mmsy_r) {
+#                        abs
+#          } else mmsy_r ) %>%
+#   full_join (tc, by = 'rgn_id') %>%
+#   mutate(x.fis = max(0, min(1, (1 - d_Bt/mmsy_r)*tc))*100)
+#
+# # current status
+# r.status = fis.status.all.years %>%
+#   filter(year==max(year)) %>% # year = 2012
+#   mutate(goal = "FIS",
+#          dimension = 'status') %>%
+#   select(goal,
+#          dimension,
+#          region_id = rgn_id,
+#          score = x.fis)
 
-# status
-status.all.years = D2 %>%
-  select(rgn_id, q) %>%
-  full_join(
-    select(D1, rgn_id, year, ut), by = 'rgn_id') %>%
-  mutate(Bt = ut/q) %>%
-  full_join(
-    select(D2, rgn_id, mmsy_r), by = 'rgn_id') %>%
-  mutate(abs = abs(mmsy_r - Bt), #absolute value of (mmsy_r - Bt)
-
-         d_Bt = if (abs< 0.05*mmsy_r) {
-           0
-         } else if ( abs > 0.05*mmsy_r | abs < mmsy_r) {
-                       abs
-         } else mmsy_r ) %>%
-  full_join (tc, by = 'rgn_id') %>%
-  mutate(x.fis = max(0, min(1, (1 - d_Bt/mmsy_r)*tc))*100) ## Q? all status are 0
-
-# current status
-r.status = status.all.years %>%
-  filter(year==max(year)) %>% # year = 2012
-  mutate(goal = "FIH",
-         dimension = 'status') %>%
-  select(goal,
-         dimension,
-         region_id = rgn_id,
-         score = x.fis)
-
-# trend
-r.trend = status.all.years %>%
-  group_by(rgn_id) %>%
-  filter(year == (max(year) - 4) : max(year)) %>% # most recent 5 years of data
-  do(dml = lm(x.fis ~ year, data =.)) %>%
-  mutate(trend = coef(dml)[['year']]*4,  # can't calculate now b/c all status are 0's
-         goal = 'FIS',
-         dimension = 'trend') %>%
-  select(goal,
-         dimension,
-         region_id = rgn_id,
-         score = trend)
-
-fis_scores = rbind(r.status, r.trend)
-return(fis_scores)
-
-  ######################### gl 2014 ######################################
-  # layers used: fis_meancatch, fis_b_bmsy, fis_proparea_saup2rgn
-
-  # catch data
-  c = SelectLayersData(layers, layers='fis_meancatch', narrow=T) %>%
-    select(
-      fao_saup_id    = id_chr,
-      taxon_name_key = category,
-      year,
-      catch          = val_num)
-
-  # separate out the region ids:
-  c$fao_id    <- as.numeric(sapply(strsplit(as.character(c$fao_saup_id), "_"), function(x)x[1]))
-  c$saup_id   <- as.numeric(sapply(strsplit(as.character(c$fao_saup_id), "_"), function(x)x[2]))
-  c$TaxonName <- sapply(strsplit(as.character(c$taxon_name_key), "_"), function(x)x[1])
-  c$TaxonKey  <- as.numeric(sapply(strsplit(as.character(c$taxon_name_key), "_"), function(x)x[2]))
-  c$catch     <- as.numeric(c$catch)
-  c$year      <- as.numeric(as.character(c$year))
-  #Create Identifier for linking assessed stocks with country-level catches
-  c$stock_id <- paste(as.character(c$TaxonName),
-                      as.character(c$fao_id), sep="_")
-
-  # b_bmsy data
-  b = SelectLayersData(layers, layer='fis_b_bmsy', narrow=T) %>%
-    select(
-      fao_id         = id_num,
-      TaxonName      = category,
-      year,
-      bmsy           = val_num)
-  # Identifier taxa/fao region:
-  b$stock_id <- paste(b$TaxonName, b$fao_id, sep="_")
-  b$bmsy     <- as.numeric(b$bmsy)
-  b$fao_id   <- as.numeric(as.character(b$fao_id))
-  b$year     <- as.numeric(as.character(b$year))
+  ###  Real calculation of trend when FIS status question answered (ie. status = 0)
+  # r.trend = status.all.years %>%
+  #   group_by(rgn_id) %>%
+  #   filter(year == (max(year) - 4) : max(year)) %>% # most recent 5 years of data
+  #   do(dml = lm(x.fis ~ year, data =.)) %>%
+  #   mutate(trend = coef(dml)[['year']]*4,  # can't calculate now b/c all status are 0's
+  #          goal = 'FIS',
+  #          dimension = 'trend') %>%
+  #   select(goal,
+  #          dimension,
+  #          region_id = rgn_id,
+  #          score = trend)
 
 
-  # area data for saup to rgn conversion
-  a = layers$data[['fis_proparea_saup2rgn']] %>%
-    select(saup_id, rgn_id, prop_area)
-  a$prop_area <- as.numeric(a$prop_area)
-  a$saup_id   <- as.numeric(as.character(a$saup_id))
-  a$rgn_id    <- as.numeric(as.character(a$rgn_id))
-
-  # ------------------------------------------------------------------------
-  # STEP 1. Merge the species status data with catch data
-  #     AssessedCAtches: only taxa with catch status data
-  # -----------------------------------------------------------------------
-  AssessedCatches <- join(b, c,
-                          by=c("stock_id", "year"), type="inner")
-
-  # b,c by stock_id
-
-  # include only taxa with species-level data
-  AssessedCatches <- AssessedCatches[as.numeric(AssessedCatches$TaxonKey)>=600000, ]
-  AssessedCatches$penalty <- 1
-
-  # ------------------------------------------------------------------------
-  # STEP 2. Estimate status data for catch taxa without species status
-  #     UnAssessedCatches: taxa with catch status data
-  # -----------------------------------------------------------------------
-  UnAssessedCatches <- c[!(c$year %in% AssessedCatches$year &
-                             c$stock_id %in% AssessedCatches$stock_id), ]
-
-  # 2a.  Join UnAssessedCatches data to the b_bmsy summaries for each FAO/Year
-
-  # Average status data for assessed stocks by FAO region for each year.
-  # This is used as the starting estimate for unassesed stocks
-  # Here, the Median b_bmsy was chosen for TaxonKey >= 600000
-  # and Min b_bmsy for TaxonKey < 600000
-  #  *************NOTE *****************************
-  #  Using the minimum B/BMSY score as an starting point
-  #  for the estimate of B/BMSY for unassessed taxa not
-  #  identified to species level is very conservative.
-  #  This is a parameter that can be changed.
-  #  ***********************************************
-  b_summary <- ddply(b, .(fao_id, year), summarize,
-                     Medianb_bmsy=quantile(as.numeric(bmsy), probs=c(0.5)),
-                     Minb_bmsy=min(as.numeric(bmsy)))
-
-  UnAssessedCatches <- join(UnAssessedCatches, b_summary, by=c("fao_id", "year"),
-                            type="left", match="all")
-
-  #  UnAssessedCatches <- UnAssessedCatches[!(is.na(UnAssessedCatches$Medianb_bmsy)), ] #added 8/21/2014 due to changes in b/bmsy data created NAs here
-
-  #   ## Troubleshooting:
-  #   head(UnAssessedCatches[is.na(UnAssessedCatches$Medianb_bmsy), ])
-  #   tmp <- UnAssessedCatches[is.na(UnAssessedCatches$Medianb_bmsy), ]
-  #   unique(tmp$fao_id)
-  #   saups <- unique(tmp$saup_id)
-  #   unique(tmp$stock_id)
-  #   a[a$saup_id %in% saups,]
-  #
-  #   ggplot(tmp, aes(x=year, y=catch, group=saup_id, color=saup_id)) +
-  #     geom_point() +
-  #     geom_line() +
-  #     facet_wrap( ~ stock_id, ncol=9, scale="free")
-  #
-  # 2b.  Create a penalty variable based on taxa level:
-  UnAssessedCatches$TaxonPenaltyCode <- substring(UnAssessedCatches$TaxonKey,1,1)
-
-  # 2c. Create a penalty table for taxa not identified to species level
-  #  *************NOTE *****************************
-  #  In some cases, it may make sense to alter the
-  #  penalty for not identifying fisheries catch data to
-  #  species level.
-  #  ***********************************************
-  penaltyTable <- data.frame(TaxonPenaltyCode=1:6,
-                             penalty=c(0.01, 0.25, 0.5, 0.8, 0.9, 1))
-  # 2d.Merge with data
-  UnAssessedCatches <- join(UnAssessedCatches, penaltyTable, by="TaxonPenaltyCode")
-
-  # ------------------------------------------------------------------------
-  # STEP 3. Calculate score for all taxa based on status (b/bmsy) and taxa
-  # -----------------------------------------------------------------------
-
-  #  *************NOTE *****************************
-  #  These values can be altered
-  #  ***********************************************
-  alpha <- 0.5
-  beta <- 0.25
-  lowerBuffer <- 0.95
-  upperBuffer <- 1.05
-
-  ## Function to calculate score for different scenarios:
-  score <- function(data, variable){
-    #data <- AssessedCatches
-    #variable <- "bmsy"
-    ifelse(data[ ,variable]*data[, "penalty"]<lowerBuffer,
-           data[ ,variable]*data[, "penalty"],
-           ifelse(data[ ,variable]*data[, "penalty"]>upperBuffer,
-                  ifelse(1-alpha*(data[ ,variable]*data[, "penalty"]
-                                  -upperBuffer)>beta,
-                         1-alpha*(data[ ,variable]*data[, "penalty"]-upperBuffer),beta),
-                  1))
-  }
-
-  AssessedCatches$score <- score(data=AssessedCatches, variable="bmsy")
-
-  # Median is used to calculate score for species with Taxon 6 coding
-  UnAssessedCatchesT6 <- subset(UnAssessedCatches, penalty==1)
-  UnAssessedCatchesT6$score <- score(UnAssessedCatchesT6, "Medianb_bmsy")
-
-  UnAssessedCatches <- subset(UnAssessedCatches, penalty!=1)
-  UnAssessedCatches$score <- score(UnAssessedCatches, "Medianb_bmsy")
-
-  AllScores <- rbind(AssessedCatches[,c("TaxonName", "TaxonKey", "year", "fao_id", "saup_id", "catch","score")],
-                     UnAssessedCatchesT6[,c("TaxonName", "TaxonKey", "year", "fao_id", "saup_id", "catch","score")],
-                     UnAssessedCatches[,c("TaxonName", "TaxonKey", "year", "fao_id", "saup_id", "catch","score")])
-
-  # ------------------------------------------------------------------------
-  # STEP 4. Calculate status for each saup_id region
-  # -----------------------------------------------------------------------
-
-  # 4a. To calculate the weight (i.e, the relative catch of each stock per saup_id),
-  # the mean catch of taxon i is divided by the
-  # sum of mean catch of all species in region r, which is calculated as:
-
-  smc <- ddply(.data = AllScores, .(year, saup_id), summarize,
-               SumCatch = sum(catch))
-  AllScores<-join(AllScores,smc,by=c("year","saup_id"))
-  AllScores$wprop<-AllScores$catch/AllScores$SumCatch
+  ### Status Place holder
+  r.status = data.frame(goal = 'FIS',
+                        dimension = 'status',
+                        region_id = c(1:11),
+                        score = 1)
 
 
-  #  4b. The "score" and "weight" values per taxon per SAUP region are used to
-  #    calculate a geometric weighted mean across taxa for each saup_id region
-  geomMean <- ddply(.data = AllScores, .(saup_id, year), summarize, status_saup = prod(score^wprop))
+ ### Trend place holder
+r.trend = data.frame(goal = 'FIS',
+                     dimension = 'trend',
+                     region_id = c(1:11),
+                     score = 0)
 
-  # ------------------------------------------------------------------------
-  # STEP 5. Convert status from saup spatial scale to OHI spatial scale
-  # -----------------------------------------------------------------------
-  # In many cases the ohi reporting regions are comprised of multiple saup regions.
-  # To correct for this, the proportion of each saup area of the total area of the
-  # OHI region was calculated. This was used to calculate Status from the Status_saup.
-  # This type of adjustment is omitted if the data were collected at the same spatial
-  # scale as the collecting region.
 
-  # Join region names/ids to Geom data
-  geomMean <- join(a, geomMean, type="inner", by="saup_id") # merge km2 of shelf area with status results
 
-  # weighted mean scores
-  StatusData <- ddply(.data = geomMean, .(rgn_id, year), summarize, Status = sum(status_saup*prop_area))
-
-  # 2013 status is based on 2011 data (most recent data)
-  status = StatusData %>%
-    filter(year==status_year) %>%
-    mutate(
-      score     = round(Status*100),
-      dimension = 'status') %>%
-    select(region_id=rgn_id, dimension, score)
-
-  # ------------------------------------------------------------------------
-  # STEP 6. Calculate trend
-  # -----------------------------------------------------------------------
-  trend = ddply(StatusData, .(rgn_id), function(x){
-    mdl = lm(Status ~ year, data=x)
-    data.frame(
-      score     = round(coef(mdl)[['year']] * 5, 2),
-      dimension = 'trend')}) %>%
-    select(region_id=rgn_id, dimension, score)
-  # %>% semi_join(status, by='rgn_id')
-
-  # assemble dimensions
-  scores = rbind(status, trend) %>% mutate(goal='FIS')
-  return(scores)
+scores = rbind(r.status, r.trend)
+return(scores)
 }
 
-MAR = function(layers, status_years){
+MAR = function(layers, Debug=T){
   # CHN model: Yc = sum(harvest * msi) / area
   #         status= log10(Yc+1)
 
@@ -355,7 +164,7 @@ mar.status.all.years = mar.status.all.years %>%
                         yc.log / ref_pt)); head(mar.status.all.years); summary(mar.status.all.years)
 
 # current status
-mar.status = mar.status.all.years %>%
+r.status = mar.status.all.years %>%
   filter(year == max(year)) %>%
   mutate(score = round(x.mar*100,2)) %>%
   select(rgn_id,
@@ -391,147 +200,76 @@ r.trend = mar.status.all.years %>%
          score) %>%
   arrange(region_id)
 
+
+# if (Debug == TRUE) mar_scores = rbind(r.status, r.trend)
+
+
 scores = rbind(r.status, r.trend)
+return(scores)
 
 
-  ###################### gl 2014 ##################################
-  # layers used: mar_harvest_tonnes, mar_harvest_species, mar_sustainability_score, mar_coastalpopn_inland25km, mar_trend_years
-  harvest_tonnes = rename(
-    SelectLayersData(layers, layers='mar_harvest_tonnes', narrow=T),
-    c('id_num'='rgn_id', 'category'='species_code', 'year'='year', 'val_num'='tonnes'))
-  harvest_species = rename(
-    SelectLayersData(layers, layers='mar_harvest_species', narrow=T),
-    c('category'='species_code', 'val_chr'='species'))
-  sustainability_score = rename(
-    SelectLayersData(layers, layers='mar_sustainability_score', narrow=T),
-    c('id_num'='rgn_id', 'category'='species', 'val_num'='sust_coeff'))
-  popn_inland25mi = rename(
-    SelectLayersData(layers, layers='mar_coastalpopn_inland25km', narrow=T),
-    c('id_num'='rgn_id', 'year'='year', 'val_num'='popsum'))
-  trend_years = rename(
-    SelectLayersData(layers, layers='mar_trend_years', narrow=T),
-    c('id_num'='rgn_id', 'val_chr'='trend_yrs'))
-
-  rky = harvest_tonnes %>%
-    merge(harvest_species     , all.x=TRUE, by='species_code') %>%
-    merge(sustainability_score, all.x=TRUE, by=c('rgn_id', 'species')) %>%
-    dcast(rgn_id + species + species_code + sust_coeff ~ year, value.var='tonnes', mean, na.rm=T) %>%
-    arrange(rgn_id, species)
-
-  # x = csv_compare(rky, '1-rky')
-
-  # smooth each species-country time-series using a running mean with 4-year window, excluding NAs from the 4-year mean calculation
-  # TODO: simplify below with dplyr::group_by()
-  yrs_smooth <- names(rky)[!names(rky) %in% c('rgn_id','species','species_code','sust_coeff')]
-  rky_smooth = zoo::rollapply(t(rky[,yrs_smooth]), 4, mean, na.rm = TRUE, partial=T)
-  rownames(rky_smooth) = as.character(yrs_smooth)
-  rky_smooth = t(rky_smooth)
-  rky = as.data.frame(cbind(rky[, c('rgn_id','species','species_code','sust_coeff')], rky_smooth)); head(rky)
-  #  x = csv_compare(rky, '2-rky-smooth')  # DEBUG
-
-  # melt
-  m = melt(rky,
-           id=c('rgn_id', 'species', 'species_code', 'sust_coeff'),
-           variable.name='year', value.name='sm_tonnes'); head(m)
-  #   m <- m %>%
-  #     arrange(rgn_id, species)
-  #   x = csv_compare(m, '3-m-melt')  # DEBUG
-  # "Component “year”: 'current' is not a factor"
-
-  # for each species-country-year, smooth mariculture harvest times the sustainability coefficient
-  m = within(m, {
-    sust_tonnes = sust_coeff * sm_tonnes
-    year        = as.numeric(as.character(m$year))
-  })
-  #   m <- m %>%
-  #     arrange(rgn_id, species)
-  #   x = csv_compare(m, '4-m-within')  # DEBUG
-
-  # merge the MAR and coastal human population data
-  m = merge(m, popn_inland25mi, by=c('rgn_id','year'), all.x=T)
-  #   m <- m %>%
-  #     arrange(rgn_id, species, species_code)
-  #   m_a = csv_compare(m, '5-m-merge')  # DEBUG
-
-  # must first aggregate all weighted timeseries per region, before dividing by total population
-  #   ry = ddply(m, .(rgn_id, year, popsum), summarize,
-  #              sust_tonnes_sum = sum(sust_tonnes),
-  #              mar_pop         = sum(sust_tonnes) / popsum[1]) # <-- PROBLEM using popsum[1] with ddply!!!
-
-  # aggregate all weighted timeseries per region, and divide by coastal human population
-  ry = m %>%
-    group_by(rgn_id, year) %>%
-    summarize(
-      sust_tonnes_sum = sum(sust_tonnes)) %>%
-    merge(
-      popn_inland25mi, by=c('rgn_id','year'), all.x=T) %>%
-    mutate(
-      mar_pop         = sust_tonnes_sum / popsum) %>%
-    select(rgn_id, year, popsum, sust_tonnes_sum, mar_pop)
-  #  ry_b = csv_compare(ry, '6-ry-ddply')  # RIGHT
-  #   ry_a = ry
-  #   eq = all.equal(ry_a, ry_b)
-  #   if (class(eq) == 'character') browser()
-
-
-  # get reference quantile based on argument years
-  ref_95pct = quantile(subset(ry, year <= max(status_years), mar_pop, drop=T), 0.95, na.rm=T)
-  #  x = csv_compare(ref_95pct, '7-ref95pct-quantile')  # DEBUG
-
-  # identify reference rgn_id
-  ry_ref = ry %>%
-    filter(year <=max(status_years)) %>%
-    arrange(mar_pop) %>%
-    filter(mar_pop >= ref_95pct)
-  cat(sprintf('95th percentile rgn_id for MAR ref pt is: %s\n', ry_ref$rgn_id[1])) # rgn_id 25 = Thailand
-
-  ry = within(ry, {
-    status = ifelse(mar_pop / ref_95pct > 1,
-                    1,
-                    mar_pop / ref_95pct)})
-  status <- subset(ry, year == max(status_years), c('rgn_id', 'status'))
-  status$status <- round(status$status*100, 2)
-  #   x = csv_compare(ry, '8-ry-within')  # DEBUG
-
-  # get list where trend is only to be calculated up to second-to-last-year
-  # species where the last year of the time-series was 2010, and the same value was copied over to 2011
-  # i.e. it was gapfilled using the previous year
-
-  # get MAR trend
-  ry = merge(ry, trend_years, all.x=T)
-  yr_max = max(status_years)
-  trend = ddply(ry, .(rgn_id), function(x){  # x = subset(ry, rgn_id==5)
-    yrs = ifelse(x$trend_yrs=='4_yr',
-                 (yr_max-5):(yr_max-1), # 4_yr
-                 (yr_max-5):(yr_max))   # 5_yr
-    y = subset(x, year %in% yrs)
-    return(data.frame(
-      trend = round(max(min(lm(status ~ year, data=y)$coefficients[['year']] * 5, 1), -1), 2)))
-  })
-
-  # return scores
-  scores = status %>%
-    select(region_id = rgn_id,
-           score     = status) %>%
-    mutate(dimension='status') %>%
-    rbind(
-      trend %>%
-        select(region_id = rgn_id,
-               score     = trend) %>%
-        mutate(dimension = 'trend')) %>%
-    mutate(goal='MAR')
-
-  return(scores)
-  # NOTE: some differences to www2013 are due to 4_yr species only previously getting trend calculated to 4 years (instead of 5)
 }
 
-FP = function(layers, scores){
+FP = function(layers, scores, debug=T){
+  # CHN model: xFP = w * xFIS + (1-w) * xMAR
+  #
+  #            w = 1,                      if xMAR = No data
+  #                0.5,                    if xFIS = 0.25 * Tc
+  #                Bt/(Bt + sum(Yk)),      otherwise
+
+
+  mar_yk = layers$data[['mar_yk']] %>%
+    group_by(rgn_id) %>%
+    filter(year == max(year)) %>% # mar: status of 2013
+    summarize(sum.yk = sum(tonnes)) %>%
+    rename(region_id = rgn_id)
+
+  fis_Bt = fis.status.all.years %>%
+    group_by(rgn_id) %>%
+    filter(year == max(year)) %>% # fis: status of 2012
+    select(region_id = rgn_id, Bt)
+
+  fis_Tc = layers$data[['fis_tc']] %>%
+    rename(region_id = rgn_id,
+           Tc = score)
+
+  r.status = rbind(fis_scores, mar_scores) %>%
+    filter(dimension == 'status') %>%
+    spread(goal, score) %>%
+    left_join(mar_yk, by = 'region_id') %>%
+    left_join(fis_Bt, by = 'region_id') %>%
+    left_join(fis_Tc, by = 'region_id') %>%
+    mutate(w = ifelse (is.na(MAR), 1,
+                       ifelse(FIS == 0.25 * fis_Tc, 0.5, Bt/(Bt+sum.yk)))) %>%
+    mutate(score = w*FIS + (1-w)*MAR,
+           goal = "FP",
+           dimension = "status") %>%
+    select(goal,
+           dimension,
+           region_id,
+           score)
+
+  r.trend = rbind(fis_scores, mar_scores) %>%
+    filter(dimension == 'status') %>%
+
+
+
+  ############# gl 2014
+
+    # while developing
+    # scores = rbind(mar_scores, fis_scores) #read.csv('~/github/chn/province2015/scores.csv')
+
   # weights
   w = rename(SelectLayersData(layers, layers='fp_wildcaught_weight', narrow=T),
              c('id_num'='region_id', 'val_num'='w_FIS')); head(w)
 
   # scores
-  s = dcast(scores, region_id + dimension ~ goal, value.var='score', subset=.(goal %in% c('FIS','MAR') & !dimension %in% c('pressures','resilience'))); head(s)
+   s = scores %>%
+    filter(goal %in% c('MAR', 'FIS'),
+           !dimension %in% c('pressures','resilience')) %>%
+    tidyr::spread(goal, score) %>%
+    select(region_id, dimension, FIS, MAR)
+
 
   # combine
   d = merge(s, w)
