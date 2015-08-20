@@ -991,7 +991,7 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
    group_by(rgn_id) %>%
    do(dlm = lm(status ~ year, data=.)) %>%
    summarize(region_id = rgn_id,
-             score = max(min(coef(dml)[['year']]*3, 1) -1) *100,
+             score = max(min(coef(dlm)[['year']]*3, 1) -1),
              dimension = 'trend',
              goal = 'LSP') ; head(r.trend) # all 0's
 
@@ -1009,18 +1009,14 @@ return(scores_LSP)
 
 SP = function(scores){
 
-  d = within(
-    dcast(
-      scores,
-      region_id + dimension ~ goal, value.var='score',
-      subset=.(goal %in% c('ICO','LSP') & !dimension %in% c('pressures','resilience')))
-    , {
-      goal = 'SP'
-      score = rowMeans(cbind(ICO, LSP), na.rm=T)})
+  scores = rbind(scores_ICO, scores_LSP) %>%
+    spread(goal, score) %>%
+    filter(!dimension %in% c('pressures', 'resilience')) %>%
+    mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP))),
+           goal = 'SP') %>%
+    select(goal, dimension, region_id, score)
 
-
-  # return all scores
-  return(rbind(scores, d[,c('region_id','goal','dimension','score')]))
+return(scores)
 }
 
 
