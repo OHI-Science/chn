@@ -232,7 +232,7 @@ FP = function(layers, scores, debug=T){
     summarize(sum.yk = sum(tonnes)) %>%
     rename(region_id = rgn_id)
 
-  fis_Bt = fis.status.all.years %>% # calculated in FIS status
+  fis_Bt = layers$data[['fis_Bt']] %>% # calculated in FIS status
     group_by(rgn_id) %>%
     filter(year == max(year)) %>% # fis: status of 2012； FIS 现状用2012
     select(region_id = rgn_id, Bt)
