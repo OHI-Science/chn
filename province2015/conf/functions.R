@@ -1,6 +1,6 @@
 FIS = function(layers){
 
-  #CHN model:
+# cast data
   ft = layers$data[['fis_ft']] %>% # fishing efforts
     select(-layer,
            ft = kilowatt)
@@ -18,7 +18,7 @@ FIS = function(layers){
            year,
            ct = tonnes)
 
-  # status:
+## Status model:
   # Bt = ut/q
 
   # delta_Bt:    0,              if mmsy_ref-Bt<0.05*mmsy_ref
@@ -32,49 +32,52 @@ FIS = function(layers){
     # Ut+1 - Ut - 1 = r - [r/(Kq)]*Ut - q*ft
     # obtain r, K, q from linear model coefficients
 
-  ### To Mian: Real calculation of status. but results are all 0's, which screwed up trend calcualtion in the next step.
+  ### To Mian: Real calculation of status and trend (40-102). but results are all 0's, which screwed up trend calcualtion in the next step.
   ### So I made a place holder status data set after this session (line 101 -). You should check on this.
+  ### 李冕，40-102 是正确的计算方式。但现状（status) 计算结果很奇怪，全是0，因为中间计算的的 r, K, q, mmsy 结果奇怪，有很多
+  ### 不该有的负数值。导致趋势 (trend) 计算不能做。这里你该仔细看一看。为了FP计算，我暂时在101- 我暂时做了占位符 （r.status, r.trend)。
 
-# D1 = ft %>%
-#   left_join(ct, by = c("rgn_id", "year")) %>%
-#   mutate(ut = ct/ft) %>%
-#   group_by(rgn_id) %>%
-#   mutate(ut_plus1 = c(ut[-1], NA), # lag: start from year 1, last year 2013 set as NA.
-#                                    # Q: lost the most recent year's info
-#          y = ut_plus1/ut - 1) %>%
-#   filter(!year=='2013')
-#
-# D2 = D1 %>%
-#   do(dlm = lm(y ~ ut + ft, data = .)) %>%
-#   # calculating r, q, and K from multiple linear regression
-#   mutate(r = coef(dlm)[["(Intercept)"]],
-#          r_Kq = -coef(dlm)[['ut']], # = r/Kq
-#          q = -coef(dlm)[['ft']],
-#          K = r/r_Kq/q,
-#          mmsy = r*K/4,
-#          mmsy_r = mmsy*0.75)  %>%
-#   select(-dlm) %>%
-#   ungroup; head(D2); summary(D2)
+  # combining all data
+D1 = ft %>%
+  left_join(ct, by = c("rgn_id", "year")) %>%
+  mutate(ut = ct/ft) %>%
+  group_by(rgn_id) %>%
+  mutate(ut_plus1 = c(ut[-1], NA), # lag: start from year 1, last year 2013 set as NA.
+                                   # Q: lost the most recent year's info
+         y = ut_plus1/ut - 1) %>%
+  filter(!year=='2013')
+
+D2 = D1 %>%
+  do(dlm = lm(y ~ ut + ft, data = .)) %>%
+  # calculating r, q, and K from multiple linear regression
+  mutate(r = coef(dlm)[["(Intercept)"]],
+         r_Kq = -coef(dlm)[['ut']], # = r/Kq
+         q = -coef(dlm)[['ft']],
+         K = r/r_Kq/q,
+         mmsy = r*K/4,
+         mmsy_r = mmsy*0.75)  %>%
+  select(-dlm) %>%
+  ungroup; head(D2); summary(D2)
 
 ## status:
-# fis.status.all.years = D2 %>%
-#   select(rgn_id, q) %>%
-#   full_join(
-#     select(D1, rgn_id, year, ut), by = 'rgn_id') %>%
-#   mutate(Bt = ut/q) %>%
-#   full_join(
-#     select(D2, rgn_id, mmsy_r), by = 'rgn_id') %>%
-#   mutate(abs = abs(mmsy_r - Bt), #absolute value of (mmsy_r - Bt)
-#
-#          d_Bt = if (abs< 0.05*mmsy_r) {
-#            0
-#          } else if ( abs > 0.05*mmsy_r | abs < mmsy_r) {
-#                        abs
-#          } else mmsy_r ) %>%
-#   full_join (tc, by = 'rgn_id') %>%
-#   mutate(x.fis = max(0, min(1, (1 - d_Bt/mmsy_r)*tc))*100)
-#
-# # current status
+fis.status.all.years = D2 %>%
+  select(rgn_id, q) %>%
+  full_join(
+    select(D1, rgn_id, year, ut), by = 'rgn_id') %>%
+  mutate(Bt = ut/q) %>%
+  full_join(
+    select(D2, rgn_id, mmsy_r), by = 'rgn_id') %>%
+  mutate(abs = abs(mmsy_r - Bt), #absolute value of (mmsy_r - Bt)
+
+         d_Bt = if (abs< 0.05*mmsy_r) {
+           0
+         } else if ( abs > 0.05*mmsy_r | abs < mmsy_r) {
+                       abs
+         } else mmsy_r ) %>%
+  full_join (tc, by = 'rgn_id') %>%
+  mutate(x.fis = max(0, min(1, (1 - d_Bt/mmsy_r)*tc))*100)
+
+# # current status 最近一年现状
 # r.status = fis.status.all.years %>%
 #   filter(year==max(year)) %>% # year = 2012
 #   mutate(goal = "FIS",
@@ -85,6 +88,7 @@ FIS = function(layers){
 #          score = x.fis)
 
   ###  Real calculation of trend when FIS status question answered (ie. status = 0)
+  ### 趋势计算
   # r.trend = status.all.years %>%
   #   group_by(rgn_id) %>%
   #   filter(year == (max(year) - 4) : max(year)) %>% # most recent 5 years of data
@@ -99,13 +103,13 @@ FIS = function(layers){
 
 
   ### Status Place holder
-  r.status = data.frame(goal = 'FIS',
+r.status = data.frame(goal = 'FIS',
                         dimension = 'status',
                         region_id = c(1:11),
                         score = 1)
 
 
- ### Trend place holder
+ ### Trend placeholder
 r.trend = data.frame(goal = 'FIS',
                      dimension = 'trend',
                      region_id = c(1:11),
@@ -113,13 +117,13 @@ r.trend = data.frame(goal = 'FIS',
 
 
 
-scores = rbind(r.status, r.trend)
+fis_scores = rbind(r.status, r.trend)
 return(scores)
 }
 
 MAR = function(layers, Debug=T){
   # CHN model: Yc = sum(harvest * msi) / area
-  #         status= log10(Yc+1)
+  #        status = log10(Yc+1)
 
   # cast data 取数据
   mar_msi = layers$data[['mar_smk']]
@@ -136,11 +140,12 @@ D = full_join(mar_msi, mar_harvest, by=c("rgn_id", 'species' )) %>% # 合并数�
   select(-layer,
          area = km2)
 
-# status - all years from word document equations
+# status - using all years from word document equations
 # aggregate all weighted timeseries per province (group by province and year), and divide by area
 mar.status.all.years =
     D %>%
-      filter(!area == 0) %>% # exclude cases where no harvest and no allowable area (rgn_id 6) #  should be filter(!(area == 0 & harvest == 0))
+      filter(!area == 0) %>% #  exclude cases where no harvest and no allowable area (rgn_id 6)
+                             #  should be filter(!(area == 0 & harvest == 0))
       group_by(rgn_id, year) %>%
       summarize(yc = sum(harvest*msi/area),
                 yc.log = log10(yc+1)) %>%
@@ -203,10 +208,8 @@ r.trend = mar.status.all.years %>%
 
 # if (Debug == TRUE) mar_scores = rbind(r.status, r.trend)
 
-
-scores = rbind(r.status, r.trend)
+mar_scores = rbind(r.status, r.trend)
 return(scores)
-
 
 }
 
@@ -217,69 +220,54 @@ FP = function(layers, scores, debug=T){
   #                0.5,                    if xFIS = 0.25 * Tc
   #                Bt/(Bt + sum(Yk)),      otherwise
 
-
+# cast data needed for w calculation: Bt, Yk, Tc from FIS and MAR data layers and calculations
   mar_yk = layers$data[['mar_yk']] %>%
     group_by(rgn_id) %>%
-    filter(year == max(year)) %>% # mar: status of 2013
+    filter(year == max(year)) %>% # mar: status of 2013； MAR 现状用2013
     summarize(sum.yk = sum(tonnes)) %>%
     rename(region_id = rgn_id)
 
-  fis_Bt = fis.status.all.years %>%
+  fis_Bt = fis.status.all.years %>% # calculated in FIS status
     group_by(rgn_id) %>%
-    filter(year == max(year)) %>% # fis: status of 2012
+    filter(year == max(year)) %>% # fis: status of 2012； FIS 现状用2012
     select(region_id = rgn_id, Bt)
 
   fis_Tc = layers$data[['fis_tc']] %>%
     rename(region_id = rgn_id,
            Tc = score)
 
-  r.status = rbind(fis_scores, mar_scores) %>%
+### 计算现状， 239-243 在正式计算所有得分(通过calculate_scores.R)并储存在scores.csv 之后，用来代替 247-248
+#   s = scores %>%
+#     filter(goal %in% c('MAR', 'FIS'),
+#            !dimension %in% c('pressures','resilience')) %>%
+#     tidyr::spread(goal, score) %>%
+#     select(region_id, dimension, FIS, MAR)
+
+  # combine fis and mar scores
+  s = rbind(fis_scores, mar_scores) %>%
+    spread(goal, score)
+
+  # calcualte w
+  w = s %>%
     filter(dimension == 'status') %>%
-    spread(goal, score) %>%
     left_join(mar_yk, by = 'region_id') %>%
     left_join(fis_Bt, by = 'region_id') %>%
     left_join(fis_Tc, by = 'region_id') %>%
     mutate(w = ifelse (is.na(MAR), 1,
                        ifelse(FIS == 0.25 * fis_Tc, 0.5, Bt/(Bt+sum.yk)))) %>%
+    select(region_id, w)
+
+  scores_FP = s %>%
+    full_join(w, by = 'region_id') %>%
     mutate(score = w*FIS + (1-w)*MAR,
-           goal = "FP",
-           dimension = "status") %>%
+           goal = 'FP') %>%
     select(goal,
            dimension,
            region_id,
            score)
 
-  r.trend = rbind(fis_scores, mar_scores) %>%
-    filter(dimension == 'status') %>%
+  return(scores_FP) }
 
-
-
-  ############# gl 2014
-
-    # while developing
-    # scores = rbind(mar_scores, fis_scores) #read.csv('~/github/chn/province2015/scores.csv')
-
-  # weights
-  w = rename(SelectLayersData(layers, layers='fp_wildcaught_weight', narrow=T),
-             c('id_num'='region_id', 'val_num'='w_FIS')); head(w)
-
-  # scores
-   s = scores %>%
-    filter(goal %in% c('MAR', 'FIS'),
-           !dimension %in% c('pressures','resilience')) %>%
-    tidyr::spread(goal, score) %>%
-    select(region_id, dimension, FIS, MAR)
-
-
-  # combine
-  d = merge(s, w)
-  d$w_MAR = 1 - d$w_FIS
-  d$score = apply(d[,c('FIS','MAR','w_FIS', 'w_MAR')], 1, function(x){ weighted.mean(x[1:2], x[3:4], na.rm=TRUE) })
-  d$goal = 'FP'
-
-  # return all scores
-  return(rbind(scores, d[,c('region_id','goal','dimension','score')]))
-}
 
 
 AO = function(layers,
@@ -351,6 +339,7 @@ AO = function(layers,
 
 
   scores = rbind(r.status, r.trend)
+  return(scores)
 
 
   ######################## gl 2014 #######################################
@@ -1097,8 +1086,8 @@ LIV_ECO = function(layers, subgoal){
  # calculate job and wage score. find reference points: "from model description: the maximum quantity in each category has been
  # used as the reference point".
 
- #jobs multipliers were added. fishing: 1.582 was used (Table S10 from Halpern et al 2012 SOM, commercial fishing)
- # while the rest of the indsutries were set to be 1, as a place holder, to be updated in the future
+ # jobs multiplier placeholders were added (original multipliers are found in Table S10 from Halpern et al 2012 SOM)
+ # all set to be 1 for now, to be updated in the future
  jobs_multiplier = c('beach_placer' = 1,
                       'tourism' = 1,
                       'egineering_arch' = 1,
