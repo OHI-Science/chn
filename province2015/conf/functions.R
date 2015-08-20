@@ -963,14 +963,14 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
            marinearea = val_num); head(marinearea)
 
   # Calculate status of each year in each province
-  d = cmpa %>%
+  status.all.years = cmpa %>%
     left_join(marinearea, by = 'rgn_id') %>% #head(d)
     mutate(reference = marinearea*0.05)%>% # ref is 5% of jurisdictional marine area
     mutate(pct_cmpa = cmpa/marinearea*100)%>%
     mutate(status = pmin(pct_cmpa/5 *100, 100))
 
  # Current status: year = 2012
-  r.status = filter(d, year == 2012)%>%
+  r.status = filter(status.all.years, year == 2012)%>%
    mutate(dimension = 'status',
           goal = "LSP") %>%
    select(region_id = rgn_id,
@@ -978,30 +978,14 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
           dimension,
           goal) ; head(r.status)
 
-#     region_id      score dimension goal
-#  1          1   4.275067    status  LSP
-#  2          2  30.852024    status  LSP
-#  3          3   5.959905    status  LSP
-#  4          4   4.595564    status  LSP
-#  5          5   3.440244    status  LSP
-#  6          6  31.273667    status  LSP
-
  #trend (2009 - 20112)
  r.trend = d %>%
    group_by(rgn_id) %>%
    do(dlm = lm(status ~ year, data=.)) %>%
    summarize(region_id = rgn_id,
-             score = max(min(coef(dml)[['year']]*3, 1) -1) *100,
+             score = max(min(coef(dlm)[['year']]*3, 1) -1),
              dimension = 'trend',
-             goal = 'LSP') ; head(r.trend) # all 0's
-
-#     region_id score dimension goal
-# 1          1     0     trend  LSP
-# 2          2     0     trend  LSP
-# 3          3     0     trend  LSP
-# 4          4     0     trend  LSP
-# 5          5     0     trend  LSP
-# 6          6     0     trend  LSP
+             goal = 'LSP') ; head(r.trend)
 
 scores_LSP = rbind(r.status, r.trend)
 return(scores_LSP)
@@ -1009,18 +993,14 @@ return(scores_LSP)
 
 SP = function(scores){
 
-  d = within(
-    dcast(
-      scores,
-      region_id + dimension ~ goal, value.var='score',
-      subset=.(goal %in% c('ICO','LSP') & !dimension %in% c('pressures','resilience')))
-    , {
-      goal = 'SP'
-      score = rowMeans(cbind(ICO, LSP), na.rm=T)})
+  scores = rbind(scores_ICO, scores_LSP) %>%
+    spread(goal, score) %>%
+    filter(!dimension %in% c('pressures', 'resilience')) %>%
+    mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP))),
+           goal = 'SP') %>%
+    select(goal, dimension, region_id, score)
 
-
-  # return all scores
-  return(rbind(scores, d[,c('region_id','goal','dimension','score')]))
+return(scores)
 }
 
 
