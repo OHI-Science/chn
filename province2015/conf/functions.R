@@ -32,10 +32,11 @@ FIS = function(layers){
     # Ut+1 - Ut - 1 = r - [r/(Kq)]*Ut - q*ft
     # obtain r, K, q from linear model coefficients
 
-  ### To Mian: Real calculation of status and trend (40-107). but results are all 0's, which screwed up trend calcualtion in the next step.
-  ### So I made a place holder status data set after this session (line 109-120). You should check on this.
-  ### 李冕，40-102 是正确的计算方式。但现状（status) 计算结果很奇怪，全是0，因为中间计算的的 r, K, q, mmsy 结果奇怪，有很多
-  ### 不该有的负数值。导致趋势 (trend) 计算不能做。这里你该仔细看一看。为了FP计算，我暂时在101- 我暂时做了占位符 （r.status, r.trend)。
+  ### To Mian: Real calculation of status and trend (40-107). But status results are all 0's, which screwed up trend calcualtion next.
+  ### Intermediate steps (r, K, q, mmsy) have many unwanted negative numbers. my mmsy results are different from provided mmsy data (except for region 1 and 4)
+  ### So I made a placeholder status and trend data set after this session (line 109-120). You should check on this.
+  ### 李冕，40-107 是正确的计算方式。但现状（status) 计算结果很奇怪，全是0，因为中间计算的的 r, K, q, mmsy 结果奇怪，有很多
+  ### 不该有的负数值。导致趋势 (trend) 计算不能做。这里你该仔细看一看。为了FP计算，我暂时在109-120 我暂时做了占位符 （r.status, r.trend)。
 
   # combining all data
 D1 = ft %>%
@@ -321,10 +322,15 @@ AO = function(layers){
   ## 问题：只有2010-2013 有所有数据（port, fishermen, gas)， 所以只有这几年有现状得分。2014 只有gas 和port
   ## 数据，如果想得分，只能忽略port。可以吗？
 
-  ## Ref point: ref points for each year in provided data. shouldn'd we use one ref point for each region
-  ## (ie. highest number of fishermen in rgn 1 across all years)?
-  ## 参考点问题： 目前每个变量每年都有个参考值（port_ref, fishermen_ref, gas_ref) 。
-  ## 但在计算得分时，我们需要一个总的参考点?
+# Q for CHN team on Reference: ref points for each type of data are provided for
+# each year in provided data (port: apr, fishermen: gas, aer). Fishermen and gas
+# reference points are the highest number across all provinces in that year,
+# which is a moving target. Generally we set the reference point to be the
+# highest number across all years as an aspiration point for provinces to
+# achieve （ie. the same ref number for all years)。
+# 问题：目前每个变量每年都有个参考值（港口: apr, 渔民: afr, 油价：aer).
+# 渔民和油价参考点是每年各个省份的最高值（每年都有个不同的参考值）。但在计算得分时，
+# 我们通常需要一个总的参考点（每年都该是一样的)，比如跨年份的最高值，而不是每年的最高值。
 
   # current status: 2013
   r.status = status.all.years %>%
