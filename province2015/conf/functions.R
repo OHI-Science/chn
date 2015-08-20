@@ -729,7 +729,7 @@ LIV_ECO = function(layers, subgoal){
                       'chemical' = 1,
                       'comm_transport' = 1,
                       'electric' = 1,
-                      'fishing' = 1.582,
+                      'fishing' = 1,
                       'ship_building' = 1,
                       'oil_gas' = 1,
                       'seasalt' = 1)
@@ -755,7 +755,7 @@ LIV_ECO = function(layers, subgoal){
                   mutate(xLIV = (jobs_score + wage_score)/2*100 )
  # current status
  LIV.status = xLIV_all_years %>%
-   filter(year == max(year)) %>% # pull out the most recent year's LIV status
+   filter(year == max(year)) %>%
    select(region_id = rgn_id,
           score = xLIV) %>%
    mutate(dimension = 'status',
@@ -783,6 +783,7 @@ LIV.trend = left_join(jobs, wage) %>%
   mutate(
     sector = as.character(sector),
     metric = as.character(metric)) %>%
+  filter(metric == 'jobs_adj' | metric == 'wage') %>%
   # get linear model coefficient per metric
   group_by(metric, rgn_id, sector, weight) %>%
   do(mdl = lm(value ~ year, data=.)) %>%
@@ -1120,30 +1121,19 @@ return(scores_LIV_ECO)
 
 LE = function(scores, layers){
 
- r.status = scores_LIV_ECO %>%
+## To replace 1128-1129 after the testing phase
+#   scores_LE = scores %>%
+#     filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %>%
+#     spread(goal, score)
+
+ scores_LE = scores_LIV_ECO %>%
    spread(goal, score) %>%
    mutate(score = rowMeans(cbind(ECO, LIV, na.rm=T))) %>%
    select(region_id, score, dimension) %>%
    mutate(goal = 'LE')
 
-
-  ###################### gl2014 model ###########################
-  # calculate LE scores
-  scores.LE = scores %.%
-    filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %.%
-    dcast(region_id + dimension ~ goal, value.var='score') %.%
-    mutate(score = rowMeans(cbind(ECO, LIV), na.rm=T)) %.%
-    select(region_id, dimension, score) %.%
-    mutate(goal  = 'LE')
-
-  # rbind to all scores
-  scores = scores %.%
-    rbind(scores.LE)
-
-  # return scores
-  return(scores)
+ return(scores_LE)
 }
-
 
 ICO = function(layers){
 
