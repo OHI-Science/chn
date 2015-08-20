@@ -270,12 +270,9 @@ FP = function(layers, scores, debug=T){
 
 
 
-AO = function(layers,
-              year_max,
-              year_min=max(min(layers_data$year, na.rm=T), year_max - 10),
-              Sustainability=1.0){
+AO = function(layers){
 
-  # CHN model:
+  # status
   # xAO = (APc/APr + AFc/AFr + AEc/AEr) / 3
 
   # cast data
@@ -300,20 +297,24 @@ AO = function(layers,
            fishermen = ao_men,
            fishermen_ref = ao_men_ref) %>%
     full_join(layers$data[['ao_port']] %>%
-                select(rgn_id, port = count), by = 'rgn_id') %>% # join with port and port_ref data
+                select(rgn_id, port = count), by = 'rgn_id') %>% # join with ao_port and ao_port_ref
     full_join(layers$data[['ao_port_ref']] %>%
                 select(rgn_id, port_ref = count), by = 'rgn_id')
 
   # status
   status.all.years = D %>%
     group_by(rgn_id) %>%
-    filter(!is.na(gas) & !is.na(fishermen)) %>% # NA prevents further calculations
+    filter(!is.na(gas) & !is.na(fishermen)) %>% # NA prevents further calculations; 去掉NA，因为无法计算
     mutate(x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen_ref + gas/gas_ref)/3))*100 )
   ## Q for CHN: only 2010-2013 have data in all three categories (port, fishermen, gas), and thus only those
   ## years have status scores. do you want to see score for 2014, using only gas and port data?
+  ## 问题：只有2010-2013 有所有数据（port, fishermen, gas)， 所以只有这几年有现状得分。2014 只有gas 和port
+  ## 数据，如果想得分，只能忽略port。可以吗？
 
   ## Ref point: ref points for each year in provided data. shouldn'd we use one ref point for each region
-  ## (ie. highest number of fishermen in rgn 1 across all years)
+  ## (ie. highest number of fishermen in rgn 1 across all years)?
+  ## 参考点问题： 目前每个变量每年都有个参考值（port_ref, fishermen_ref, gas_ref) 。
+  ## 但在计算得分时，我们需要一个总的参考点?
 
   # current status: 2013
   r.status = status.all.years %>%
@@ -339,59 +340,6 @@ AO = function(layers,
 
 
   scores = rbind(r.status, r.trend)
-  return(scores)
-
-
-  ######################## gl 2014 #######################################
-
-  # cast data
-  layers_data = SelectLayersData(layers, targets='AO')
-
-  ry = rename(dcast(layers_data, id_num + year ~ layer, value.var='val_num',
-                    subset = .(layer %in% c('ao_need'))),
-              c('id_num'='region_id', 'ao_need'='need')); head(ry); summary(ry)
-
-  r = na.omit(rename(dcast(layers_data, id_num ~ layer, value.var='val_num',
-                           subset = .(layer %in% c('ao_access'))),
-                     c('id_num'='region_id', 'ao_access'='access'))); head(r); summary(r)
-
-  ry = merge(ry, r); head(r); summary(r); dim(r)
-
-  # model
-  ry = within(ry,{
-    Du = (1.0 - need) * (1.0 - access)
-    statusData = ((1.0 - Du) * Sustainability)
-  })
-
-  # status
-  r.status <- ry %>%
-    filter(year==year_max) %>%
-    select(region_id, statusData) %>%
-    mutate(status=statusData*100)
-  summary(r.status); dim(r.status)
-
-  # trend
-  r.trend = ddply(subset(ry, year >= year_min), .(region_id), function(x)
-  {
-    if (length(na.omit(x$statusData))>1) {
-      # use only last valid 5 years worth of status data since year_min
-      d = data.frame(statusData=x$statusData, year=x$year)[tail(which(!is.na(x$statusData)), 5),]
-      trend = coef(lm(statusData ~ year, d))[['year']]*5
-    } else {
-      trend = NA
-    }
-    return(data.frame(trend=trend))
-  })
-
-  # return scores
-  scores = r.status %>%
-    select(region_id, score=status) %>%
-    mutate(dimension='status') %>%
-    rbind(
-      r.trend %>%
-        select(region_id, score=trend) %>%
-        mutate(dimension='trend')) %>%
-    mutate(goal='AO') # dlply(scores, .(dimension), summary)
   return(scores)
 }
 
@@ -439,8 +387,9 @@ NP <- function(layers){
 
   # Question for OHI-China Team:
   # 1. Currently, the reference point for NP is the mean tonnes for each product-region.
-  #    Please review the reference point and the variable 'tonnes_real_capped';
-  #    is this the behavior you expect? Should so many scores be 1.0?
+  #    Please review the reference point and the variable 'tonnes_rel_capped';
+  #    is this the behavior you expect? Should so many scores be 100?
+  # 目前，参考点是产值平均值-请查对‘tonnes_rel_capped'.这是你们想要的结果吗？这样做的结果是很多地区得分是100
 
   #    rgn_id year product  tonnes tonnes_mean tonnes_rel tonnes_rel_capped
   #         1 2007 seasalt  135788     1079230  0.1258194         0.1258194
@@ -620,15 +569,18 @@ CS = function(layers){
 
 CP = function(layers){
 
-  # select data, combine cp_condition, cs_extent_maxyr (ie. most rencent year. but not the same year for
-  # all regions and habitats ), and cs_extent_trend for trend calculation b/c there were very few and uneven years
-  #of data for each region
+  # select data, combine cp_condition, cp_extent (chose the most rencent year b/c data are very sparse and scattered.
+  # most habitats in each province has only 1 year of data, and few have up to 3), and cs_extent_trend for trend calculation b/c there were very few and uneven years
+  # of data for each region.
+  # 结合 cp_condition, cp_extent (最近年的面积)， cs_extent_trend
 
   m = layers$data[['cp_condition']] %>%
     select(rgn_id,
            habitat,
            condition=value) %>%
     full_join(layers$data[['cp_extent']] %>%
+                group_by(rgn_id, habitat) %>%
+                filter(year==max(year)) %>% #choose the most recent year's data
                 select(-layer,
                        -year,
                        extent = hectare),
@@ -642,7 +594,7 @@ CP = function(layers){
   habitat.wt = c('saltmarshes' = 3,
                  'mangroves' = 4,
                  'seagrasses' = 1,
-                 'coral' = 4)
+                 'coral reef' = 4)
   m = m %>%
     mutate(weight = habitat.wt[habitat])
 
@@ -670,6 +622,7 @@ CP = function(layers){
 
 # Trend
 r.trend = m %>%
+  filter(!habitat=='coral reef') %>% # coral reef has no trend score... NA throws off calculation, therefore removed now
   group_by(rgn_id) %>%
   summarize(trend_raw = sum(weight * extent * trend) / (sum(extent) * max(weight)),
             score = max(min(trend_raw, 1), -1),
@@ -684,76 +637,6 @@ r.trend = m %>%
 scores_CP = rbind(r.status, r.trend)
 
 return(scores_CP)
-
-#################### below are the gl2014 codes #############################
-
-
-  # join layer data
-  d =
-    join_all(
-      list(
-        layers$data[['hab_health']] %>%
-          select(rgn_id, habitat, health),
-
-        layers$data[['hab_trend']] %>%
-          select(rgn_id, habitat, trend),
-
-        # for habitat extent
-        rbind_list(
-
-          # do not use all mangrove
-          layers$data[['hab_extent']] %>%
-            filter(!habitat %in% c('mangrove','mangrove_inland1km','mangrove_offshore1km')) %>%
-            select(rgn_id, habitat, km2),
-
-          # just use inland1km and offshore1km
-          m)),
-
-      by=c('rgn_id','habitat'), type='full') %>%
-    select(rgn_id, habitat, km2, health, trend)
-
-  # limit to CP habitats and add rank
-  habitat.rank = c('coral'            = 4,
-                   'mangrove'         = 4,
-                   'saltmarsh'        = 3,
-                   'seagrass'         = 1,
-                   'seaice_shoreline' = 4)
-
-  d = d %>%
-    filter(habitat %in% names(habitat.rank)) %>%
-    mutate(
-      rank = habitat.rank[habitat],
-      extent = ifelse(km2==0, NA, km2))
-
-  if (nrow(d) > 0){
-    scores_CP = rbind_list(
-      # status
-      d %>%
-        filter(!is.na(rank) & !is.na(health) & !is.na(extent)) %>%
-        group_by(rgn_id) %>%
-        summarize(
-          score = pmin(1, sum(rank * health * extent) / (sum(extent) * max(rank)) ) * 100,
-          dimension = 'status'),
-      # trend
-      d %>%
-        filter(!is.na(rank) & !is.na(trend) & !is.na(extent)) %>%
-        group_by(rgn_id) %>%
-        summarize(
-          score = sum(rank * trend * extent) / (sum(extent)* max(rank)),
-          dimension = 'trend')) %>%
-      mutate(
-        goal = 'CP') %>%
-      select(region_id=rgn_id, goal, dimension, score)
-  } else {
-    scores_CP = data.frame(
-      goal      = character(0),
-      dimension = character(0),
-      region_id = integer(0),
-      score     = numeric())
-  }
-
-  # return scores
-  return(scores_CP)
 }
 
 
