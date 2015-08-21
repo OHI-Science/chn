@@ -32,9 +32,9 @@ FIS = function(layers){
     # Ut+1 - Ut - 1 = r - [r/(Kq)]*Ut - q*ft
     # obtain r, K, q from linear model coefficients
 
-  ### To Mian: Real calculation of status and trend (40-107). But status results are all 0's, which screwed up trend calcualtion next.
+  ### To Mian: Real calculation of status and trend (40-108). But status results are all 0's, which screwed up trend calcualtion next.
   ### Intermediate steps (r, K, q, mmsy) have many unwanted negative numbers. my mmsy results are different from provided mmsy data (except for region 1 and 4)
-  ### So I made a placeholder status and trend data set after this session (line 109-120). You should check on this.
+  ### So I made a placeholder status and trend data set after this session (line 109-122). You should check on this.
   ### 李冕，40-107 是正确的计算方式。但现状（status) 计算结果很奇怪，全是0，因为中间计算的的 r, K, q, mmsy 结果奇怪，有很多
   ### 不该有的负数值。导致趋势 (trend) 计算不能做。这里你该仔细看一看。为了FP计算，我暂时在109-120 我暂时做了占位符 （r.status, r.trend)。
 
@@ -121,10 +121,8 @@ r.trend = data.frame(goal = 'FIS',
                      region_id = c(1:11),
                      score = 0)
 
-
-
-fis_scores = rbind(r.status, r.trend)
-return(scores)
+scores_FIS = rbind(r.status, r.trend)
+return(scores_FIS)
 }
 
 MAR = function(layers, Debug=T){
@@ -219,10 +217,7 @@ r.trend = mar.status.all.years %>%
          score) %>%
   arrange(region_id)
 
-
-# if (Debug == TRUE) mar_scores = rbind(r.status, r.trend)
-
-mar_scores = rbind(r.status, r.trend)
+scores_MAR = rbind(r.status, r.trend)
 return(scores)
 
 }
@@ -255,7 +250,7 @@ FP = function(layers, scores, debug=T){
 ## 问题：FIS用2012， MAR2013。暂时用这个数据合并来计算FP得分。可以吗？
 
 ### To replace line 252 - 253 after all calcuations are done and stored in scores.csv
-### 计算现状， 239-243 在正式计算所有得分(通过calculate_scores.R)并储存在scores.csv 之后，用来代替 247-248
+### 计算现状， 239-243 在正式计算所有得分(通过calculate_scores.R)并储存在scores.csv 之后，用来代替头两行(S = ...)
 #   s = scores %>%
 #     filter(goal %in% c('MAR', 'FIS'),
 #            !dimension %in% c('pressures','resilience')) %>%
@@ -263,7 +258,7 @@ FP = function(layers, scores, debug=T){
 #     select(region_id, dimension, FIS, MAR)
 
   # combine fis and mar scores
-  s = rbind(fis_scores, mar_scores) %>%
+  s = rbind(scores_FIS, scores_MAR) %>%
     spread(goal, score)
 
   # calcualte w
@@ -470,7 +465,7 @@ NP <- function(layers){
     max(r.status$score, na.rm = TRUE) <= 100)
 
   ### trend based on 4 intervals (5 years of data)
-  r.trend <- np_status_all %>%
+  r.trend = np_status_all %>%
     filter(year <= max(year) & year > (max(year) - 4) & !is.na(status)) %>%
     group_by(rgn_id) %>%
     do(mdl = lm(status ~ year, data=.)) %>%
@@ -592,8 +587,8 @@ CS = function(layers){
 
 
   # return scores
-  scores = rbind(r.status, r.trend) #合并所有横行
-  return(scores)
+  scores_CS = rbind(r.status, r.trend) #合并所有横行
+  return(scores_CS)
 }
 
 
@@ -656,7 +651,7 @@ CP = function(layers){
     summarize(score = pmin(1, sum(condition* weight/4*extent/sum(extent)) ) * 100,
               dimension ='status',
               goal = 'CP') %>%
-    rename(region_id = rgn_id) ; head(r.status)
+    select(goal, dimension, region_id = rgn_id, score); head(r.status)
 
 
 # Trend
@@ -667,10 +662,8 @@ r.trend = m %>%
             score = max(min(trend_raw, 1), -1),
             dimension = 'trend',
             goal = 'CP') %>%
-  select(region_id = rgn_id,
-         score,
-         dimension,
-         goal) ; head(r.trend)
+  select(goal, dimension, region_id = rgn_id,
+         score) ; head(r.trend)
 
 #combine status and trend
 scores_CP = rbind(r.status, r.trend)
@@ -799,10 +792,12 @@ LIV_ECO = function(layers, subgoal){
  # current status
  LIV.status = xLIV_all_years %>%
    filter(year == max(year)) %>%
-   select(region_id = rgn_id,
-          score = xLIV) %>%
    mutate(dimension = 'status',
-          goal = 'LIV') ; head(LIV.status)
+          goal = 'LIV') %>%
+   select(goal,
+          dimension,
+          region_id = rgn_id,
+          score = xLIV); head(LIV.status)
 
 #      region_id    score dimension goal
 #  1          1 46.94071    status  LIV
@@ -849,10 +844,7 @@ LIV.trend = left_join(jobs, wage) %>%
   mutate(
     goal      = 'LIV',
     dimension = 'trend') %>%
-  select(region_id = rgn_id,
-         score,
-         dimension,
-         goal)
+  select(goal, dimension, region_id = rgn_id, score)
 
 #    region_id score dimension goal
 # 1          1  0.75     trend  LIV
@@ -874,17 +866,13 @@ xECO_all_years = income %>%
 
 ECO.status = xECO_all_years %>%
   filter(year == max(year)) %>%
-  select(region_id = rgn_id,
-         score = xECO) %>%
   mutate(dimension = 'status',
          goal = 'ECO')  %>%
+  select(goal,
+         dimension,
+         region_id = rgn_id,
+         score = xECO) %>%
   arrange(region_id) ; head(ECO.status)
-
-#   region_id    score dimension goal
-# 1         1 32.28161    status  ECO
-# 2         2 15.43792    status  ECO
-# 3         3 37.49262    status  ECO
-# 4         4 85.39489    status  ECO
 
 # ECO trend
 
@@ -894,12 +882,8 @@ ECO.trend = xECO_all_years %>%
   summarize(region_id = rgn_id,
             score = pmax(pmin(coef(lmd)[['year']] *4, 1) ,-1),
             dimension = 'trend',
-            goal = 'ECO'); head(ECO.trend)
-
-#    region_id score dimension goal
-# 1         1     1     trend  ECO
-# 2         2     1     trend  ECO
-# 3         3     1     trend  ECO
+            goal = 'ECO') %>%
+  select(goal, dimension, region_id, score); head(ECO.trend)
 
 scores_LIV_ECO = rbind(LIV.status, LIV.trend, ECO.status, ECO.trend)
 return(scores_LIV_ECO)
@@ -965,12 +949,8 @@ ICO = function(layers){
 # 2          2 48.57143    status  ICO
 # 3          3 41.66667    status  ICO
 
-<<<<<<< HEAD
 # Trend: the same as SPP trend. Data from gl2014. only contains 10 species in 10 provinces.
-=======
-# Trend: the same as SPP trend （See SPP). Data from gl2014. only contains 9 species in 10 provinces.
->>>>>>> e25b6448be7860000bda13086c3ae9b40f4f232a
-# the other provinces will be given NA for now.
+
 # 加入了我们根据2014全球SPP趋势计算的 spp_iucn_trend。 只有10个省份，9个物种有趋势值。region 2 暂时设为NA。
 # 在 province2015/prep/data_prep.r/SPP 中查看我们怎样从全球评估中取出中国所需的值。 －－》需要和goal keeper 讲
 
@@ -997,11 +977,7 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
 
   # CHN model:
   # xLSP = %cmpa / reference%
-<<<<<<< HEAD
   #      = (cmpa/total_marine_area) / 5%
-=======
-  #      = (cmpa/total_marine_area) / 5
->>>>>>> e25b6448be7860000bda13086c3ae9b40f4f232a
 
   # cast data ----
   cmpa = SelectLayersData(layers, layers='lsp_cmpa')
@@ -1027,19 +1003,16 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
   r.status = filter(status.all.years, year == 2012)%>%
    mutate(dimension = 'status',
           goal = "LSP") %>%
-   select(region_id = rgn_id,
-          score = status,
-          dimension,
-          goal) ; head(r.status)
+   select(goal, dimension, region_id = rgn_id, score = status) ; head(r.status)
 
  #trend (2009 - 20112)
  r.trend = status.all.years %>%
    group_by(rgn_id) %>%
    do(dlm = lm(status ~ year, data=.)) %>%
-   summarize(region_id = rgn_id,
-             score = max(min(coef(dlm)[['year']]*3, 1) -1),
-             dimension = 'trend',
-             goal = 'LSP') ; head(r.trend)
+   summarize( goal = 'LSP',
+              dimension = 'trend',
+              region_id = rgn_id,
+             score = max(min(coef(dlm)[['year']]*3, 1) -1)) ; head(r.trend)
 
 scores_LSP = rbind(r.status, r.trend)
 return(scores_LSP)
@@ -1122,27 +1095,14 @@ CW = function(layers){
           region_id,
           score = trend)
 
- scores = rbind(r.status, r.trend)
- return(scores)
+ scores_CW = rbind(r.status, r.trend)
+ return(scores_CW)
 }
 
 
 HAB = function(layers){
 
 #   #cast data
-#   lyrs = c('cp_condition',
-#            'cp_extent',
-#            'cs_extent_trend')
-#
-#   d = SelectLayersData(layers, layers = lyrs) %>%
-#     select(region_id = id_num,
-#            layer,
-#            habitat = category,
-#            val_num) %>%
-#     tidyr::spread(layer, val_num) %>%   #spread(key=variable to become the column headings, value=data)
-#     dplyr::rename(condition    = cp_condition,
-#                   extent       = cp_extent,
-#                   extent_trend = cs_extent_trend) ; head(d)
 
   # select data, combine cp_condition, cp_extent (chose the most rencent year b/c data are very sparse and scattered.
   # most habitats in each province has only 1 year of data, and few have up to 3), and cs_extent_trend for trend calculation b/c there were very few and uneven years
@@ -1277,6 +1237,17 @@ BD = function(scores){
 
   return(scores_BD)
 }
+
+##### during testing phase only.
+##### Combining all the scores into one data frame for CHN team for reference
+CHN.scores = rbind(scores_AO, scores_BD, scores_CP, scores_CS, scores_CW, scores_FIS, scores_FP,
+                   scores_HAB, scores_ICO, scores_LE, scores_LIV_ECO, scores_LSP,
+                   scores_MAR, scores_NP, scores_SP, scores_TR)
+library(readr) # contains write_csv function
+dir_layers = '~/github/chn/province2015/tmp' #save results to temporary folder
+write_csv(CHN.scores, file.path(dir_layers, 'china.final.scores.temp.csv')) # saved on 8.21.2015
+#########
+
 
 FinalizeScores = function(layers, conf, scores){
 
