@@ -63,6 +63,7 @@ Data sources:
 "FIS","fis_ft","Fishing effort ","Fishing effort at time t (China Fisheries Statistical Yearbook, 1994-2013)","kilowatt","Kilowatts","fis_ft_chn2015_LZH.csv","rgn_id",,,"year","kilowatt",,TRUE,1994,2013,30348,3815090,FALSE,,,,11,FALSE
 "FIS","fis_mmsy","Maximum sustainable yield ","Maximum sustainable yield in each province (China Fisheries Statistical Yearbook, 1994-2013)","tonnes","Tonnes","fis_mmsy_chn2015_LZH.csv","rgn_id",,,,"tonnes",,TRUE,,,23838.5,3091850,FALSE,,,,11,FALSE
 "FIS","fis_tc","Normalizing parameter ","Normalizing parameter for each province","score","value","fis_tc_chn2015_LZH.csv","rgn_id",,,,"score",,TRUE,,,0.285858,0.285858,TRUE,,,,11,FALSE
+"FIS","fis_Bt","Catch per unit effort","Bt results saved from FIS status calculations, which will be used for FP calculations","Bt","Tonnes/Kilowatt","fis_bt_chn2015_NJ.csv","rgn_id",,,"year","bt",,TRUE,1994,2012,-385912000,277270000,FALSE,,,,11,FALSE
 "FP","fp_wildcaught_weight","Fisheries weighting factor","Proportion of wild caught fisheries yield to mariculture yield, based on FAO fisheries statistics.
 
 Data sources:

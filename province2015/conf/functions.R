@@ -32,10 +32,11 @@ FIS = function(layers){
     # Ut+1 - Ut - 1 = r - [r/(Kq)]*Ut - q*ft
     # obtain r, K, q from linear model coefficients
 
-  ### To Mian: Real calculation of status and trend (40-102). but results are all 0's, which screwed up trend calcualtion in the next step.
-  ### So I made a place holder status data set after this session (line 101 -). You should check on this.
-  ### 李冕，40-102 是正确的计算方式。但现状（status) 计算结果很奇怪，全是0，因为中间计算的的 r, K, q, mmsy 结果奇怪，有很多
-  ### 不该有的负数值。导致趋势 (trend) 计算不能做。这里你该仔细看一看。为了FP计算，我暂时在101- 我暂时做了占位符 （r.status, r.trend)。
+  ### To Mian: Real calculation of status and trend (40-107). But status results are all 0's, which screwed up trend calcualtion next.
+  ### Intermediate steps (r, K, q, mmsy) have many unwanted negative numbers. my mmsy results are different from provided mmsy data (except for region 1 and 4)
+  ### So I made a placeholder status and trend data set after this session (line 109-120). You should check on this.
+  ### 李冕，40-107 是正确的计算方式。但现状（status) 计算结果很奇怪，全是0，因为中间计算的的 r, K, q, mmsy 结果奇怪，有很多
+  ### 不该有的负数值。导致趋势 (trend) 计算不能做。这里你该仔细看一看。为了FP计算，我暂时在109-120 我暂时做了占位符 （r.status, r.trend)。
 
   # combining all data
 D1 = ft %>%
@@ -76,6 +77,11 @@ fis.status.all.years = D2 %>%
          } else mmsy_r ) %>%
   full_join (tc, by = 'rgn_id') %>%
   mutate(x.fis = max(0, min(1, (1 - d_Bt/mmsy_r)*tc))*100)
+
+# save fis.status.all.years in layers folder for calcualtion in FP
+dir_layers = '~/github/chn/province2015/layers'
+write_csv(fis.status.all.years %>%
+            select(rgn_id, year, Bt), file.path(dir_layers, 'fis_Bt_chn2015_NJ.csv'))
 
 # # current status 最近一年现状
 # r.status = fis.status.all.years %>%
@@ -244,6 +250,11 @@ FP = function(layers, scores, debug=T){
     rename(region_id = rgn_id,
            Tc = score)
 
+## status and trend years are uneven among goals, eg. FIS 2012, MAR 2013, which were used for FP, which combines these two goals.
+## is it okay?
+## 问题：FIS用2012， MAR2013。暂时用这个数据合并来计算FP得分。可以吗？
+
+### To replace line 252 - 253 after all calcuations are done and stored in scores.csv
 ### 计算现状， 239-243 在正式计算所有得分(通过calculate_scores.R)并储存在scores.csv 之后，用来代替 247-248
 #   s = scores %>%
 #     filter(goal %in% c('MAR', 'FIS'),
@@ -319,10 +330,15 @@ AO = function(layers){
   ## 问题：只有2010-2013 有所有数据（port, fishermen, gas)， 所以只有这几年有现状得分。2014 只有gas 和port
   ## 数据，如果想得分，只能忽略port。可以吗？
 
-  ## Ref point: ref points for each year in provided data. shouldn'd we use one ref point for each region
-  ## (ie. highest number of fishermen in rgn 1 across all years)?
-  ## 参考点问题： 目前每个变量每年都有个参考值（port_ref, fishermen_ref, gas_ref) 。
-  ## 但在计算得分时，我们需要一个总的参考点?
+# Q for CHN team on Reference: ref points for each type of data are provided for
+# each year in provided data (port: apr, fishermen: gas, aer). Fishermen and gas
+# reference points are the highest number across all provinces in that year,
+# which is a moving target. Generally we set the reference point to be the
+# highest number across all years as an aspiration point for provinces to
+# achieve （ie. the same ref number for all years)。
+# 问题：目前每个变量每年都有个参考值（港口: apr, 渔民: afr, 油价：aer).
+# 渔民和油价参考点是每年各个省份的最高值（每年都有个不同的参考值）。但在计算得分时，
+# 我们通常需要一个总的参考点（每年都该是一样的)，比如跨年份的最高值，而不是每年的最高值。
 
   # current status: 2013
   r.status = status.all.years %>%
@@ -483,7 +499,8 @@ CS = function(layers){
   lyrs = c('cs_condition',
            'cs_contribution',
            'cs_extent',
-           'cs_extent_trend')
+           'cs_extent_trend') # a file that NCEAS/Julie calculated and saved in layers folder （prep/4_CS/prep_cs.r)
+                              # 我们计算并添加的数据层(看怎样计算：prep/4_CS/prep_cs.r)
   D = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
   # SelectLayerData 从数据层中选所需文件
   # head: 头6横行数据
@@ -582,7 +599,12 @@ CP = function(layers){
   # select data, combine cp_condition, cp_extent (chose the most rencent year b/c data are very sparse and scattered.
   # most habitats in each province has only 1 year of data, and few have up to 3), and cs_extent_trend for trend calculation b/c there were very few and uneven years
   # of data for each region.
-  # 结合 cp_condition, cp_extent (最近年的面积)， cs_extent_trend
+  # Question for CHN team: cp_conndition, cp_extent include Coral Reef data in region 11, but cs_extent_trend does not. How to reconcile?
+  # For now, in trend calculation, region 11 coral reef is just ignored.
+
+  # 结合 cp_condition, cp_extent (选最近年的面积, 因为数据很少，大部分生境只有1年数据，少部分有2-3年)， cs_extent_trend （碳汇趋势数据）
+  # 问题： cp_conndition, cp_extent 有新加 Coral Reef 数据在 region 11, 但 cs_extent_trend 没有。暂时在计算趋势时，省略了 region 11 的
+  # Coral Reef. 中国团队想怎样处理？
 
   m = layers$data[['cp_condition']] %>%
     select(rgn_id,
@@ -621,6 +643,10 @@ CP = function(layers){
   # China model:
   # x = sum [ (Cc / Cr)  * (Wk / Wmax) * (Ak / Atotal) ]
   # x = sum [condition   * (Wk / Wmax) * (Extent_k / Total_extent))]
+
+# Status year different for each habitat and province, which is not explicit in the status scores.
+# See description above previous question.
+# 问题： 现状计算，每个生境和省份年份都不同。原因看上个问题之上的数据描述。
 
   r.status = m %>%
     group_by(rgn_id) %>%
@@ -731,7 +757,7 @@ LIV_ECO = function(layers, subgoal){
  # used as the reference point".
 
  # jobs multiplier placeholders were added (original multipliers are found in Table S10 from Halpern et al 2012 SOM)
- # all set to be 1 for now, to be updated in the future
+ # all set to be 1, so that it doesn't affect the results. To be updated in the future
  jobs_multiplier = c('beach_placer' = 1,
                       'tourism' = 1,
                       'egineering_arch' = 1,
@@ -751,13 +777,17 @@ LIV_ECO = function(layers, subgoal){
  # calculate jobs, wages scores, and then status of all years
   jobs_score = jobs %>%
    group_by(sector) %>%
-   mutate(jobs_ref = max(jobs_adj)) %>% #find reference point for each industry, across all regions and all years (2007-2011)
+   mutate(jobs_ref = max(jobs_adj)) %>% # find reference point for each industry, across all regions and all years (2007-2011)。 no info on
+                                        # on coasta line length and therefore couldn't calculate max quantity per unit coast line
+                                        # 取总量最大值为参考点，没有海岸线长度资料，无法计算单位海岸线最大值。
    ungroup() %>%
    group_by(rgn_id, year) %>%
    summarize(jobs_score = sum(jobs_adj)/sum(jobs_ref)); head(jobs_score)
 
  wage_score = wage %>%
- mutate(wage_ref = max(wage),
+ mutate(wage_ref = max(wage), # reference point: max wage across all regions, all years; no info on
+                              # on coasta line length and therefore couldn't calculate max quantity per unit coast line
+                              # 取总量最大值为参考点，没有海岸线长度资料，无法计算单位海岸线最大值。
         wage_score = wage/wage_ref)
 
  xLIV_all_years = full_join(jobs_score, #calculate status scores for each year
@@ -876,7 +906,7 @@ return(scores_LIV_ECO)
 
 LE = function(scores, layers){
 
-## To replace 1128-1129 after the testing phase
+##  To replace the first two lines of code after the testing phase:
 #   scores_LE = scores %>%
 #     filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %>%
 #     spread(goal, score)
@@ -932,8 +962,15 @@ ICO = function(layers){
 # 2          2 48.57143    status  ICO
 # 3          3 41.66667    status  ICO
 
+<<<<<<< HEAD
 # Trend: the same as SPP trend. Data from gl2014. only contains 10 species in 10 provinces.
+=======
+# Trend: the same as SPP trend （See SPP). Data from gl2014. only contains 9 species in 10 provinces.
+>>>>>>> e25b6448be7860000bda13086c3ae9b40f4f232a
 # the other provinces will be given NA for now.
+# 加入了我们根据2014全球SPP趋势计算的 spp_iucn_trend。 只有10个省份，9个物种有趋势值。region 2 暂时设为NA。
+# 在 province2015/prep/data_prep.r/SPP 中查看我们怎样从全球评估中取出中国所需的值。 －－》需要和goal keeper 讲
+
 d2 = layers$data[['spp_iucn_trends']] %>%
   select(rgn_id, trend_score)
 
@@ -957,7 +994,11 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
 
   # CHN model:
   # xLSP = %cmpa / reference%
+<<<<<<< HEAD
   #      = (cmpa/total_marine_area) / 5%
+=======
+  #      = (cmpa/total_marine_area) / 5
+>>>>>>> e25b6448be7860000bda13086c3ae9b40f4f232a
 
   # cast data ----
   cmpa = SelectLayersData(layers, layers='lsp_cmpa')
@@ -973,14 +1014,14 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
            marinearea = val_num); head(marinearea)
 
   # Calculate status of each year in each province
-  d = cmpa %>%
+  status.all.years = cmpa %>%
     left_join(marinearea, by = 'rgn_id') %>% #head(d)
     mutate(reference = marinearea*0.05)%>% # ref is 5% of jurisdictional marine area
     mutate(pct_cmpa = cmpa/marinearea*100)%>%
     mutate(status = pmin(pct_cmpa/5 *100, 100))
 
  # Current status: year = 2012
-  r.status = filter(d, year == 2012)%>%
+  r.status = filter(status.all.years, year == 2012)%>%
    mutate(dimension = 'status',
           goal = "LSP") %>%
    select(region_id = rgn_id,
@@ -988,30 +1029,14 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
           dimension,
           goal) ; head(r.status)
 
-#     region_id      score dimension goal
-#  1          1   4.275067    status  LSP
-#  2          2  30.852024    status  LSP
-#  3          3   5.959905    status  LSP
-#  4          4   4.595564    status  LSP
-#  5          5   3.440244    status  LSP
-#  6          6  31.273667    status  LSP
-
  #trend (2009 - 20112)
- r.trend = d %>%
+ r.trend = status.all.years %>%
    group_by(rgn_id) %>%
    do(dlm = lm(status ~ year, data=.)) %>%
    summarize(region_id = rgn_id,
              score = max(min(coef(dlm)[['year']]*3, 1) -1),
              dimension = 'trend',
-             goal = 'LSP') ; head(r.trend) # all 0's
-
-#     region_id score dimension goal
-# 1          1     0     trend  LSP
-# 2          2     0     trend  LSP
-# 3          3     0     trend  LSP
-# 4          4     0     trend  LSP
-# 5          5     0     trend  LSP
-# 6          6     0     trend  LSP
+             goal = 'LSP') ; head(r.trend)
 
 scores_LSP = rbind(r.status, r.trend)
 return(scores_LSP)
@@ -1019,14 +1044,25 @@ return(scores_LSP)
 
 SP = function(scores){
 
-  scores = rbind(scores_ICO, scores_LSP) %>%
+  # to replace the first two lines of code after testing:
+  # scores_LE = scores %>%
+    #     filter(goal %in% c('ICO','LSP') & dimension %in% c('status','trend','score','future')) %>%
+    #     spread(goal, score)
+
+  scores_SP = rbind(scores_ICO, scores_LSP) %>%
     spread(goal, score) %>%
     filter(!dimension %in% c('pressures', 'resilience')) %>%
-    mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP))),
+    mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP), na.rm = T)), # na.rm 去除NA
            goal = 'SP') %>%
-    select(goal, dimension, region_id, score)
+    select(goal, dimension, region_id, score); head(scores_SP)
 
-return(scores)
+  ## b/c rgn_2 ICO trend score is NA, SP trend score is NA even after na.rm
+  ## 因为region 2 ICO 趋势是NA，SP趋势也是NA， 虽然经过了 na.rm 操作
+#     region_id dimension              ICO                LSP         score goal
+#   7          2    status 48.5714285714286                100  4.985714e+01   SP
+#   8          2     trend               NA                 -1            NA   SP
+
+return(scores_SP)
 }
 
 
@@ -1056,7 +1092,8 @@ CW = function(layers){
    mutate(cw = (sum(phosphate, nitrogen, cod, oil)/4)^(1/4)) %>%
    ungroup %>%
    mutate(cw.ref = max(cw[year==max(year)])) %>% # reference point: not specified in OHI manual yet. choose the highest cw.score of all regions
-                                                   # in most recent year as a ref point for now
+                                                 # in most recent year as a ref point for now
+                                                 # 参考点：没有再手册中说明。暂时选择 cw 公式得分的最高分为参考点
    mutate(x.cw = cw/cw.ref*100)
 
  # current status
@@ -1083,103 +1120,76 @@ CW = function(layers){
           score = trend)
 
  scores = rbind(r.status, r.trend)
-
-
-
-
-###################### gl 2014 #################################
-  # layers
-  lyrs = c('po_pathogens' = 'a',
-           'po_nutrients' = 'u',
-           'po_chemicals' = 'l',
-           'po_trash'     = 'd',
-           'cw_pesticide_trend'   = 'pest_trend',
-           'cw_fertilizer_trend'  = 'fert_trend',
-           'cw_coastalpopn_trend' = 'popn_trend',
-           'cw_pathogen_trend'    = 'path_trend')
-
-  # cast data
-  d = SelectLayersData(layers, layers=names(lyrs))
-  r = rename(dcast(d, id_num ~ layer, value.var='val_num', subset = .(layer %in% names(lyrs))),
-             c('id_num'='region_id', lyrs)); head(r); summary(r)
-
-  # invert pressures
-  r$a = 1 - r$a
-  r$u = 1 - r$u
-  r$l = 1 - r$l
-  r$d = 1 - r$d
-
-  # invert trends for CW
-  r$popn_trend = -1 * r$popn_trend
-  r$path_trend = -1 * r$path_trend
-  r$pest_trend = -1 * r$pest_trend
-  r$fert_trend = -1 * r$fert_trend
-
-  # status
-  r$status = psych::geometric.mean(t(r[,c('a','u','l','d')]), na.rm=T) * 100
-
-  # trend
-  r$trend = rowMeans(r[,c('pest_trend','fert_trend','popn_trend','path_trend')], na.rm=T)
-
-  # return scores
-  scores = rbind(
-    within(r, {
-      goal      = 'CW'
-      dimension = 'status'
-      score     = status}),
-    within(r, {
-      goal      = 'CW'
-      dimension = 'trend'
-      score     = trend}))[,c('region_id','goal','dimension','score')]
-  return(scores)
+ return(scores)
 }
 
 
 HAB = function(layers){
 
-  #cast data
-  lyrs = c('cs_condition',
-           'cs_extent',
-           'cs_extent_trend')
+#   #cast data
+#   lyrs = c('cp_condition',
+#            'cp_extent',
+#            'cs_extent_trend')
+#
+#   d = SelectLayersData(layers, layers = lyrs) %>%
+#     select(region_id = id_num,
+#            layer,
+#            habitat = category,
+#            val_num) %>%
+#     tidyr::spread(layer, val_num) %>%   #spread(key=variable to become the column headings, value=data)
+#     dplyr::rename(condition    = cp_condition,
+#                   extent       = cp_extent,
+#                   extent_trend = cs_extent_trend) ; head(d)
 
-  d = SelectLayersData(layers, layers = lyrs) %>%
-    select(region_id = id_num,
-           layer,
-           habitat = category,
-           val_num) %>%
-    tidyr::spread(layer, val_num) %>%   #spread(key=variable to become the column headings, value=data)
-    dplyr::rename(condition    = cs_condition,
-                  extent       = cs_extent,
-                  extent_trend = cs_extent_trend) ; head(d)
+  # select data, combine cp_condition, cp_extent (chose the most rencent year b/c data are very sparse and scattered.
+  # most habitats in each province has only 1 year of data, and few have up to 3), and cs_extent_trend for trend calculation b/c there were very few and uneven years
+  # of data for each region.
+  # Question for CHN team: cp_conndition, cp_extent include Coral Reef data in region 11, but cs_extent_trend does not. How to reconcile?
+  # For now, in trend calculation, region 11 coral reef is just ignored.
+
+  # 结合 cp_condition, cp_extent (选最近年的面积, 因为数据很少，大部分生境只有1年数据，少部分有2-3年)， cs_extent_trend （碳汇趋势数据）
+  # 问题： cp_conndition, cp_extent 有新加 Coral Reef 数据在 region 11, 但 cs_extent_trend 没有。暂时在计算趋势时，省略了 region 11 的
+  # Coral Reef. 中国团队想怎样处理？
+
+  d = layers$data[['cp_condition']] %>%
+    select(rgn_id,
+           habitat,
+           condition=value) %>%
+    full_join(layers$data[['cp_extent']] %>%
+                group_by(rgn_id, habitat) %>%
+                filter(year==max(year)) %>% #choose the most recent year's data
+                select(-layer,
+                       -year,
+                       extent = hectare),
+              by = c('rgn_id', 'habitat')) %>% #join by rgn_id, habitat
+    full_join(layers$data[['cs_extent_trend']] %>%
+                select(-layer,
+                       trend = trend.score),
+              by = c('rgn_id', 'habitat'))
 
   # status = 1/3(Csg + Csm + Cmg)
-
+  # Status year different for each habitat and province, which is not explicit in the status scores.
+  # See description above previous question.
+  # 问题： 现状计算，每个生境和省份年份都不同。原因看上个问题之上的数据描述。
   r.status = d %>%
-    group_by(region_id) %>%
+    group_by(rgn_id) %>%
     summarize(score = mean(condition) * 100,
               dimension = 'status',
-              goal = ' HAB') %>%
-    select(region_id,
+              goal = 'HAB') %>%
+    select(region_id = rgn_id,
            score,
            dimension,
            goal) ; head(r.status)
 
-#     region_id score dimension goal
-#   1         1    80    status  HAB
-#   2         2    80    status  HAB
-#   3         3    80    status  HAB
-#   4         4    80    status  HAB
-#   5         5    80    status  HAB
-#   6         6    80    status  HAB
-
   # trend = sum(extent * extent_trend) / sum(extent)
   r.trend = d %>%
-    group_by(region_id) %>%
-    summarize(trend_raw = sum(extent * extent_trend) / sum(extent),
-              score = max(min(trend_raw, 1), -1) * 100,
+    filter(!habitat == 'coral reef') %>%
+    group_by(rgn_id) %>%
+    summarize(trend_raw = sum(extent * trend) / sum(extent),
+              score = max(min(trend_raw, 1), -1),
               dimension = 'trend',
               goal = 'HAB') %>%
-    select(region_id,
+    select(region_id = rgn_id,
            score,
            dimension,
            goal) ; head(r.trend)
@@ -1189,54 +1199,7 @@ HAB = function(layers){
   # 2         2  -10.000000     trend  HAB
   # 3         3  -10.000000     trend  HAB
 
-  scores_HAB = cbind(r.status, r.trend)
-  return(scores_HAB)
-
-  ############################## gl2014 model ##################################
-  # get layer data
-  d =
-    join_all(
-      list(
-
-        layers$data[['hab_health']] %>%
-          select(rgn_id, habitat, health),
-
-        layers$data[['hab_trend']] %>%
-          select(rgn_id, habitat, trend),
-
-        layers$data[['hab_extent']] %>%
-          select(rgn_id, habitat, extent=km2)),
-
-      by=c('rgn_id','habitat'), type='full') %>%
-    select(rgn_id, habitat, extent, health, trend)
-
-  # limit to habitats used for HAB, create extent presence as weight
-  d = d %>%
-    filter(habitat %in% c('coral','mangrove','saltmarsh','seaice_edge','seagrass','soft_bottom')) %>%
-    mutate(
-      w  = ifelse(!is.na(extent) & extent > 0, 1, NA)) %>%
-    filter(!is.na(w)) %>%
-    group_by(rgn_id)
-
-  # calculate scores
-  scores_HAB = rbind_list(
-    # status
-    d %>%
-      filter(!is.na(health)) %>%
-      summarize(
-        score = pmin(1, sum(w * health) / sum(w)) * 100,
-        dimension = 'status'),
-    # trend
-    d %>%
-      filter(!is.na(trend)) %>%
-      summarize(
-        score =  sum(w * trend) / sum(w),
-        dimension = 'trend')) %>%
-    mutate(
-      goal = 'HAB') %>%
-    select(region_id=rgn_id, goal, dimension, score)
-
-  # return scores
+  scores_HAB = rbind(r.status, r.trend)
   return(scores_HAB)
 }
 
@@ -1246,8 +1209,11 @@ SPP = function(layers){
   species = layers$data[['spp_species']] %>%
     select(rgn_id, risk.wt = value)
 
-  ## iucn_trends created by NCEAS from global SPP trend data. But only 11 species in 6 provinces have trend score.
+  ## iucn_trends created by NCEAS from global SPP trend data. But only 9 species in 10 provinces have trend score.
   ## used for now. will need updates later. See data_prep.r --> SPP for how to obtain the trend scores.
+  ## 加入了我们根据2014全球SPP趋势计算的 spp_iucn_trend。 只有10个省份，9个物种有趋势值。region 2 暂时设为NA。
+  ## 在 province2015/prep/data_prep.r/SPP 中查看我们怎样从全球评估中取出中国所需的值。 －－》需要和goal keeper 讲
+
   trend = layers$data[['spp_iucn_trends']] %>%
     select(rgn_id, trend_score)
 
@@ -1259,14 +1225,14 @@ SPP = function(layers){
     mutate(dimension = 'status',
            goal = 'SPP')
 
-  # Trend: the same as SPP trend. Data from gl2014. only contains 11 species in 6 provinces.
-  # the other provinces will be given NA for now.
+  # Trend: the same as SPP trend. Data from gl2014
+  # region 2 will be given NA for now.
 
   spp.trend = trend %>%
     group_by(rgn_id) %>%
     summarize(score = mean(trend_score))
 
-  NA.trend = data.frame(rgn_id = c(2, 6, 7, 9, 10), score = 'NA') ## assign NA to provinces without trend data
+  NA.trend = data.frame(rgn_id = 2, score = 'NA') ## assign NA to province without trend data
 
   r.trend = rbind(spp.trend, NA.trend) %>%
     arrange(rgn_id) %>%
@@ -1277,44 +1243,36 @@ SPP = function(layers){
   # combine status and trend scores
   scores_SPP = rbind(r.status, r.trend)
   return(scores_SPP)
-
-  #################### gl2014 model ###############################
-  # scores
-  scores = cbind(rename(SelectLayersData(layers, layers=c('spp_status'='status','spp_trend'='trend'), narrow=T),
-                        c(id_num='region_id', layer='dimension', val_num='score')),
-                 data.frame('goal'='SPP'))
-  scores = mutate(scores, score=ifelse(dimension=='status', score*100, score))
-  return(scores)
 }
 
 BD = function(scores){
+  # To replace the first two lines of code after testing:
+  # scores_BD = scores %>%
+  #     filter(goal %in% c('HAB','SPP') & dimension %in% c('status','trend','score','future')) %>%
+  #     spread(goal, score)
 
-  d = within(
-    dcast(
-      scores,
-      region_id + dimension ~ goal, value.var='score',
-      subset=.(goal %in% c('HAB','SPP') & !dimension %in% c('pressures','resilience'))),
-{
-  goal = 'BD'
-  score = rowMeans(cbind(HAB, SPP), na.rm=T)})
+  # BD score = mean(HAB, SPP scores), same as the global model--> different from CHN model description: xBD = xHAB + xSPP, which I don't think is right...
+  # 根据全球模型， BD得分＝（HAB， SPP得分平均值）－》和中国模型不同： xBD = xHAB + xSPP，请查证
 
-# return all scores
-return(rbind(scores, d[,c('region_id','goal','dimension','score')]))
-}
+  scores_BD = rbind(scores_HAB, scores_SPP) %>%
+    spread(goal, score) %>%
+    mutate(score = rowMeans(cbind(as.numeric(HAB), as.numeric(SPP), na.rm = T)),
+           goal = 'BD') %>%
+    select(goal,
+           dimension,
+           region_id,
+           score)
 
-PreGlobalScores = function(layers, conf, scores){
+  ## Same problem as SP: b/c rgn_2 SPP trend score is NA, BD trend score is NA even after na.rm
+  ## 和SP同样的问题：因为region 2 SPP 趋势是NA，BD趋势也是NA， 虽然经过了 na.rm 操作
 
-  # get regions
-  rgns = SelectLayersData(layers, layers=conf$config$layer_region_labels, narrow=T)
+#   region_id dimension                 HAB              SPP      BD
+#   1          1    status                  65 58.0526315789474 41.3508772
+#   2          1     trend -0.0999915874484731             -0.3  0.2000028
+#   3          2    status                  50 67.1176470588235 39.3725490
+#   4          2     trend                -0.1               NA         NA
 
-  # limit to just desired regions and global (region_id==0)
-  scores = subset(scores, region_id %in% c(rgns[,'id_num'], 0))
-
-  # apply NA to Antarctica
-  id_ant = subset(rgns, val_chr=='Antarctica', id_num, drop=T)
-  scores[scores$region_id==id_ant, 'score'] = NA
-
-  return(scores)
+  return(scores_BD)
 }
 
 FinalizeScores = function(layers, conf, scores){
