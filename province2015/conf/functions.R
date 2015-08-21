@@ -151,7 +151,15 @@ mar.status.all.years =
                 yc.log = log10(yc+1)) %>%
       ungroup(); head(mar.status.all.years); summary(mar.status.all.years); sapply(mar.status.all.years, class)
 
-# set reference point the highest region in the most recent (max) year
+# Q1. In mar_yk data, region 6 (SH) has no MAR area, but molluscus and crabs have large harvest (1000's tonnes)
+# I confirmed with CHN team that it wasn't a data entry error, and it was recorded on Marine Yearbook as such.
+# But should we consider removing these data as outliers b/c they don't make sense?
+# 在mar_yk 数据中，region 6 上海 2012 年，虽然面积为0，但这两个物种收获非常高。虽然确认了这不是数据报告错误，
+# 但是否该考虑去除这两个数据：
+# 6, 2012, "Marine molluscs nei", 705550
+# 6, 2012, "Marine crabs nei", 33047
+
+# Q2. Currently set reference point the highest yc.log across regions in the most recent (max) year. Is it right?
 # 参考点的取值，暂时取用最近一年最高 yc.log 值为参考点； 在文件叙述中没有表明。需要讨论。
 
 ref_data = mar.status.all.years %>%
@@ -227,7 +235,7 @@ FP = function(layers, scores, debug=T){
     summarize(sum.yk = sum(tonnes)) %>%
     rename(region_id = rgn_id)
 
-  fis_Bt = fis.status.all.years %>% # calculated in FIS status
+  fis_Bt = layers$data[['fis_Bt']] %>% # calculated in FIS status
     group_by(rgn_id) %>%
     filter(year == max(year)) %>% # fis: status of 2012； FIS 现状用2012
     select(region_id = rgn_id, Bt)
@@ -354,10 +362,11 @@ NP <- function(layers){
   np_harvest  = layers$data[['np_harvest_tonnes']]
   np_risk     = layers$data[['np_risk']]
   np_weight   = layers$data[['np_harvest_weight']]
+  # did not receive np_harvest_relative; 没收到 Hp： “单个自然产品相对于所有产品总产值的权重” 的数据, 如下计算
 
 
-  # Calculate sustainability
-  # sustainability = 1 - (exposure + risk) / 2
+  # Calculate sustainability (Sp)
+  # sustainability (Sp) = 1 - mean(exposure + risk)
 
   np_sust <- np_exposure %>%
     select(rgn_id,
@@ -375,6 +384,7 @@ NP <- function(layers){
 
 
   # Calculate relative harvest using the mean as the reference point
+  # 没收到 Hp： “单个自然产品相对于所有产品总产值的权重” 的数据, 暂时如下计算。需改进：
   # relative harvest = tonnes / mean(tonnes) for each region-product
   np_harvest_rel <- np_harvest %>%
     select(-layer) %>%
@@ -401,7 +411,7 @@ NP <- function(layers){
 
 
   # Calculate status for each product (status of each natural product per region)
-  # xp = Hp * Sp
+  # xp = Hp * Sp = harvest_rel *
 
   xp = np_harvest_rel %>%
     left_join(np_sust,
@@ -663,8 +673,8 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
            tour_per_area_S = tour_per_area * S,
            tour_per_area_S_1 = tour_per_area_S +1,
            log = log10(tour_per_area_S_1),
-           ref_point = max(log), #assume ref point is maximum log(tour_per_area_S_1)
-                                 # 参考点使用 log(tour_per_area_S_1) 跨省最大值
+           ref_point = max(log), #assume ref point is maximum log(tour_per_area_S_1) （2010 SH）
+                                 # 参考点使用 log(tour_per_area_S_1) 跨省最大值 （2010 上海）
            xTR = log/ref_point*100) %>%
     round(2); head(d); summary(d)
 
@@ -922,7 +932,7 @@ ICO = function(layers){
 # 2          2 48.57143    status  ICO
 # 3          3 41.66667    status  ICO
 
-# Trend: the same as SPP trend. Data from gl2014. only contains 9 species in 10 provinces.
+# Trend: the same as SPP trend. Data from gl2014. only contains 10 species in 10 provinces.
 # the other provinces will be given NA for now.
 d2 = layers$data[['spp_iucn_trends']] %>%
   select(rgn_id, trend_score)
@@ -947,7 +957,7 @@ LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years)
 
   # CHN model:
   # xLSP = %cmpa / reference%
-  #      = (cmpa/total_marine_area) / 30%
+  #      = (cmpa/total_marine_area) / 5%
 
   # cast data ----
   cmpa = SelectLayersData(layers, layers='lsp_cmpa')
