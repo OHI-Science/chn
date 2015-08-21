@@ -363,8 +363,8 @@ AO = function(layers){
            score = trend)
 
 
-  scores = rbind(r.status, r.trend)
-  return(scores)
+  scores_AO = rbind(r.status, r.trend)
+  return(scores_AO)
 }
 
 NP <- function(layers){
@@ -440,14 +440,14 @@ NP <- function(layers){
   ### upon weighted mean of all products produced.
   ### From this, reports the most recent year as the NP status.
   ### Calculates NP trend for each region, based upon slope of a linear
-  ### model over the past six years inclusive (five one-year intervals).
+  ### model over the past 5 years inclusive (4 one-year intervals).
   ### Returns data frame with status and trend by region:
   ### [goal   dimension   region_id   score]
   #########################################.
 
   ### Calculate status, trends
   ### aggregate across products to rgn-year status, weighting with np_weight
-  np_status_all <- xp %>%
+  np_status_all = xp %>%
     left_join(np_weight,
               by = c('rgn_id', 'product')) %>%
     select(rgn_id, year, product, product_status, weight) %>%
@@ -457,35 +457,38 @@ NP <- function(layers){
     ungroup()
 
   ### get current status
-  np_status_current <- np_status_all %>%
+  r.status = np_status_all %>%
     filter(year == max(year) & !is.na(status)) %>%
-    mutate(
-      dimension = 'status',
-      score     = round(status,4) * 100) %>%
-    select(rgn_id, dimension, score)
+    mutate(dimension = 'status',
+      score     = max(-1, min(1, round(status,4))) * 100) %>%
+    select(rgn_id, dimension, score) %>%
+    rbind(data.frame(rgn_id = '6', dimension = 'status', score = NA)) %>%
+    arrange(as.numeric(rgn_id))
+  # good check to have in case the results exceeded 0-100 boundary
   stopifnot(
-    min(np_status_current$score, na.rm = TRUE) >= 0,
-    max(np_status_current$score, na.rm = TRUE) <= 100)
+    min(r.status$score, na.rm = TRUE) >= 0,
+    max(r.status$score, na.rm = TRUE) <= 100)
 
-  ### trend based on 5 intervals (6 years of data)
-  np_trend <- np_status_all %>%
-    filter(year <= max(year) & year > (max(year) - 5) & !is.na(status)) %>%
+  ### trend based on 4 intervals (5 years of data)
+  r.trend <- np_status_all %>%
+    filter(year <= max(year) & year > (max(year) - 4) & !is.na(status)) %>%
     group_by(rgn_id) %>%
     do(mdl = lm(status ~ year, data=.)) %>%
     summarize(
       rgn_id    = rgn_id,
       dimension = 'trend',
-      score     = max(-1, min(1, coef(mdl)[['year']] * 5)))
+      score     = max(-1, min(1, coef(mdl)[['year']] * 4))) %>%
+    rbind(data.frame(rgn_id = '6', dimension = 'trend', score = NA)) %>%
+    arrange(as.numeric(rgn_id))
+
   stopifnot(min(np_trend$score) >= -1, max(np_trend$score) <= 1)
 
   ### return scores
-  np_scores <- np_status_current %>%
-    full_join(np_trend) %>%
+  scores_NP = rbind(r.status, r.trend) %>%
     mutate(goal = 'NP') %>%
-    select(goal, dimension, region_id=rgn_id, score) %>%
-    arrange(goal, dimension, region_id)
+    select(goal, dimension, region_id=rgn_id, score)
 
-  return(np_scores)
+  return(scores_NP)
 }
 
 
