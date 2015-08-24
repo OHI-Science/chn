@@ -377,3 +377,21 @@ dn = add_rgn_id(d, fld_name = 'rgn_id')
 write_csv(dn, file.path(dir_f, f_orig))
 write_csv(dn, file.path(dir_layers, f_orig)) }
 
+# PRESSURE & RESILIENCE DATA LAYERS ----
+
+# cs_habitat_extent = Habitat extent * rank, per Carbon Storage habitats
+#                   = extent * contribution
+
+extent = layers$data[['cs_extent']] %>%
+  select(rgn_id, habitat, extent = hectare)
+
+contribution = layers$data[['cs_contribution']] %>%
+  select(rgn_id, habitat, contribution = value)
+
+result = full_join(extent, contribution, by = c('rgn_id', 'habitat')) %>%
+  mutate(hectare = extent*contribution) %>%
+  select(rgn_id, habitat, hectare)
+
+write_csv(result, file.path(dir_layers, 'cs_habitat_extent_chn2015.csv'))
+
+# cp_habitat_extent_rank =
