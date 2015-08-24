@@ -102,7 +102,7 @@ Data sources:
 "LE","le_unemployment","Unemployment","gapfilled","percent","percent unemployed","le_unemployment_gl2014.csv","rgn_id",,,"year","percent",,TRUE,1998,2010,3.10000081,4.30000027,FALSE,,,,11,FALSE
 "LE","le_wage_sector_year","Wages","gapfilled","value","2010 USD","le_wage_sector_year_gl2014.csv","rgn_id",,"sector","year","value",,TRUE,2003,2008,1635.48274461361,69002.1153637486,FALSE,,,,11,FALSE
 "LE","le_workforcesize_adj","Modeled Livelihoods & Economies data","adjusted workforce size","jobs","jobs","le_workforcesize_adj_sc2014-popn-inland25km.csv","rgn_id",,,"year","jobs",,TRUE,1990,2012,5566587.10743865,266826151.733338,FALSE,,,,11,FALSE
-"LE pressures","le_sector_weight","Jobs weighting","Jobs weighting by sector (defaulting to 1)","weight","value","le_sector_weight_gl2014.csv","rgn_id",,"sector",,"weight",,TRUE,,,1,1,TRUE,,,,11,FALSE
+"LE pressures","le_sector_weight","Jobs weighting","Jobs weighting by sector (defaulting to 1)","weight","value","le_sector_weight_gl2014.csv",,,,,,,FALSE,,,,,FALSE,,,,11,
 "LIV ECO","le_popn","Total population by subregion","Population data from The World Bank","count","count","le_popn_gl2014.csv","rgn_id",,,"year","count",,TRUE,1960,2012,660330000,1350695000,FALSE,,,,11,FALSE
 "LIV","le_livjob","Employment","number of employment in sea-related industry in costal region","value","10,000 people","le_livjob_chn2015_zb.csv","rgn_id",,"datalayer","year","value",,TRUE,2007,2011,249,1363640,FALSE,,,,11,FALSE
 "LIV","le_livwage","Income","average income of urban and rural households in costal provinces ","value","Chinese Yuan","le_livwage_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2011,7791.71,28293,FALSE,,,,11,FALSE
