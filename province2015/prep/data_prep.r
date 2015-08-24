@@ -260,7 +260,7 @@ for (f_orig in lsp_file_list) {
 
 }
 
-# LIV_ECO ====
+# LIV ====
 
 liv_file_list = c("le_livjob_chn2015_zb.csv",
                  "le_livwage_chn2015_zb.csv")
@@ -271,7 +271,7 @@ for (f_orig in liv_file_list) {
 
   if(f_orig == "le_livjob_chn2015_zb.csv") {
     d = d %>%
-    mutate(datalayer = str_replace_all(datalayer, "beach placer industry", 'beach_placer'),
+    mutate(datalayer = str_replace_all(datalayer, "beach placer industry", 'mining'),
            datalayer = str_replace_all(datalayer, "coastal tourism", 'tourism'),
            datalayer = str_replace_all(datalayer, "marein engineering architecture", 'egineering_arch'),
            datalayer = str_replace_all(datalayer, "marine biomedicine", 'biomedicine'),

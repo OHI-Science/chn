@@ -754,7 +754,7 @@ LIV_ECO = function(layers, subgoal){
 
  # jobs multiplier placeholders were added (original multipliers are found in Table S10 from Halpern et al 2012 SOM)
  # all set to be 1, so that it doesn't affect the results. To be updated in the future
- jobs_multiplier = c('beach_placer' = 1,
+ jobs_multiplier = c('mining' = 1,
                       'tourism' = 1,
                       'egineering_arch' = 1,
                       'biomedicine' = 1,
