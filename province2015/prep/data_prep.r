@@ -377,6 +377,7 @@ dn = add_rgn_id(d, fld_name = 'rgn_id')
 write_csv(dn, file.path(dir_f, f_orig))
 write_csv(dn, file.path(dir_layers, f_orig)) }
 
+
 # PRESSURE & RESILIENCE DATA LAYERS ----
 
 # cs_habitat_extent = Habitat extent * rank, per Carbon Storage habitats
@@ -394,4 +395,23 @@ result = full_join(extent, contribution, by = c('rgn_id', 'habitat')) %>%
 
 write_csv(result, file.path(dir_layers, 'cs_habitat_extent_chn2015.csv'))
 
-# cp_habitat_extent_rank =
+# cp_habitat_extent_rank = Habitat extent * rank, per Coastal Protection habitats
+#                        = extent * weight
+
+habitat.wt = c('saltmarshes' = 3,
+               'mangroves' = 4,
+               'seagrasses' = 1,
+               'coral reef' = 4)
+
+m = layers$data[['cp_extent']] %>%
+  group_by(rgn_id, habitat) %>%
+  filter(year == max(year)) %>% #choose the most recent year's data
+  select(-layer,
+         -year,
+         extent = hectare) %>%
+  mutate(weight = habitat.wt[habitat],
+         extent_rank = extent * weight) %>%
+  select(rgn_id, habitat, extent_rank)
+
+write_csv(m, file.path(dir_layers, 'cp_habitat_extent_rank_chn2015.csv'))
+
