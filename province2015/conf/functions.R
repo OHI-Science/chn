@@ -893,13 +893,13 @@ return(scores_LIV_ECO)
 
 LE = function(scores, layers){
 
-##  To replace the first two lines of code after the testing phase:
-#   scores_LE = scores %>%
-#     filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %>%
-#     spread(goal, score)
+  #  During testing-individual-goal phase, run this line instead of the first two lines of code:
+  # 在单独查看LE目标时，用这个line 代替第一，二行程序
+  #  scores_LE = scores_LIV_ECO %>%
 
- scores_LE = scores_LIV_ECO %>%
-   spread(goal, score) %>%
+  scores_LE = scores %>%
+    filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %>%
+    spread(goal, score) %>%
    mutate(score = rowMeans(cbind(ECO, LIV, na.rm=T))) %>%
    select(region_id, score, dimension) %>%
    mutate(goal = 'LE')
@@ -1019,13 +1019,12 @@ return(scores_LSP)
 }
 
 SP = function(scores){
+  #  During testing-individual-goal phase, run this line instead of the first two lines of code:
+  # 在单独查看LE目标时，用这个line 代替第一，二行程序
+  # scores_SP = rbind(scores_ICO, scores_LSP) %>%
 
-  # to replace the first two lines of code after testing:
-  # scores_LE = scores %>%
-    #     filter(goal %in% c('ICO','LSP') & dimension %in% c('status','trend','score','future')) %>%
-    #     spread(goal, score)
-
-  scores_SP = rbind(scores_ICO, scores_LSP) %>%
+  scores_LE = scores %>%
+        filter(goal %in% c('ICO','LSP') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
     filter(!dimension %in% c('pressures', 'resilience')) %>%
     mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP), na.rm = T)), # na.rm 去除NA
@@ -1209,15 +1208,12 @@ SPP = function(layers){
 }
 
 BD = function(scores){
-  # To replace the first two lines of code after testing:
-  # scores_BD = scores %>%
-  #     filter(goal %in% c('HAB','SPP') & dimension %in% c('status','trend','score','future')) %>%
-  #     spread(goal, score)
+  #  During testing-individual-goal phase, run this line instead of the first two lines of code:
+  # 在单独查看LE目标时，用这个line 代替第一,二行程序
+  # scores_BD = rbind(scores_HAB, scores_SPP) %>%
 
-  # BD score = mean(HAB, SPP scores), same as the global model--> different from CHN model description: xBD = xHAB + xSPP, which I don't think is right...
-  # 根据全球模型， BD得分＝（HAB， SPP得分平均值）－》和中国模型不同： xBD = xHAB + xSPP，请查证
-
-  scores_BD = rbind(scores_HAB, scores_SPP) %>%
+  scores_BD = scores %>%
+      filter(goal %in% c('HAB','SPP') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
     mutate(score = rowMeans(cbind(as.numeric(HAB), as.numeric(SPP), na.rm = T)),
            goal = 'BD') %>%
