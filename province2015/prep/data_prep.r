@@ -415,3 +415,23 @@ m = layers$data[['cp_extent']] %>%
 
 write_csv(m, file.path(dir_layers, 'cp_habitat_extent_rank_chn2015.csv'))
 
+# hab_presence: 1 for presence, 0 for absence
+
+m = layers$data[['cp_extent']] %>%
+  group_by(rgn_id, habitat) %>%
+  filter(year == max(year)) %>% #choose the most recent year's data
+  select(-layer,
+         -year,
+         extent = hectare) %>%
+  mutate(boolean = 1) %>%
+  select(rgn_id, habitat, boolean) %>%
+  rbind(data.frame(rgn_id = c(2:3, 5:8, 1:6, 1:10),
+                   habitat = c(rep('seagrasses', 6), rep('mangroves', 6), rep('coral reef', 10)),
+                   boolean = c(rep('0', 22)))) # added 0 for provinces that don't have a particular habitat
+
+write_csv(m, file.path(dir_layers, 'hab_presence_chn2015.csv'))
+
+
+
+
+
