@@ -44,7 +44,8 @@ D1 = ft %>%
   mutate(ut = ct/ft) %>%
   group_by(rgn_id) %>%
   mutate(ut_plus1 = c(ut[-1], NA), # lag: start from year 1, last year 2013 set as NA.
-                                   # Q: lost the most recent year's info
+                                   # Q: lost the most recent year's (2013) info. r, q, k, and mmsy can also be calculated up to 2012, and therefore status
+                                   # will only be calculated up to 2012.
          y = ut_plus1/ut - 1) %>%
   filter(!year=='2013')
 
@@ -80,7 +81,8 @@ fis.status.all.years = D2 %>%
 
 # save fis.status.all.years in layers folder for calcualtion in FP
 dir_layers = '~/github/chn/province2015/layers'
-write_csv(fis.status.all.years %>%
+
+write.csv(fis.status.all.years %>%
             select(rgn_id, year, Bt), file.path(dir_layers, 'fis_Bt_chn2015_NJ.csv'))
 
 # # current status 最近一年现状
@@ -296,7 +298,7 @@ AO = function(layers){
           'ao_men_ref',
           'ao_gas',       #2010-2014
           'ao_gas_ref')
-  d = SelectLayersData(layers, layers=lyrs); head(D); summary(D)
+  d = SelectLayersData(layers, layers=lyrs); head(d); summary(d)
 
   D = d %>%
     select(rgn_id = id_num,
@@ -475,8 +477,6 @@ NP <- function(layers){
       score     = max(-1, min(1, coef(mdl)[['year']] * 4))) %>%
     rbind(data.frame(rgn_id = '6', dimension = 'trend', score = NA)) %>%
     arrange(as.numeric(rgn_id))
-
-  stopifnot(min(np_trend$score) >= -1, max(np_trend$score) <= 1)
 
   ### return scores
   scores_NP = rbind(r.status, r.trend) %>%
@@ -787,7 +787,7 @@ LIV_ECO = function(layers, subgoal){
         wage_score = wage/wage_ref)
 
  xLIV_all_years = full_join(jobs_score, #calculate status scores for each year
-                  select(wage_score, rgn_id, year, wage_score)) %>%
+                  select(wage_score, rgn_id, year, wage_score), by = c('rgn_id','year')) %>%
                   mutate(xLIV = (jobs_score + wage_score)/2*100 )
  # current status
  LIV.status = xLIV_all_years %>%
@@ -810,7 +810,7 @@ LIV_ECO = function(layers, subgoal){
 # with the average weighted by the number of jobs in each sector
 # ... averaging slopes across sectors weighted by the revenue in each sector
 
-LIV.trend = left_join(jobs, wage) %>%
+LIV.trend = left_join(jobs, wage, by=c('rgn_id', 'year')) %>%
   # get sector weight as total jobs across years for given region
   arrange(rgn_id, year, sector) %>%
   group_by(rgn_id, sector) %>%
@@ -1240,12 +1240,12 @@ BD = function(scores){
 
 ##### during testing phase only.
 ##### Combining all the scores into one data frame for CHN team for reference
-CHN.scores = rbind(scores_AO, scores_BD, scores_CP, scores_CS, scores_CW, scores_FIS, scores_FP,
-                   scores_HAB, scores_ICO, scores_LE, scores_LIV_ECO, scores_LSP,
-                   scores_MAR, scores_NP, scores_SP, scores_TR)
-library(readr) # contains write_csv function
-dir_layers = '~/github/chn/province2015/tmp' #save results to temporary folder
-write_csv(CHN.scores, file.path(dir_layers, 'china.final.scores.temp.csv')) # saved on 8.21.2015
+# CHN.scores = rbind(scores_AO, scores_BD, scores_CP, scores_CS, scores_CW, scores_FIS, scores_FP,
+#                    scores_HAB, scores_ICO, scores_LE, scores_LIV_ECO, scores_LSP,
+#                    scores_MAR, scores_NP, scores_SP, scores_TR)
+# library(readr) # contains write_csv function
+# dir_layers = '~/github/chn/province2015/tmp' #save results to temporary folder
+# write_csv(CHN.scores, file.path(dir_layers, 'china.final.scores.temp.csv')) # saved on 8.21.2015
 #########
 
 
