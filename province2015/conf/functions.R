@@ -729,7 +729,7 @@ scores_TR = rbind(r.status, r.trend)
 return(scores_TR)
 }
 
-LIV_ECO = function(layers, subgoal){
+LIV = function(layers){
 
 # select data
 
@@ -739,13 +739,9 @@ LIV_ECO = function(layers, subgoal){
  wage = layers$data[['le_livwage']] %>%
    select(rgn_id, wage = value, year); head(wage)
 
- income = layers$data[['le_eco']] %>%
-   select(rgn_id, income = value, year); head(income)
 
   # China model:
   # xLIV = ( sum(jobs) / sum(jobs_ref) + wage / wage_ref) /2
-  # xECO = income / income_ref
-  # xLE = (xLIV + xECO)/2
 
  #LIV status:
 
@@ -790,14 +786,14 @@ LIV_ECO = function(layers, subgoal){
                   select(wage_score, rgn_id, year, wage_score), by = c('rgn_id','year')) %>%
                   mutate(xLIV = (jobs_score + wage_score)/2*100 )
  # current status
- LIV.status = xLIV_all_years %>%
+ r.status = xLIV_all_years %>%
    filter(year == max(year)) %>%
    mutate(dimension = 'status',
           goal = 'LIV') %>%
    select(goal,
           dimension,
           region_id = rgn_id,
-          score = xLIV); head(LIV.status)
+          score = xLIV); head(r.status)
 
 #      region_id    score dimension goal
 #  1          1 46.94071    status  LIV
@@ -810,7 +806,7 @@ LIV_ECO = function(layers, subgoal){
 # with the average weighted by the number of jobs in each sector
 # ... averaging slopes across sectors weighted by the revenue in each sector
 
-LIV.trend = left_join(jobs, wage, by=c('rgn_id', 'year')) %>%
+r.trend = left_join(jobs, wage, by=c('rgn_id', 'year')) %>%
   # get sector weight as total jobs across years for given region
   arrange(rgn_id, year, sector) %>%
   group_by(rgn_id, sector) %>%
@@ -844,27 +840,25 @@ LIV.trend = left_join(jobs, wage, by=c('rgn_id', 'year')) %>%
   mutate(
     goal      = 'LIV',
     dimension = 'trend') %>%
-  select(goal, dimension, region_id = rgn_id, score)
+  select(goal, dimension, region_id = rgn_id, score); head(r.trend)
 
-#    region_id score dimension goal
-# 1          1  0.75     trend  LIV
-# 2          2  0.75     trend  LIV
-# 3          3  0.75     trend  LIV
-# 4          4  0.75     trend  LIV
-# 5          5  0.75     trend  LIV
-# 6          6  0.75     trend  LIV
-# 7          7  0.75     trend  LIV
-# 8          8  0.75     trend  LIV
-# 9          9  0.75     trend  LIV
-# 10        10  0.75     trend  LIV
-# 11        11  0.75     trend  LIV
+scores_LIV = rbind(r.status, r.trend)
+return(scores_LIV)
+}
+
+ECO = function(layers){
+# xECO = income / income_ref
+
+# cast data
+income = layers$data[['le_eco']] %>%
+  select(rgn_id, income = value, year); head(income)
 
 # ECO status calculation
 xECO_all_years = income %>%
   mutate (eco_ref = max(income),
           xECO = income/eco_ref*100); head(xECO_all_years)
 
-ECO.status = xECO_all_years %>%
+r.status = xECO_all_years %>%
   filter(year == max(year)) %>%
   mutate(dimension = 'status',
          goal = 'ECO')  %>%
@@ -872,26 +866,27 @@ ECO.status = xECO_all_years %>%
          dimension,
          region_id = rgn_id,
          score = xECO) %>%
-  arrange(region_id) ; head(ECO.status)
+  arrange(region_id) ; head(r.status)
 
 # ECO trend
 
-ECO.trend = xECO_all_years %>%
+r.trend = xECO_all_years %>%
   group_by(rgn_id) %>%
   do(lmd = lm(xECO ~ year, data =.)) %>%
   summarize(region_id = rgn_id,
             score = pmax(pmin(coef(lmd)[['year']] *4, 1) ,-1),
             dimension = 'trend',
             goal = 'ECO') %>%
-  select(goal, dimension, region_id, score); head(ECO.trend)
+  select(goal, dimension, region_id, score); head(r.trend)
 
-scores_LIV_ECO = rbind(LIV.status, LIV.trend, ECO.status, ECO.trend)
-return(scores_LIV_ECO)
-
+scores_ECO = rbind(r.status, r.trend)
+return(scores_ECO)
 }
 
 
 LE = function(scores, layers){
+
+  # xLE = (xLIV + xECO)/2
 
   #  During testing-individual-goal phase, run this line instead of the first two lines of code:
   # 在单独查看LE目标时，用这个line 代替第一，二行程序
@@ -911,8 +906,9 @@ ICO = function(layers){
 
   #cast data:
   d = layers$data[['ico_species']] %>%
-    select(-layer) %>%
-    rename(count = value)
+    select(rgn_id,
+           category,
+           count = value)
 
   # lookup for weights status
   w.risk_category = c('LC' = 0,
@@ -939,10 +935,7 @@ ICO = function(layers){
   summarize(score = sum(count_wt)/sum(count)*100,
             dimension = 'status',
             goal = 'ICO') %>%
-  select(region_id = rgn_id, #format
-         score,
-         dimension,
-         goal)
+  select( goal, dimension, region_id = rgn_id, score)
 
 #   region_id    score dimension goal
 # 1          1 44.00000    status  ICO
@@ -964,16 +957,19 @@ spp.trend = d2 %>%
 NA.trend = data.frame(rgn_id = '2', score = 'NA') ## assign NA to the rest of the provinces
 
 r.trend = rbind(spp.trend, NA.trend) %>%
-  arrange(rgn_id) %>%
-  rename(region_id = rgn_id) %>%
   mutate(dimension = 'trend',
-         goal = 'ICO')
+         goal = 'ICO') %>%
+  select(goal,
+         dimension,
+         region_id = rgn_id,
+         score) %>%
+  arrange(as.numeric(region_id))
 
 scores_ICO = rbind(r.status, r.trend)
 return(scores_ICO) }
 
 
-LSP = function(layers, ref_pct_cmpa=30, ref_pct_cp=30, status_year, trend_years){
+LSP = function(layers){
 
   # CHN model:
   # xLSP = %cmpa / reference%
@@ -1054,13 +1050,15 @@ CW = function(layers){
           val_num,
           layer) %>%
    spread(layer, val_num) %>% #head(D)
-   rename(phosphate = cw_phosphate,
+   select(rgn_id,
+          year,
+          phosphate = cw_phosphate,
           nitrogen = cw_nitrogen,
           cod = cw_cod,
           oil = cw_oil)
 
  # status
- # model = 4throot (mean(pollutant_scores))
+ # model = 4th.root (mean(pollutant_scores))
 
  cw.status.all.years = D %>%
    group_by(rgn_id, year) %>%
@@ -1176,21 +1174,21 @@ SPP = function(layers){
   ## 加入了我们根据2014全球SPP趋势计算的 spp_iucn_trend。 只有10个省份，9个物种有趋势值。region 2 暂时设为NA。
   ## 在 province2015/prep/data_prep.r/SPP 中查看我们怎样从全球评估中取出中国所需的值。 －－》需要和goal keeper 讲
 
-  trend = layers$data[['spp_iucn_trends']] %>%
+  trend.data = layers$data[['spp_iucn_trends']] %>%
     select(rgn_id, trend_score)
 
   # status = 1 - sum(risk.wt)/number of species = 1 - mean(risk.wt)
   r.status = species %>%
     group_by(rgn_id) %>%
-    summarize(score = (1- mean(risk.wt)) *100) %>%
-    rename(region_id = rgn_id) %>%
-    mutate(dimension = 'status',
-           goal = 'SPP')
+    summarize(score = (1- mean(risk.wt)) *100,
+              dimension = 'status',
+              goal = 'SPP') %>%
+   select(goal, dimension, region_id = rgn_id, score)
 
   # Trend: the same as SPP trend. Data from gl2014
   # region 2 will be given NA for now.
 
-  spp.trend = trend %>%
+  spp.trend = trend.data %>%
     group_by(rgn_id) %>%
     summarize(score = mean(trend_score))
 
@@ -1198,9 +1196,10 @@ SPP = function(layers){
 
   r.trend = rbind(spp.trend, NA.trend) %>%
     arrange(rgn_id) %>%
-    rename(region_id = rgn_id) %>%
     mutate(dimension = 'trend',
-           goal = 'SPP')
+           goal = 'SPP') %>%
+    select(goal, dimension, region_id = rgn_id, score)
+
 
   # combine status and trend scores
   scores_SPP = rbind(r.status, r.trend)
