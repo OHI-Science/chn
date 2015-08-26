@@ -204,7 +204,7 @@ Data sources:
 "resilience","env_protection","Marine Environmental Protection","","resilience score","resilience score","env_protection_chn2015.csv","rgn_id",,,,"resilience.score",,TRUE,,,0.4,0.6,TRUE,,,,11,FALSE
 "resilience","resource_exploit","Marin Resource Exploitation","","resilience score","resilience score","resource_exploit_chn2015.csv","rgn_id",,,,"resilience.score",,TRUE,,,0.4,0.6,TRUE,,,,11,FALSE
 "resilience","wildlife_conservation","Marine Wildlife Conservation","","resilience score","resilience score","wildlife_conservation_chn2015.csv","rgn_id",,,,"resilience.score",,TRUE,,,0.4,0.6,TRUE,,,,11,FALSE
-"resilience","fish_mgmt","Fishery Management","","resilience score","resilience score","fish_mgmt_chn2015.csv","rgn_id",,,,,"resilience.score",TRUE,,,,,FALSE,,,,11,
+"resilience","fish_mgmt","Fishery Management","","resilience score","resilience score","fish_mgmt_chn2015.csv","rgn_id",,,,"resilience.score",,TRUE,,,0,0.6,TRUE,,,,11,FALSE
 "resilience","diversity_index","Costal ecological integrity ","","resilience score","resilience score","diversity_index_chn2015.csv","rgn_id",,,,"resilience.score",,TRUE,,,0.2,0.8,TRUE,,,,11,FALSE
 "resilience","sector_evenness","Sector evenness as a measure of economic diversity","","resilience score","resilience score","sector_evenness_chn2015.csv","rgn_id",,,,"resilience.score",,TRUE,,,1,1,TRUE,,,,11,FALSE
 "spatial","rgn_area","Region area of total EEZ ocean","Area of Ocean Health Index regions based on exclusive economic zones (VLIZ 2012).
