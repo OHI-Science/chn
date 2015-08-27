@@ -35,10 +35,10 @@ FIS = function(layers){
   ### To Mian: Real calculation of status and trend (40-108). But status results are all 0's, which screwed up trend calcualtion next.
   ### Intermediate steps (r, K, q, mmsy) have many unwanted negative numbers. my mmsy results are different from provided mmsy data (except for region 1 and 4)
   ### So I made a placeholder status and trend data set after this session (line 109-122). You should check on this.
-  ### 李冕，40-107 是正确的计算方式。但现状（status) 计算结果很奇怪，全是0，因为中间计算的的 r, K, q, mmsy 结果奇怪，有很多
-  ### 不该有的负数值。导致趋势 (trend) 计算不能做。这里你该仔细看一看。为了FP计算，我暂时在109-120 我暂时做了占位符 （r.status, r.trend)。
+  ### 李冕，现状（status) 计算结果很奇怪，因为中间计算的的 r, K, q, mmsy 结果奇怪，有很多
+  ### 不该有的负数值。导致趋势 (trend) 计算不能做。这里你该仔细看一看。为了FP计算，我暂时在109-120 我暂时做了占位符 （r.status, r.trend)->占位符已取消。
 
-  # combining all data
+  # calculate needed variables (r, q, K, mmsy) from linear model (independent variables: ut, ft)
 D1 = ft %>%
   left_join(ct, by = c("rgn_id", "year")) %>%
   mutate(ut = ct/ft) %>%
@@ -60,68 +60,62 @@ D2 = D1 %>%
          mmsy_r = mmsy*0.75)  %>%
   select(-dlm) %>%
   ungroup; head(D2); summary(D2)
+### NOTE: take a look at D2, some mmsy values are negative.
+### 李冕：看一下D2，有几个q, K, mmsy 是负数。。。
 
 ## status:
-fis.status.all.years = D2 %>%
-  select(rgn_id, q) %>%
-  full_join(
-    select(D1, rgn_id, year, ut), by = 'rgn_id') %>%
-  mutate(Bt = ut/q) %>%
-  full_join(
-    select(D2, rgn_id, mmsy_r), by = 'rgn_id') %>%
-  mutate(abs = abs(mmsy_r - Bt), #absolute value of (mmsy_r - Bt)
+status.all.years = D2 %>%
+  select(rgn_id, mmsy_r) %>%
+  left_join(ct, by='rgn_id') %>%
+  filter(!year == max(year)) %>% # take out most recent eyar. See reasoning in D1.
+  mutate(abs = abs(mmsy_r - ct)) %>%
+  group_by(rgn_id, year) %>%
+  mutate(d_Ct = if (abs< 0.05*mmsy_r) {
+    0
+  } else if ( abs > 0.05*mmsy_r & abs < mmsy_r) {
+    abs
+  } else mmsy_r ) %>%
+  ungroup %>%
+  left_join(tc, by = 'rgn_id') %>%
+  mutate(x.fis = pmax(-1, pmin(1, (1-(d_Ct/mmsy_r))*tc)) *100)
 
-         d_Bt = if (abs< 0.05*mmsy_r) {
-           0
-         } else if ( abs > 0.05*mmsy_r | abs < mmsy_r) {
-                       abs
-         } else mmsy_r ) %>%
-  full_join (tc, by = 'rgn_id') %>%
-  mutate(x.fis = max(0, min(1, (1 - d_Bt/mmsy_r)*tc))*100)
 
-# save fis.status.all.years in layers folder for calcualtion in FP
+# save Bt in layers folder for calcualtion in FP
 dir_layers = '~/github/chn/province2015/layers'
+  # Bt= ut/q
+Bt = left_join (
+  D1 %>% select(rgn_id, year, ut),
+  D2 %>% select(rgn_id, q),
+  by = 'rgn_id') %>%
+  mutate(Bt= ut/q)
 
-write.csv(fis.status.all.years %>%
+write.csv(Bt %>%
             select(rgn_id, year, Bt), file.path(dir_layers, 'fis_Bt_chn2015_NJ.csv'))
 
-# # current status 最近一年现状
-# r.status = fis.status.all.years %>%
-#   filter(year==max(year)) %>% # year = 2012
-#   mutate(goal = "FIS",
-#          dimension = 'status') %>%
-#   select(goal,
-#          dimension,
-#          region_id = rgn_id,
-#          score = x.fis)
+# # current status 最近一年现状 2012
+r.status = status.all.years %>%
+  filter(year==max(year)) %>% # year = 2012
+  mutate(goal = "FIS",
+         dimension = 'status') %>%
+  select(goal,
+         dimension,
+         region_id = rgn_id,
+         score = x.fis)
 
-  ###  Real calculation of trend when FIS status question answered (ie. status = 0)
+  ###  Real calculation of trend when FIS status question answered
   ### 趋势计算
-  # r.trend = status.all.years %>%
-  #   group_by(rgn_id) %>%
-  #   filter(year == (max(year) - 4) : max(year)) %>% # most recent 5 years of data
-  #   do(dml = lm(x.fis ~ year, data =.)) %>%
-  #   mutate(trend = coef(dml)[['year']]*4,  # can't calculate now b/c all status are 0's
-  #          goal = 'FIS',
-  #          dimension = 'trend') %>%
-  #   select(goal,
-  #          dimension,
-  #          region_id = rgn_id,
-  #          score = trend)
-
-
-  ### Status Place holder
-r.status = data.frame(goal = 'FIS',
-                        dimension = 'status',
-                        region_id = c(1:11),
-                        score = 1)
-
-
- ### Trend placeholder
-r.trend = data.frame(goal = 'FIS',
-                     dimension = 'trend',
-                     region_id = c(1:11),
-                     score = 0)
+  r.trend = status.all.years %>%
+    select(rgn_id, year, x.fis) %>%
+    filter(year > (max(year)-5)) %>% # most recent 5 years of data
+    group_by(rgn_id) %>%
+    do(dml = lm(x.fis ~ year, data =.)) %>%
+    mutate(trend = coef(dml)[['year']]*4,  # can't calculate now b/c all status are 0's
+           goal = 'FIS',
+           dimension = 'trend') %>%
+    select(goal,
+           dimension,
+           region_id = rgn_id,
+           score = trend)
 
 scores_FIS = rbind(r.status, r.trend)
 return(scores_FIS)
@@ -1058,21 +1052,19 @@ CW = function(layers){
           oil = cw_oil)
 
  # status
- # model = 4th.root (mean(pollutant_scores))
+ # model = 4th.root (phosphate*nitrogen*cod*oil)
 
  cw.status.all.years = D %>%
    group_by(rgn_id, year) %>%
-   mutate(cw = (sum(phosphate, nitrogen, cod, oil)/4)^(1/4)) %>%
-   ungroup %>%
-   mutate(cw.ref = max(cw[year==max(year)])) %>% # reference point: not specified in OHI manual yet. choose the highest cw.score of all regions
-                                                 # in most recent year as a ref point for now
-                                                 # 参考点：没有再手册中说明。暂时选择 cw 公式得分的最高分为参考点
-   mutate(x.cw = cw/cw.ref*100)
+   mutate(x.cw = max(-1, (min(1, phosphate*nitrogen*cod*oil)^(1/4)))*100)
+   ungroup
+
 
  # current status
  r.status = cw.status.all.years %>%
    mutate(goal = 'CW',
           dimension = 'status') %>%
+   group_by(rgn_id) %>%
    filter(year == max(year)) %>%
    select(goal,
           dimension,
