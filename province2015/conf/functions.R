@@ -1058,21 +1058,19 @@ CW = function(layers){
           oil = cw_oil)
 
  # status
- # model = 4th.root (mean(pollutant_scores))
+ # model = 4th.root (phosphate*nitrogen*cod*oil)
 
  cw.status.all.years = D %>%
    group_by(rgn_id, year) %>%
-   mutate(cw = (sum(phosphate, nitrogen, cod, oil)/4)^(1/4)) %>%
-   ungroup %>%
-   mutate(cw.ref = max(cw[year==max(year)])) %>% # reference point: not specified in OHI manual yet. choose the highest cw.score of all regions
-                                                 # in most recent year as a ref point for now
-                                                 # 参考点：没有再手册中说明。暂时选择 cw 公式得分的最高分为参考点
-   mutate(x.cw = cw/cw.ref*100)
+   mutate(x.cw = max(-1, (min(1, phosphate*nitrogen*cod*oil)^(1/4)))*100)
+   ungroup
+
 
  # current status
  r.status = cw.status.all.years %>%
    mutate(goal = 'CW',
           dimension = 'status') %>%
+   group_by(rgn_id) %>%
    filter(year == max(year)) %>%
    select(goal,
           dimension,
