@@ -1,6 +1,10 @@
 # load required libraries
 suppressWarnings(require(ohicore))
 
+# # for debugging
+# remove.packages('ohicore')
+# devtools::load_all('~/github/ohicore')
+
 # set working directory to the scenario directory, ie containing conf and layers directories
 setwd('~/github/chn/province2015')
 
