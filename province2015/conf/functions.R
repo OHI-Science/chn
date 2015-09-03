@@ -197,7 +197,7 @@ r.status = mar.status.all.years %>%
 r.trend = mar.status.all.years %>%
   select(rgn_id, year, x.mar) %>%
   group_by(rgn_id) %>%
-  filter(year > (max(year)-5)) %>% #the most recent 5 years of data
+  filter(year > (max(year)-5) & !rgn_id== 6) %>% #the most recent 5 years of data; ignore region 6 b/c no harvest in past 5 years
   do(dml = lm(x.mar ~ year, data=.)) %>% # lm 线性方程
   mutate(score = pmax(-1, pmin(1, coef(dml)[['year']]*4))) %>% # 4 intervals 4个间隔；year的系数
                                                                # pmin(1, ...): 最大不超过1
@@ -214,8 +214,7 @@ r.trend = mar.status.all.years %>%
   arrange(region_id)
 
 scores_MAR = rbind(r.status, r.trend)
-return(scores)
-
+return(scores_MAR)
 }
 
 FP = function(layers, scores, debug=T){
