@@ -42,20 +42,14 @@ $$
 the opportunity to fish artisanally, independent of how many fish are caught
 
 $$
-x_{AO} = (1 - D_{U}) * S_{AO}
+x_{AO} =\frac{\frac{AP_{c}}{AP_{r}} + \frac{AF_{c}}{AF_{r}} + \frac{AE_{c}}{AE_{r}} }{3}
 $$
 
-$$
-D_{U} = (1 - P) * (1 - O_{AO})
-$$
+- $AP$ = number of ports, current [$c$] or reference [$r$]
 
-- $D_{U}$ = unmet demand
+- $AF$ = number of fishermen, current [$c$] or reference [$r$]
 
-- $S_{AO}$ = sustainability of fishing methods   
-
-- $O_{AO}$ = access to artisanal fishing
-
-- $P$ = gross domestic product (GDP) per capita, adjusted by purchasing power parity (PPP)
+- $AE$ = gas price, current [$c$] or reference [$r$] 
 
 
 ## Natural Products
@@ -85,19 +79,23 @@ $$
 
 - $R$ = risk term
 
-￼products:aquaria fishes, corals, sponges, shells, seaweeds, fish oil
+- $N$ = number of natural products
+
+￼products:seasalt, marine chemicals, biomedicine
 
 
 ## Carbon Storage
 Extent and condition of coastal habitats that store and sequester atmospheric carbon 
 
 $$
-x_{CS} =  \sum_{1}^{k} \frac{C_{s}}{C_{r}} * \frac{A_{k}}{A_{T}}
+x_{CS} =  \sum_{1}^{k} ( c_k * \frac{C_{s}}{C_{r}} * \frac{A_{k}}{A_{T}} )
 $$
 
 - $C$ = condition of habitat $k$, current [$c$] or reference[$r$]
 
 - $A$ = area of habitat $k$, current [$c$] or total area covered by all habitats assessed [T]
+
+- ${c_k}$ = relative contribution to carbon storage by each habitat
 
 habitats: seagrass beds, salt marshes, mangroves
 
