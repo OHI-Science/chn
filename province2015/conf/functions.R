@@ -19,12 +19,11 @@ FIS = function(layers){
            ct = tonnes)
 
 ## Status model:
-  # Bt = ut/q
 
-  # delta_Bt:    0,              if mmsy_ref-Bt<0.05*mmsy_ref
+  # delta_Ct:    0,              if mmsy_ref-Bt<0.05*mmsy_ref
   #              |mmsy_ref-Bt|,  if  |mmsy_ref-Bt|<mmsy_ref
   #              mmsy_ref,       otherwise.
-  # xFIS = (1 - delta_Bt/mmsy_ref) * Tc
+  # xFIS = (1 - delta_Ct/mmsy_ref) * Tc
 
     # before calculating status, we need to obtain r, K, and q:
     # first, calcualte Ut = Ct/ft, and Ut+1
@@ -121,7 +120,7 @@ scores_FIS = rbind(r.status, r.trend)
 return(scores_FIS)
 }
 
-MAR = function(layers, Debug=T){
+MAR = function(layers){
   # CHN model: Yc = sum(harvest * msi) / area
   #        status = log10(Yc+1)
 
@@ -182,7 +181,7 @@ r.status = mar.status.all.years %>%
   mutate(score = round(x.mar*100,2)) %>%
   select(rgn_id,
          score) %>%
-  rbind(data.frame(rgn_id = 6, #SH[6] has no MAR from 2007-2013, social preference to have no more mariculture. Add back as NA
+  rbind(data.frame(rgn_id = as.integer(6), #SH[6] has no MAR from 2007-2013, social preference to have no more mariculture. Add back as NA
                    score  = NA)) %>%
   arrange(rgn_id) %>%
   mutate(dimension = 'status',
@@ -204,7 +203,7 @@ r.trend = mar.status.all.years %>%
                                                                # pmax(-1, ...): 最小不超过－1
   select(region_id = rgn_id,
          score) %>%
-  rbind(data.frame(region_id = 6, score = NA)) %>% # rgn 6 (SH), again doesn't have a trend as there is no more MAR
+  rbind(data.frame(region_id = as.integer(6), score = NA)) %>% # rgn 6 (SH), again doesn't have a trend as there is no more MAR
   mutate(dimension = 'trend',
          goal = 'MAR') %>%
   select(goal,
@@ -440,20 +439,22 @@ NP <- function(layers){
   np_status_all = xp %>%
     left_join(np_weight,
               by = c('rgn_id', 'product')) %>%
+    filter(!rgn_id == 6) %>% #rgn 6 has no harvest; if status  = NA, 1/0 produces NaN
     select(rgn_id, year, product, product_status, weight) %>%
     group_by(rgn_id, year) %>%
     summarize(status = weighted.mean(product_status, weight)) %>%
-    filter(!is.na(status)) %>% # 1/0 produces NaN
     ungroup()
 
   ### get current status
   r.status = np_status_all %>%
     filter(year == max(year) & !is.na(status)) %>%
-    mutate(dimension = 'status',
-      score     = max(-1, min(1, round(status,4))) * 100) %>%
-    select(rgn_id, dimension, score) %>%
-    rbind(data.frame(rgn_id = '6', dimension = 'status', score = NA)) %>%
-    arrange(as.numeric(rgn_id))
+    mutate(score = max(-1, min(1, round(status,4))) * 100) %>%
+    select(rgn_id, score) %>%
+    rbind(data.frame(rgn_id = as.integer(6), score = NA)) %>%
+    arrange(rgn_id) %>%
+    mutate(goal = 'NP',
+           dimension = 'status') %>%
+    select(goal, dimension, region_id = rgn_id, score)
   # good check to have in case the results exceeded 0-100 boundary
   stopifnot(
     min(r.status$score, na.rm = TRUE) >= 0,
@@ -464,18 +465,15 @@ NP <- function(layers){
     filter(year > (max(year) - 5) & !is.na(status)) %>%
     group_by(rgn_id) %>%
     do(mdl = lm(status ~ year, data=.)) %>%
-    summarize(
-      rgn_id    = rgn_id,
-      dimension = 'trend',
-      score     = max(-1, min(1, coef(mdl)[['year']] * 4))) %>%
-    rbind(data.frame(rgn_id = '6', dimension = 'trend', score = NA)) %>%
-    arrange(as.numeric(rgn_id))
+    summarize(region_id = rgn_id,
+              score = max(-1, min(1, coef(mdl)[['year']] * 4))) %>%
+    rbind(data.frame(region_id = as.integer(6), score = NA)) %>%
+    arrange(region_id) %>%
+    mutate(goal = 'NP', dimension = 'trend') %>%
+    select(goal, dimension, region_id, score)
 
   ### return scores
-  scores_NP = rbind(r.status, r.trend) %>%
-    mutate(goal = 'NP') %>%
-    select(goal, dimension, region_id=rgn_id, score)
-
+  scores_NP = rbind(r.status, r.trend)
   return(scores_NP)
 }
 
@@ -680,18 +678,17 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
   S = 0.787
   d = layers$data[['tr_tourist']] %>%
     left_join(layers$data[["tr_marinearea"]], by="rgn_id") %>%
-    select(rgn_id,
+    select(rgn_id = as.integer(rgn_id),
            year,
            tourist = million,
            area = km2) %>%
     mutate(tour_per_area = tourist*1000000/area,
            tour_per_area_S = tour_per_area * S,
            tour_per_area_S_1 = tour_per_area_S +1,
-           log = log10(tour_per_area_S_1),
+           log = log(tour_per_area_S_1),
            ref_point = max(log), #assume ref point is maximum log(tour_per_area_S_1) （2010 SH）
                                  # 参考点使用 log(tour_per_area_S_1) 跨省最大值 （2010 上海）
-           xTR = log/ref_point*100) %>%
-    round(2); head(d); summary(d)
+           xTR = log/ref_point*100); head(d); summary(d)
 
 #     rgn_id year tourist    area tour_per_area tour_per_area_S tour_per_area_S_1  log ref_point   xTR
 #   1      1 2008 6487.79 2000000       3243.89         2552.95           2553.95 3.41      6.76 50.38
@@ -704,19 +701,20 @@ r.status = d %>%
   filter(year == 2011) %>%
    mutate(goal = 'TR',
          dimension = 'status') %>%   #format
-   select(region_id = rgn_id,
-          goal,
+   select(goal,
           dimension,
+          region_id = as.integer(rgn_id),
           score = xTR); head(r.status)
 
  # Trend: 4 years of data, 3 intervals
 r.trend = d %>%
   group_by(rgn_id) %>%
   do(dml = lm(xTR ~ year, data =.)) %>%
-  summarize(region_id = rgn_id,
+  summarize(goal = 'TR',
             dimension = 'trend',
-            goal = 'TR',
-            score = max(min(coef(dml)[['year']] * 3, 1), -1))
+            region_id = as.integer(rgn_id),
+            score = max(min(coef(dml)[['year']] * 3, 1), -1)) %>%
+  ungroup
 
 scores_TR = rbind(r.status, r.trend)
 return(scores_TR)
@@ -947,7 +945,7 @@ spp.trend = d2 %>%
   group_by(rgn_id) %>%
   summarize(score = mean(trend_score))
 
-NA.trend = data.frame(rgn_id = '2', score = 'NA') ## assign NA to the rest of the provinces
+NA.trend = data.frame(rgn_id = as.integer(2), score = NA) ## assign NA to the rest of the provinces
 
 r.trend = rbind(spp.trend, NA.trend) %>%
   mutate(dimension = 'trend',
@@ -956,10 +954,12 @@ r.trend = rbind(spp.trend, NA.trend) %>%
          dimension,
          region_id = rgn_id,
          score) %>%
-  arrange(as.numeric(region_id))
+  arrange(region_id)
 
 scores_ICO = rbind(r.status, r.trend)
-return(scores_ICO) }
+return(scores_ICO)
+
+}
 
 
 LSP = function(layers){
@@ -1112,8 +1112,9 @@ HAB = function(layers){
                 select(-layer,
                        -year,
                        extent = hectare),
-              by = c('rgn_id', 'habitat')) %>% #join by rgn_id, habitat
-    full_join(layers$data[['cs_extent_trend']] %>%
+              by = c('rgn_id', 'habitat')) %>%
+    arrange(rgn_id) %>% #join by rgn_id, habitat
+    right_join(layers$data[['cs_extent_trend']] %>%
                 select(-layer,
                        trend = trend.score),
               by = c('rgn_id', 'habitat'))
@@ -1127,10 +1128,10 @@ HAB = function(layers){
     summarize(score = mean(condition) * 100,
               dimension = 'status',
               goal = 'HAB') %>%
-    select(region_id = rgn_id,
-           score,
+    select(goal,
            dimension,
-           goal) ; head(r.status)
+           region_id = rgn_id,
+           score) ; head(r.status)
 
   # trend = sum(extent * extent_trend) / sum(extent)
   r.trend = d %>%
@@ -1140,10 +1141,10 @@ HAB = function(layers){
               score = max(min(trend_raw, 1), -1),
               dimension = 'trend',
               goal = 'HAB') %>%
-    select(region_id = rgn_id,
-           score,
+    select(goal,
            dimension,
-           goal) ; head(r.trend)
+           region_id = rgn_id,
+           score) ; head(r.trend)
 
   #   region_id       score dimension goal
   # 1         1   -9.999159     trend  HAB
@@ -1183,7 +1184,7 @@ SPP = function(layers){
     group_by(rgn_id) %>%
     summarize(score = mean(trend_score))
 
-  NA.trend = data.frame(rgn_id = 2, score = 'NA') ## assign NA to province without trend data
+  NA.trend = data.frame(rgn_id = as.integer(2), score = NA) ## assign NA to province without trend data
 
   r.trend = rbind(spp.trend, NA.trend) %>%
     arrange(rgn_id) %>%

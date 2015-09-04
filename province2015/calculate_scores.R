@@ -1,9 +1,12 @@
 # load required libraries
-suppressWarnings(require(ohicore))
+# suppressWarnings(require(ohicore))
+library(tidyr) #install.packages('tidyr')
 
 # # for debugging
-# remove.packages('ohicore')
-# devtools::load_all('~/github/ohicore')
+remove.packages('ohicore')
+devtools::load_all('~/github/ohicore')
+library(dplyr)
+debug=F
 
 # set working directory to the scenario directory, ie containing conf and layers directories
 setwd('~/github/chn/province2015')
@@ -20,3 +23,7 @@ layers = Layers('layers.csv', 'layers')
 # calculate scenario scores
 scores = CalculateAll(conf, layers, debug=F)
 write.csv(scores, 'scores.csv', na='', row.names=F)
+
+
+
+
