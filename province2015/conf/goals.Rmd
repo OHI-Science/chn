@@ -26,7 +26,7 @@ x_{MAR} =  \frac{Y_{c}}{Y_{r}}
 $$
 
 $$
-Y_{c} = \frac{\sum{1}^{k} Y_{k} * S_{M,k}}{P_{c}}
+Y_{c} = \frac{\sum_{1}^{k} Y_{k} * S_{M,k}}{P_{c}}
 $$
 
 - $Y$ = current sustainably harvested total yield, current [$c$] or reference [$r$] 
@@ -88,7 +88,7 @@ $$
 Extent and condition of coastal habitats that store and sequester atmospheric carbon 
 
 $$
-x_{CS} =  \sum_{1}^{k} ( c_k * \frac{C_{s}}{C_{r}} * \frac{A_{k}}{A_{T}} )
+x_{CS} =  \sum_{1}^{k} ( c_k * \frac{C_{c}}{C_{r}} * \frac{A_{k}}{A_{T}} )
 $$
 
 - $C$ = condition of habitat $k$, current [$c$] or reference[$r$]
@@ -104,24 +104,15 @@ habitats: seagrass beds, salt marshes, mangroves
 Protection from inundation or erosion compared to the local natural potential
 
 $$
-x_{CP} =  \sum_{k}^{n} \alpha_{k} * \frac{C_{c,k}}{C_{r,k}}
+x_{CP} =  \sum_{i=1}^{k} ( \frac{C_c}{C_r} * \frac {w_k}{w_max} * \frac{A_k}{A_T} )
 $$
 
-$$
-\alpha_{k} = \frac{w_{k}*A_{k}}{\sum{w_{k}*A_{k}}}
-$$
-
-$$
-w_{k} = \frac{r_{k}}{\sum{r_{k}}}
-$$
 
 - $C$ = condition of habitat $k$, current [$c$] and reference [$r$]
 
-- $\alpha$ = weighted area of habitat $k$  
+- $w$ = weighted capacity of habitat $k$ to protect the coast
 
-- $A$ = area of habitat $k$ 
-
-- $r$ = habitat protective ability rank weight 
+- $A$ = coverage area of habitat $k$ 
 
 habitats: salt marshes, seagrass beds, mangroves, coral reefs, sea ice
 
@@ -130,24 +121,14 @@ habitats: salt marshes, seagrass beds, mangroves, coral reefs, sea ice
 Tourism & recreation value, independent of monetary exchange
 
 $$
-x_{TR} = E_{t} * S_{t} 
+x_{TR} = \log (\frac{A_t}{V_t} * {S_t} + {1})
 $$
 
-$$
-E_{t} = E_{W} / (L_{t} - L_{t} * U_{t})
-$$
+- $A$ = number of tourists in year $t$ 
 
-- $E$ = tourism employment proportion
+- $V$ = area within jurisdiction 
 
-- $S$ = sustainability measure
-
-- $E_{W}$ = number of employees in travel and tourism sectors
-
-- $L$ = total labor force
-
-- $U$ = percent unemployment
-
-- $t$ = current year
+- $S$ = sustainability coefficient, set as 0.787 (China TTCI, 2009)
 
 
 ## Livelihoods & Economies: Livelihoods
