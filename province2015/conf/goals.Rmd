@@ -135,7 +135,7 @@ $$
 Number of jobs and job quality from marine-associated sectors
 
 $$
-x_{LIV} = \frac{\frac{\sum_{i=1}^{k} j_{c,k}}{\sum_{i=1}^{k} j_{r,k}} + \frac{\sum_{i=1}^{k} g_{m,k}}{\sum_{i=1}^{k} g_{r,k}}}{2}
+x_{LIV} = \frac{\frac{\sum_{i=1}^{k} j_{c,k}}{\sum_{i=1}^{k} j_{r,k}} + \frac{g_{c}} {g_{r}}}{2}
 $$
 
 - $j$ = number of jobs within sector $k$ at current [$c$] or reference [$r$] time
