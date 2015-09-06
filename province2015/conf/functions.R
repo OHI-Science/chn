@@ -78,19 +78,6 @@ status.all.years = D2 %>%
   left_join(tc, by = 'rgn_id') %>%
   mutate(x.fis = pmax(-1, pmin(1, (1-(d_Ct/mmsy_r))*tc)) *100)
 
-
-# save Bt in layers folder for calcualtion in FP
-dir_layers = '~/github/chn/province2015/layers'
-  # Bt= ut/q
-Bt = left_join (
-  D1 %>% select(rgn_id, year, ut),
-  D2 %>% select(rgn_id, q),
-  by = 'rgn_id') %>%
-  mutate(Bt= ut/q)
-
-write.csv(Bt %>%
-            select(rgn_id, year, Bt), file.path(dir_layers, 'fis_Bt_chn2015_NJ.csv'))
-
 # # current status 最近一年现状 2012
 r.status = status.all.years %>%
   filter(year==max(year)) %>% # year = 2012
@@ -108,7 +95,7 @@ r.status = status.all.years %>%
     filter(year > (max(year)-5)) %>% # most recent 5 years of data
     group_by(rgn_id) %>%
     do(dml = lm(x.fis ~ year, data =.)) %>%
-    mutate(trend = coef(dml)[['year']]*4,  # can't calculate now b/c all status are 0's
+    mutate(trend = max(-1, min(1, coef(dml)[['year']]*4)),
            goal = 'FIS',
            dimension = 'trend') %>%
     select(goal,
@@ -221,22 +208,22 @@ FP = function(layers, scores, debug=T){
   #
   #            w = 1,                      if xMAR = No data
   #                0.5,                    if xFIS = 0.25 * Tc
-  #                Bt/(Bt + sum(Yk)),      otherwise
+  #                Ct/(Ct + sum(Yk)),      otherwise
 
-# cast data needed for w calculation: Bt, Yk, Tc from FIS and MAR data layers and calculations
+# cast data needed for w calculation: Ct, Yk, Tc from FIS and MAR data layers and calculations
   mar_yk = layers$data[['mar_yk']] %>%
     group_by(rgn_id) %>%
     filter(year == max(year)) %>% # mar: status of 2013； MAR 现状用2013
     summarize(sum.yk = sum(tonnes)) %>%
     rename(region_id = rgn_id)
 
-  fis_Bt = layers$data[['fis_Bt']] %>% # calculated in FIS status
-    group_by(rgn_id) %>%
-    filter(year == max(year)) %>% # fis: status of 2012； FIS 现状用2012
-    select(region_id = rgn_id, Bt)
+  fis_ct = layers$data[['fis_ct']] %>% # catch at time t: 2012
+    filter(year == 2012) %>%
+    select(region_id = rgn_id,
+           ct = tonnes)
 
   fis_Tc = layers$data[['fis_tc']] %>%
-    rename(region_id = rgn_id,
+    select(region_id = rgn_id,
            Tc = score)
 
 ## status and trend years are uneven among goals, eg. FIS 2012, MAR 2013, which were used for FP, which combines these two goals.
@@ -259,10 +246,10 @@ FP = function(layers, scores, debug=T){
   w = s %>%
     filter(dimension == 'status') %>%
     left_join(mar_yk, by = 'region_id') %>%
-    left_join(fis_Bt, by = 'region_id') %>%
+    left_join(fis_ct, by = 'region_id') %>%
     left_join(fis_Tc, by = 'region_id') %>%
     mutate(w = ifelse (is.na(MAR), 1,
-                       ifelse(FIS == 0.25 * fis_Tc, 0.5, Bt/(Bt+sum.yk)))) %>%
+                       ifelse(FIS == 0.25 * fis_Tc, 0.5, ct/(ct+sum.yk)))) %>%
     select(region_id, w)
 
   scores_FP = s %>%
