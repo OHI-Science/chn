@@ -300,7 +300,9 @@ AO = function(layers){
   status.all.years = D %>%
     group_by(rgn_id) %>%
     filter(!is.na(gas) & !is.na(fishermen)) %>% # NA prevents further calculations; 去掉NA，因为无法计算
-    mutate(x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen_ref + gas/gas_ref)/3))*100 )
+    mutate(fishermen_ref_new = max(fishermen_ref), # new ref point, max across years.
+           gas_ref_new = max(gas_ref), #CHN: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
+      x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen_ref_new + gas/gas_ref_new)/3))*100 )
   ## Q for CHN: only 2010-2013 have data in all three categories (port, fishermen, gas), and thus only those
   ## years have status scores. do you want to see score for 2014, using only gas and port data?
   ## 问题：只有2010-2013 有所有数据（port, fishermen, gas)， 所以只有这几年有现状得分。2014 只有gas 和port
@@ -315,6 +317,7 @@ AO = function(layers){
 # 问题：目前每个变量每年都有个参考值（港口: apr, 渔民: afr, 油价：aer).
 # 渔民和油价参考点是每年各个省份的最高值（每年都有个不同的参考值）。但在计算得分时，
 # 我们通常需要一个总的参考点（每年都该是一样的)，比如跨年份的最高值，而不是每年的最高值。
+# CHN answer: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
 
   # current status: 2013
   r.status = status.all.years %>%
