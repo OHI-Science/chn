@@ -5,7 +5,7 @@ FIS = function(layers){
     select(-layer,
            ft = kilowatt)
 
-  mmsy = layers$data[['fis_mmsy']] %>% #maximum sustainable yield
+  mmsy = layers$data[['fis_mmsy']] %>% #maximum sustainable yield -> not used in calcuation b/c it was calculated in D2 (below)
     select(rgn_id,
            mmsy = tonnes)
 
@@ -88,7 +88,7 @@ r.status = status.all.years %>%
          region_id = rgn_id,
          score = x.fis)
 
-  ###  Real calculation of trend when FIS status question answered
+  ###  trend
   ### 趋势计算
   r.trend = status.all.years %>%
     select(rgn_id, year, x.fis) %>%
