@@ -135,7 +135,9 @@ mar.status.all.years =
       group_by(rgn_id, year) %>%
       summarize(yc = sum(harvest*msi/area),
                 yc.log = log10(yc+1)) %>%
-      ungroup(); head(mar.status.all.years); summary(mar.status.all.years); sapply(mar.status.all.years, class)
+      ungroup() %>%
+      mutate (ref = max(yc.log), #ref = highest yc.log across years and regions
+              x.mar = yc.log/ref*100); head(mar.status.all.years); summary(mar.status.all.years); sapply(mar.status.all.years, class)
 
 # Q1. In mar_yk data, region 6 (SH) has no MAR area, but molluscus and crabs have large harvest (1000's tonnes)
 # I confirmed with CHN team that it wasn't a data entry error, and it was recorded on Marine Yearbook as such.
@@ -144,23 +146,11 @@ mar.status.all.years =
 # 但是否该考虑去除这两个数据：
 # 6, 2012, "Marine molluscs nei", 705550
 # 6, 2012, "Marine crabs nei", 33047
+# CHN answer: Yes.
 
 # Q2. Currently set reference point the highest yc.log across regions in the most recent (max) year. Is it right?
 # 参考点的取值，暂时取用最近一年最高 yc.log 值为参考点； 在文件叙述中没有表明。需要讨论。
-
-ref_data = mar.status.all.years %>%
-  filter(year == 2013); ref_data #选最近一年
-
-ref_pt_info <- ref_data %>% filter(yc.log == max(yc.log, na.rm=TRUE)) #选最高yc.log 为参考点
-ref_pt <- ref_pt_info$yc.log
-cat(sprintf('reference point for MAR is: %s (region %s)\n', ref_pt, ref_pt_info$rgn_id))
-# display reference point
-# 直接显示／打印标题内容 cat(sprintf('.... %s ...%s..'), 取代第一个%s, 取代第二个%s)
-
-mar.status.all.years = mar.status.all.years %>%
-  mutate(x.mar = ifelse(yc.log / ref_pt > 1,
-                        1,
-                        yc.log / ref_pt)); head(mar.status.all.years); summary(mar.status.all.years)
+# CHN answer: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
 
 # current status
 r.status = mar.status.all.years %>%
