@@ -222,15 +222,14 @@ FP = function(layers, scores, debug=T){
 
 ### To replace line 252 - 253 after all calcuations are done and stored in scores.csv
 ### 计算现状， 239-243 在正式计算所有得分(通过calculate_scores.R)并储存在scores.csv 之后，用来代替头两行(S = ...)
-#   s = scores %>%
-#     filter(goal %in% c('MAR', 'FIS'),
-#            !dimension %in% c('pressures','resilience')) %>%
-#     tidyr::spread(goal, score) %>%
-#     select(region_id, dimension, FIS, MAR)
+  s = scores %>%
+    filter(goal %in% c('MAR', 'FIS'),
+           !dimension %in% c('pressures','resilience')) %>%
+    tidyr::spread(goal, score)
 
-  # combine fis and mar scores
-  s = rbind(scores_FIS, scores_MAR) %>%
-    spread(goal, score)
+  # combine fis and mar scores during testing individual goals
+#   s = rbind(scores_FIS, scores_MAR) %>%
+#     spread(goal, score)
 
   # calcualte w
   w = s %>%
@@ -861,7 +860,7 @@ LE = function(scores, layers){
 
   #  During testing-individual-goal phase, run this line instead of the first two lines of code:
   # 在单独查看LE目标时，用这个line 代替第一，二行程序
-  #  scores_LE = scores_LIV_ECO %>%
+  # scores_LE = rbind(scores_LIV, scores_ECO) %>%
 
   scores_LE = scores %>%
     filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %>%
@@ -992,10 +991,9 @@ SP = function(scores){
   # 在单独查看LE目标时，用这个line 代替第一，二行程序
   # scores_SP = rbind(scores_ICO, scores_LSP) %>%
 
-  scores_LE = scores %>%
+  scores_SP = scores %>%
         filter(goal %in% c('ICO','LSP') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
-    filter(!dimension %in% c('pressures', 'resilience')) %>%
     mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP), na.rm = T)), # na.rm 去除NA
            goal = 'SP') %>%
     select(goal, dimension, region_id, score); head(scores_SP)
@@ -1213,8 +1211,12 @@ BD = function(scores){
 # library(readr) # contains write_csv function
 # dir_layers = '~/github/chn/province2015/tmp' #save results to temporary folder
 # write_csv(CHN.scores, file.path(dir_layers, 'china.final.scores.temp.csv')) # saved on 8.21.2015
-#########
 
+# combined goals only:
+# comb.scores = rbind(scores_FP, scores_LE, scores_SP, scores_BD)
+# dir_layers = '~/github/chn/province2015/tmp'
+# write_csv(comb.scores, file.path(dir_layers, 'comb.scores.csv'))
+#########
 
 FinalizeScores = function(layers, conf, scores){
 
