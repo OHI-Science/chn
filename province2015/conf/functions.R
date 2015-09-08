@@ -5,7 +5,7 @@ FIS = function(layers){
     select(-layer,
            ft = kilowatt)
 
-  mmsy = layers$data[['fis_mmsy']] %>% #maximum sustainable yield
+  mmsy = layers$data[['fis_mmsy']] %>% #maximum sustainable yield -> not used in calcuation b/c it was calculated in D2 (below)
     select(rgn_id,
            mmsy = tonnes)
 
@@ -78,19 +78,6 @@ status.all.years = D2 %>%
   left_join(tc, by = 'rgn_id') %>%
   mutate(x.fis = pmax(-1, pmin(1, (1-(d_Ct/mmsy_r))*tc)) *100)
 
-
-# save Bt in layers folder for calcualtion in FP
-dir_layers = '~/github/chn/province2015/layers'
-  # Bt= ut/q
-Bt = left_join (
-  D1 %>% select(rgn_id, year, ut),
-  D2 %>% select(rgn_id, q),
-  by = 'rgn_id') %>%
-  mutate(Bt= ut/q)
-
-write.csv(Bt %>%
-            select(rgn_id, year, Bt), file.path(dir_layers, 'fis_Bt_chn2015_NJ.csv'))
-
 # # current status 最近一年现状 2012
 r.status = status.all.years %>%
   filter(year==max(year)) %>% # year = 2012
@@ -101,14 +88,14 @@ r.status = status.all.years %>%
          region_id = rgn_id,
          score = x.fis)
 
-  ###  Real calculation of trend when FIS status question answered
+  ###  trend
   ### 趋势计算
   r.trend = status.all.years %>%
     select(rgn_id, year, x.fis) %>%
     filter(year > (max(year)-5)) %>% # most recent 5 years of data
     group_by(rgn_id) %>%
     do(dml = lm(x.fis ~ year, data =.)) %>%
-    mutate(trend = coef(dml)[['year']]*4,  # can't calculate now b/c all status are 0's
+    mutate(trend = max(-1, min(1, coef(dml)[['year']]*4)),
            goal = 'FIS',
            dimension = 'trend') %>%
     select(goal,
@@ -148,7 +135,9 @@ mar.status.all.years =
       group_by(rgn_id, year) %>%
       summarize(yc = sum(harvest*msi/area),
                 yc.log = log10(yc+1)) %>%
-      ungroup(); head(mar.status.all.years); summary(mar.status.all.years); sapply(mar.status.all.years, class)
+      ungroup() %>%
+      mutate (ref = max(yc.log), #ref = highest yc.log across years and regions
+              x.mar = yc.log/ref*100); head(mar.status.all.years); summary(mar.status.all.years); sapply(mar.status.all.years, class)
 
 # Q1. In mar_yk data, region 6 (SH) has no MAR area, but molluscus and crabs have large harvest (1000's tonnes)
 # I confirmed with CHN team that it wasn't a data entry error, and it was recorded on Marine Yearbook as such.
@@ -157,28 +146,16 @@ mar.status.all.years =
 # 但是否该考虑去除这两个数据：
 # 6, 2012, "Marine molluscs nei", 705550
 # 6, 2012, "Marine crabs nei", 33047
+# CHN answer: Yes.
 
 # Q2. Currently set reference point the highest yc.log across regions in the most recent (max) year. Is it right?
 # 参考点的取值，暂时取用最近一年最高 yc.log 值为参考点； 在文件叙述中没有表明。需要讨论。
-
-ref_data = mar.status.all.years %>%
-  filter(year == 2013); ref_data #选最近一年
-
-ref_pt_info <- ref_data %>% filter(yc.log == max(yc.log, na.rm=TRUE)) #选最高yc.log 为参考点
-ref_pt <- ref_pt_info$yc.log
-cat(sprintf('reference point for MAR is: %s (region %s)\n', ref_pt, ref_pt_info$rgn_id))
-# display reference point
-# 直接显示／打印标题内容 cat(sprintf('.... %s ...%s..'), 取代第一个%s, 取代第二个%s)
-
-mar.status.all.years = mar.status.all.years %>%
-  mutate(x.mar = ifelse(yc.log / ref_pt > 1,
-                        1,
-                        yc.log / ref_pt)); head(mar.status.all.years); summary(mar.status.all.years)
+# CHN answer: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
 
 # current status
 r.status = mar.status.all.years %>%
   filter(year == max(year)) %>%
-  mutate(score = round(x.mar*100,2)) %>%
+  mutate(score = round(x.mar,2)) %>%
   select(rgn_id,
          score) %>%
   rbind(data.frame(rgn_id = as.integer(6), #SH[6] has no MAR from 2007-2013, social preference to have no more mariculture. Add back as NA
@@ -221,22 +198,22 @@ FP = function(layers, scores, debug=T){
   #
   #            w = 1,                      if xMAR = No data
   #                0.5,                    if xFIS = 0.25 * Tc
-  #                Bt/(Bt + sum(Yk)),      otherwise
+  #                Ct/(Ct + sum(Yk)),      otherwise
 
-# cast data needed for w calculation: Bt, Yk, Tc from FIS and MAR data layers and calculations
+# cast data needed for w calculation: Ct, Yk, Tc from FIS and MAR data layers and calculations
   mar_yk = layers$data[['mar_yk']] %>%
     group_by(rgn_id) %>%
     filter(year == max(year)) %>% # mar: status of 2013； MAR 现状用2013
     summarize(sum.yk = sum(tonnes)) %>%
     rename(region_id = rgn_id)
 
-  fis_Bt = layers$data[['fis_Bt']] %>% # calculated in FIS status
-    group_by(rgn_id) %>%
-    filter(year == max(year)) %>% # fis: status of 2012； FIS 现状用2012
-    select(region_id = rgn_id, Bt)
+  fis_ct = layers$data[['fis_ct']] %>% # catch at time t: 2012
+    filter(year == 2012) %>%
+    select(region_id = rgn_id,
+           ct = tonnes)
 
   fis_Tc = layers$data[['fis_tc']] %>%
-    rename(region_id = rgn_id,
+    select(region_id = rgn_id,
            Tc = score)
 
 ## status and trend years are uneven among goals, eg. FIS 2012, MAR 2013, which were used for FP, which combines these two goals.
@@ -245,24 +222,23 @@ FP = function(layers, scores, debug=T){
 
 ### To replace line 252 - 253 after all calcuations are done and stored in scores.csv
 ### 计算现状， 239-243 在正式计算所有得分(通过calculate_scores.R)并储存在scores.csv 之后，用来代替头两行(S = ...)
-#   s = scores %>%
-#     filter(goal %in% c('MAR', 'FIS'),
-#            !dimension %in% c('pressures','resilience')) %>%
-#     tidyr::spread(goal, score) %>%
-#     select(region_id, dimension, FIS, MAR)
+  s = scores %>%
+    filter(goal %in% c('MAR', 'FIS'),
+           !dimension %in% c('pressures','resilience')) %>%
+    tidyr::spread(goal, score)
 
-  # combine fis and mar scores
-  s = rbind(scores_FIS, scores_MAR) %>%
-    spread(goal, score)
+  # combine fis and mar scores during testing individual goals
+#   s = rbind(scores_FIS, scores_MAR) %>%
+#     spread(goal, score)
 
   # calcualte w
   w = s %>%
     filter(dimension == 'status') %>%
     left_join(mar_yk, by = 'region_id') %>%
-    left_join(fis_Bt, by = 'region_id') %>%
+    left_join(fis_ct, by = 'region_id') %>%
     left_join(fis_Tc, by = 'region_id') %>%
     mutate(w = ifelse (is.na(MAR), 1,
-                       ifelse(FIS == 0.25 * fis_Tc, 0.5, Bt/(Bt+sum.yk)))) %>%
+                       ifelse(FIS == 0.25 * fis_Tc, 0.5, ct/(ct+sum.yk)))) %>%
     select(region_id, w)
 
   scores_FP = s %>%
@@ -313,7 +289,9 @@ AO = function(layers){
   status.all.years = D %>%
     group_by(rgn_id) %>%
     filter(!is.na(gas) & !is.na(fishermen)) %>% # NA prevents further calculations; 去掉NA，因为无法计算
-    mutate(x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen_ref + gas/gas_ref)/3))*100 )
+    mutate(fishermen_ref_new = max(fishermen_ref), # new ref point, max across years.
+           gas_ref_new = max(gas_ref), #CHN: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
+      x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen_ref_new + gas/gas_ref_new)/3))*100 )
   ## Q for CHN: only 2010-2013 have data in all three categories (port, fishermen, gas), and thus only those
   ## years have status scores. do you want to see score for 2014, using only gas and port data?
   ## 问题：只有2010-2013 有所有数据（port, fishermen, gas)， 所以只有这几年有现状得分。2014 只有gas 和port
@@ -328,6 +306,7 @@ AO = function(layers){
 # 问题：目前每个变量每年都有个参考值（港口: apr, 渔民: afr, 油价：aer).
 # 渔民和油价参考点是每年各个省份的最高值（每年都有个不同的参考值）。但在计算得分时，
 # 我们通常需要一个总的参考点（每年都该是一样的)，比如跨年份的最高值，而不是每年的最高值。
+# CHN answer: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
 
   # current status: 2013
   r.status = status.all.years %>%
@@ -881,7 +860,7 @@ LE = function(scores, layers){
 
   #  During testing-individual-goal phase, run this line instead of the first two lines of code:
   # 在单独查看LE目标时，用这个line 代替第一，二行程序
-  #  scores_LE = scores_LIV_ECO %>%
+  # scores_LE = rbind(scores_LIV, scores_ECO) %>%
 
   scores_LE = scores %>%
     filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %>%
@@ -1012,10 +991,9 @@ SP = function(scores){
   # 在单独查看LE目标时，用这个line 代替第一，二行程序
   # scores_SP = rbind(scores_ICO, scores_LSP) %>%
 
-  scores_LE = scores %>%
+  scores_SP = scores %>%
         filter(goal %in% c('ICO','LSP') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
-    filter(!dimension %in% c('pressures', 'resilience')) %>%
     mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP), na.rm = T)), # na.rm 去除NA
            goal = 'SP') %>%
     select(goal, dimension, region_id, score); head(scores_SP)
@@ -1233,8 +1211,12 @@ BD = function(scores){
 # library(readr) # contains write_csv function
 # dir_layers = '~/github/chn/province2015/tmp' #save results to temporary folder
 # write_csv(CHN.scores, file.path(dir_layers, 'china.final.scores.temp.csv')) # saved on 8.21.2015
-#########
 
+# combined goals only:
+# comb.scores = rbind(scores_FP, scores_LE, scores_SP, scores_BD)
+# dir_layers = '~/github/chn/province2015/tmp'
+# write_csv(comb.scores, file.path(dir_layers, 'comb.scores.csv'))
+#########
 
 FinalizeScores = function(layers, conf, scores){
 
