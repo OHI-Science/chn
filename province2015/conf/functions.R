@@ -221,7 +221,7 @@ FP = function(layers, scores, debug=T){
 ## 问题：FIS用2012， MAR2013。暂时用这个数据合并来计算FP得分。可以吗？
 
 ### To replace line 252 - 253 after all calcuations are done and stored in scores.csv
-### 计算现状， 239-243 在正式计算所有得分(通过calculate_scores.R)并储存在scores.csv 之后，用来代替头两行(S = ...)
+### 计算现状
   s = scores %>%
     filter(goal %in% c('MAR', 'FIS'),
            !dimension %in% c('pressures','resilience')) %>%
@@ -230,6 +230,7 @@ FP = function(layers, scores, debug=T){
   # combine fis and mar scores during testing individual goals
 #   s = rbind(scores_FIS, scores_MAR) %>%
 #     spread(goal, score)
+
 
   # calcualte w
   w = s %>%
@@ -427,7 +428,7 @@ NP <- function(layers){
   ### get current status
   r.status = np_status_all %>%
     filter(year == max(year) & !is.na(status)) %>%
-    mutate(score = max(-1, min(1, round(status,4))) * 100) %>%
+    mutate(score = pmax(-1,pmin(1, round(status,4))) * 100) %>%
     select(rgn_id, score) %>%
     rbind(data.frame(rgn_id = as.integer(6), score = NA)) %>%
     arrange(rgn_id) %>%
@@ -515,7 +516,7 @@ CS = function(layers){
                                                 # 摘要，和另加相似，但会聚集一组数据，结果指给一个
     ungroup() %>% #always a good practice to ungroup before next operation
     mutate(xCS_calc = sum_c_c_a/total_extent,
-           score = min(1,xCS_calc) * 100); head(xCS) #score can't exceed 100
+           score = pmin(1,xCS_calc) * 100); head(xCS) #score can't exceed 100
 
   # format to combine with other goals **variable must be called r.status with the proper formatting**
   # 一定要取名：r.status (和r.trend)
