@@ -38,6 +38,12 @@ cs_file_list = c('cs_contribtion_chn2015_HHM.csv.xlsx',
                  'cs_condition_chn2015_HHM.xlsx',
                  'cs_extent_chn2015_HHM.xlsx')
 
+for (f_orig in cs_file_list) {
+
+  dir_f = file.path(dir_chn_prep, '4_CS')
+
+  d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
+  f_new = file_path_sans_ext(file_path_sans_ext(f_orig))
 
   # add rgn_id from prep_functions.r - add_rgn_id()
   dn = add_rgn_id(d, fld_name = 'rgn_ID') %>%
@@ -49,13 +55,17 @@ cs_file_list = c('cs_contribtion_chn2015_HHM.csv.xlsx',
 
   # save as csv
   write_csv(dn, file.path(dir_f, paste0(f_new, '.csv')))
+  write_csv(dn, file.path(dir_layers, paste0(f_new, '.csv')))
 
   # typo correction
   if (f_new == 'cs_contribtion_chn2015_HHM') {
     file.rename(file.path(dir_f, paste0(f_new, '.csv')),
                 file.path(dir_f, 'cs_contribution_chn2015_HHM.csv'))
-  }
 
+    file.rename(file.path(dir_layers, paste0(f_new, '.csv')),
+                file.path(dir_layers, 'cs_contribution_chn2015_HHM.csv'))
+
+  }
 }
 
 # NP data ----
