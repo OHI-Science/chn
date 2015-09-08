@@ -155,7 +155,7 @@ mar.status.all.years =
 # current status
 r.status = mar.status.all.years %>%
   filter(year == max(year)) %>%
-  mutate(score = round(x.mar*100,2)) %>%
+  mutate(score = round(x.mar,2)) %>%
   select(rgn_id,
          score) %>%
   rbind(data.frame(rgn_id = as.integer(6), #SH[6] has no MAR from 2007-2013, social preference to have no more mariculture. Add back as NA
