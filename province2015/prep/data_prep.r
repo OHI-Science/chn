@@ -45,6 +45,11 @@ for (f_orig in cs_file_list) {
   d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
   f_new = file_path_sans_ext(file_path_sans_ext(f_orig))
 
+  if ('habit' %in% names(d)) {
+    d = d %>%
+      rename(habitat = habit); head(d)
+  }
+
   # add rgn_id from prep_functions.r - add_rgn_id()
   dn = add_rgn_id(d, fld_name = 'rgn_ID') %>%
     filter(!is.na(rgn_id)); head(dn)

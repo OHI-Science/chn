@@ -67,7 +67,7 @@ extent_trend =
       summarize(hectare_max_yr = last(hectare)) %>%
       ungroup() %>%
       select(hectare_max_yr)) %>%
-  mutate(trend.score = hectare_max_yr - hectare_min_yr) %>%
+  mutate(trend.score = hectare_max_yr / hectare_min_yr) %>%
   select(rgn_id, habitat, trend.score) %>%
   bind_rows(
     extent %>%
