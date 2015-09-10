@@ -205,7 +205,7 @@ FP = function(layers, scores, debug=T){
     group_by(rgn_id) %>%
     filter(year == max(year)) %>% # mar: status of 2013； MAR 现状用2013
     summarize(sum.yk = sum(tonnes)) %>%
-    rename(region_id = rgn_id)
+    dplyr::rename(region_id = rgn_id)
 
   fis_ct = layers$data[['fis_ct']] %>% # catch at time t: 2012
     filter(year == 2012) %>%
@@ -251,7 +251,7 @@ FP = function(layers, scores, debug=T){
            region_id,
            score)
 
-  return(scores_FP) }
+  return(rbind(scores,scores_FP)) }
 
 
 
@@ -516,7 +516,7 @@ CS = function(layers){
                                                 # 摘要，和另加相似，但会聚集一组数据，结果指给一个
     ungroup() %>% #always a good practice to ungroup before next operation
     mutate(xCS_calc = sum_c_c_a/total_extent,
-           score = pmin(1,xCS_calc) * 100); head(xCS) #score can't exceed 100
+           score = pmin(1, xCS_calc) * 100); head(xCS) #score can't exceed 100
 
   # format to combine with other goals **variable must be called r.status with the proper formatting**
   # 一定要取名：r.status (和r.trend)
@@ -619,7 +619,7 @@ CP = function(layers){
 
   r.status = m %>%
     group_by(rgn_id) %>%
-    summarize(score = pmin(1, sum(condition* weight/4*extent/sum(extent)) ) * 100,
+    summarize(score = pmax(-1, pmin(1, sum(condition* weight/4*extent/sum(extent)) )) * 100,
               dimension ='status',
               goal = 'CP') %>%
     select(goal, dimension, region_id = rgn_id, score); head(r.status)
@@ -867,10 +867,11 @@ LE = function(scores, layers){
     filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
    mutate(score = rowMeans(cbind(ECO, LIV, na.rm=T))) %>%
-   select(region_id, score, dimension) %>%
-   mutate(goal = 'LE')
+    mutate(goal = 'LE') %>%
+   select(goal, dimension, region_id, score)
 
- return(scores_LE)
+
+ return(rbind(scores, scores_LE))
 }
 
 ICO = function(layers){
@@ -1005,7 +1006,8 @@ SP = function(scores){
 #   7          2    status 48.5714285714286                100  4.985714e+01   SP
 #   8          2     trend               NA                 -1            NA   SP
 
-return(scores_SP)
+return(rbind(scores, scores_SP))
+
 }
 
 
@@ -1201,7 +1203,8 @@ BD = function(scores){
 #   3          2    status                  50 67.1176470588235 39.3725490
 #   4          2     trend                -0.1               NA         NA
 
-  return(scores_BD)
+  return(rbind(scores, scores_BD))
+
 }
 
 ##### during testing phase only.
