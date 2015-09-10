@@ -67,7 +67,7 @@ extent_trend =
       summarize(hectare_max_yr = last(hectare)) %>%
       ungroup() %>%
       select(hectare_max_yr)) %>%
-  mutate(trend.score = hectare_max_yr / hectare_min_yr) %>%
+  mutate(trend.score = max(-1, min(1, hectare_max_yr / hectare_min_yr))) %>%
   select(rgn_id, habitat, trend.score) %>%
   bind_rows(
     extent %>%
@@ -77,6 +77,9 @@ extent_trend =
       select(rgn_id, habitat, trend.score)) %>%
   arrange(rgn_id, habitat); head(extent_trend)
 
+# caveats: Great trend data from Global assessments: Shoreline, sea ice, mangrove (2000-2012), soft bottom, sea ice edge --> but not on regional scale.
+# from global data, mangrove has shown very little change over since 2000.
+# Better to use local data: sea grass, salt marsh.
 
 f_out = paste0(tools::file_path_sans_ext(f_in), '_trend.csv')
 write_csv(extent_trend, file.path(dir_scenario, 'layers', f_out))
