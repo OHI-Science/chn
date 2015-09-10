@@ -187,8 +187,8 @@ for (f_orig in mar_file_list) { # f_orig = "6A_mar_yk.xlsx"
 
 #AO ----
 
-ao_file_list = c("6B_ao_aec.xlsx",
-                 "6B_ao_aer.xlsx",
+ao_file_list = c("6B_ao_gc.xlsx",
+                 "6B_ao_ic.xlsx",
                  "6B_ao_afc.xlsx",
                  "6B_ao_afr.xlsx",
                  "6B_ao_apc.xlsx",
@@ -203,7 +203,7 @@ for (f_orig in ao_file_list) { # f_orig = ao_file_list[5]
   } else {read_excel(file.path(dir_raw, f_orig))} ; head(d) ; summary(d)
 
   # change the ao_aec and ao_aer (gas price) column name to rmb_l; R can't deal with /
-  names(d)[names(d) == "RMB/L"] = 'rmb_l'
+  names(d)[names(d) == "rmb/l"] = 'rmb_l'
 
   # change ao_apc and ao_apr (port) column name to count
   if ("NO." %in% names(d)) {
