@@ -277,26 +277,27 @@ for (f_orig in lsp_file_list) {
 
 # LIV ====
 
-liv_file_list = c("le_livjob_chn2015_zb.csv",
-                 "le_livwage_chn2015_zb.csv")
+liv_file_list = c("le_livwage_chn2015_zb.csv", # all three data layers updated on 9/9/2015 on new data from CHN
+                 "le_livjobindustry_chn2015_zb.csv",
+                 "le_livjobprovince_chn2015_zb.csv")
 
 for (f_orig in liv_file_list) {
   dir_f = file.path(dir_chn_prep, "6.1_LIV")
   d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
 
-  if(f_orig == "le_livjob_chn2015_zb.csv") {
+  if(f_orig == "le_livjob_chn2015_zb.csv" | f_orig == "le_livjobindustry_chn2015_zb.csv") {
     d = d %>%
-    mutate(datalayer = str_replace_all(datalayer, "beach placer industry", 'mining'),
-           datalayer = str_replace_all(datalayer, "coastal tourism", 'tourism'),
-           datalayer = str_replace_all(datalayer, "marein engineering architecture", 'egineering_arch'),
-           datalayer = str_replace_all(datalayer, "marine biomedicine", 'biomedicine'),
-           datalayer = str_replace_all(datalayer, "marine chemical industry", 'chemical'),
-           datalayer = str_replace_all(datalayer, "marine communication and trasportation industry", 'comm_transport'),
-           datalayer = str_replace_all(datalayer, "maren electric power and seawater utilization industry", 'electric'),
-           datalayer = str_replace_all(datalayer, "marine fishery and the related industries", 'fishing'),
-           datalayer = str_replace_all(datalayer, "marine shipbuilting industry", 'ship_building'),
-           datalayer = str_replace_all(datalayer, "offshore oil and natural gas industry", 'oil_gas'),
-           datalayer = str_replace_all(datalayer, "sea salt industry", 'seasalt'))
+    mutate(category = str_replace_all(category, "beach placer industry", 'mining'),
+           category = str_replace_all(category, "coastal tourism", 'tourism'),
+           category = str_replace_all(category, "marein engineering architecture", 'egineering_arch'),
+           category = str_replace_all(category, "marine biomedicine", 'biomedicine'),
+           category = str_replace_all(category, "marine chemical industry", 'chemical'),
+           category = str_replace_all(category, "marine communication and trasportation industry", 'comm_transport'),
+           category = str_replace_all(category, "maren electric power and seawater utilization industry", 'electric'),
+           category = str_replace_all(category, "marine fishery and the related industries", 'fishing'),
+           category = str_replace_all(category, "marine shipbuilting industry", 'ship_building'),
+           category = str_replace_all(category, "offshore oil and natural gas industry", 'oil_gas'),
+           category = str_replace_all(category, "sea salt industry", 'seasalt'))
     }
 
   dn = add_rgn_id(d, fld_name = "province")
@@ -306,7 +307,7 @@ for (f_orig in liv_file_list) {
 }
 
 # ECO ----
-eco_file_list = c("le_eco_chn2015_zb.csv")
+eco_file_list = c("LE_eco_chn2015_zb.csv") #updated on 9/9/2015 on new data from CHN
 
 for (f_orig in eco_file_list) {
   dir_f = file.path(dir_chn_prep, "6.2_ECO")
