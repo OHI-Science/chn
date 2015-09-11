@@ -1,9 +1,10 @@
 # data_prep.r
 
+#设置路径 (dir: directory)
 dir_chn_prep = '~/github/chn/province2015/prep'
 setwd(dir_chn_prep)
 
-# setup ----
+# setup ---- 叫出需要的工具包
 library(readxl)  # install.packages('readxl')
 library(readr)   # install.packages('readr')
 library(stringr) # install.packages('stringr')
@@ -11,46 +12,40 @@ library(tools)
 library(dplyr)  # install.packages('dplyr')
 source(file.path(dir_chn_prep,'prep_functions.r'))
 
-
+# dir_layers: 设置 layers 文件夹
 dir_layers = '~/github/chn/province2015/layers'
 
+# dir_raw: 最原始文件存放在这里
 # paths: '~/' means '/Users/julialowndes/' for Julie
+dir_raw = '~/github/chn/province2015/pre-proc'
 
-dir_raw = c('mendes'='~/Google Drive/OHI China 2015/model_data/',
-            'ningningj'='~/Google Drive/OHI China 2015/model_data/',
-            'julialowndes'='~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/',
-            'jstewart'    ='~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/')[Sys.info()["user"]]
-
-## to make a universal pathway, should we just upload raw files into prep
-## folder, and prep, and then save the cleaned data to layers folder? right now
-## we have the same cleaned files in both prep and layers
-## then: dir_raw = '~/github/chn/province2015/prep/subfolder'
+# dir_raw = c('mendes'='~/Google Drive/OHI China 2015/model_data/',
+#             'ningningj'='~/Google Drive/OHI China 2015/model_data/',
+#             'julialowndes'='~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/',
+#             'jstewart'    ='~/Google Drive/1 OHI+ Countries:Regions:Territories/China/OHI China 2015/model_data/')[Sys.info()["user"]]
 
 chn_file_list = list.files(dir_raw)
-## seems like we never used this line of code
 
 # CS data ----
-
-# Julie finish
-# cs_file_list = str_match(chn_file_list, 'cs_')
 
 cs_file_list = c('cs_contribtion_chn2015_HHM.csv.xlsx',
                  'cs_condition_chn2015_HHM.xlsx',
                  'cs_extent_chn2015_HHM.xlsx')
 
-for (f_orig in cs_file_list) {
+# f: file, orig: original， d: data
+for (f_orig in cs_file_list) { #f_orig = 'cs_contribtion_chn2015_HHM.csv.xlsx'
 
   dir_f = file.path(dir_chn_prep, '4_CS')
 
-  d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
-  f_new = file_path_sans_ext(file_path_sans_ext(f_orig))
+  d = read_excel(file.path(dir_raw, '4_CS', f_orig)); head(d); summary(d) #读取数据
+  f_new = file_path_sans_ext(file_path_sans_ext(f_orig)) #去除原始文件扩展名
 
   if ('habit' %in% names(d)) {
     d = d %>%
       rename(habitat = habit); head(d)
   }
 
-  # add rgn_id from prep_functions.r - add_rgn_id()
+  # add rgn_id from prep_functions.r - add_rgn_id() #省份名字变为数字
   dn = add_rgn_id(d, fld_name = 'rgn_ID') %>%
     filter(!is.na(rgn_id)); head(dn)
 
@@ -69,7 +64,6 @@ for (f_orig in cs_file_list) {
 
     file.rename(file.path(dir_layers, paste0(f_new, '.csv')),
                 file.path(dir_layers, 'cs_contribution_chn2015_HHM.csv'))
-
   }
 }
 
@@ -87,7 +81,7 @@ for (f_orig in np_file_list) {  # f_orig =  'np _weight_chn2015_HHM.csv.xlsx'
 
   dir_f = file.path(dir_chn_prep, '3_NP')
 
-  d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
+  d = read_excel(file.path(dir_raw, '3_NP', f_orig)); head(d); summary(d)
   f_new = file_path_sans_ext(file_path_sans_ext(f_orig))
   f_new = str_replace(f_new, ' ', '')
 
@@ -133,7 +127,7 @@ cp_file_list=c("cp_condition_chn2015_zb.csv",
 
 for (f_orig in cp_file_list) {
   dir_f = file.path(dir_chn_prep, "5_CP")
-  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+  d = read.csv(file.path(dir_raw, "5_CP", f_orig)); head(d); summary(d)
   dn = add_rgn_id(d, fld_name = 'rgn_ID')
 
   if ('habit' %in% names(dn)) {
@@ -156,7 +150,7 @@ fis_file_list = c("6A_fis_ft.xlsx",
 
 for (f_orig in fis_file_list) {
   dir_f = file.path(dir_chn_prep, "1.1_FIS")
-  d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
+  d = read_excel(file.path(dir_raw, "1.1_FIS", f_orig)); head(d); summary(d)
   dn = add_rgn_id(d, fld_name = "province_id")
 
   f_new = file_path_sans_ext(f_orig)
@@ -173,7 +167,7 @@ mar_file_list = c("6A_mar_ac.xlsx",
 
 for (f_orig in mar_file_list) { # f_orig = "6A_mar_yk.xlsx"
   dir_f = file.path(dir_chn_prep, "1.2_MAR")
-  d = read_excel(file.path(dir_raw, f_orig)); head(d); summary(d)
+  d = read_excel(file.path(dir_raw, "1.2_MAR", f_orig)); head(d); summary(d)
   dn = add_rgn_id(d, fld_name = "province_id")
 
   f_new = file_path_sans_ext(f_orig) %>%
@@ -199,8 +193,8 @@ for (f_orig in ao_file_list) { # f_orig = ao_file_list[5]
 
   # ao_afc (number of fishermen) last col was set as "date". Need to change to "numeric" for calculation:
   d = if (f_orig == "6B_ao_afc.xlsx") {
-    read_excel(file.path(dir_raw, f_orig), col_types = c('text', 'numeric', 'numeric'))
-  } else {read_excel(file.path(dir_raw, f_orig))} ; head(d) ; summary(d)
+    read_excel(file.path(dir_raw, "2_AO", f_orig), col_types = c('text', 'numeric', 'numeric'))
+  } else {read_excel(file.path(dir_raw, "2_AO", f_orig))} ; head(d) ; summary(d)
 
   # change the ao_aec and ao_aer (gas price) column name to rmb_l; R can't deal with /
   names(d)[names(d) == "rmb/l"] = 'rmb_l'
@@ -226,7 +220,7 @@ tr_file_list = c("6G_tr_marinearea_chn2015_YWW.csv",
 
 for (f_orig in tr_file_list) {
   dir_f = file.path(dir_chn_prep, "7_TR")
-  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+  d = read.csv(file.path(dir_raw, "7_TR", f_orig)); head(d); summary(d)
   d = filter(d,!is.na(rgn_id)); head(d);
   f_new = str_replace(f_orig, "6G_", "")
 
@@ -241,7 +235,7 @@ ico_file_list = c("6H_ico_species_chn2015_YWW.csv")
 
 for (f_orig in ico_file_list) {
   dir_f = file.path(dir_chn_prep, "9.1_ICO")
-  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+  d = read.csv(file.path(dir_raw, "9.1_ICO", f_orig)); head(d); summary(d)
 
   if ("region_id" %in% names(d)) {
   d = rename(d, rgn_id = region_id); head(d)
@@ -265,7 +259,7 @@ lsp_file_list = c("6H_lsp_cmpa_chn2015_YWW.csv",
 
 for (f_orig in lsp_file_list) {
   dir_f = file.path(dir_chn_prep, "9.2_LSP")
-  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+  d = read.csv(file.path(dir_raw, "9.2_LSP", f_orig)); head(d); summary(d)
   d = filter(d, !is.na(rgn_id))
 
   f_new = str_replace(f_orig, "6H_", "")
@@ -275,15 +269,15 @@ for (f_orig in lsp_file_list) {
 
 }
 
-# LIV ====
+# LIV ----
 
 liv_file_list = c("le_livwage_chn2015_zb.csv", # all three data layers updated on 9/9/2015 on new data from CHN
                  "le_livjobindustry_chn2015_zb.csv",
                  "le_livjobprovince_chn2015_zb.csv")
 
-for (f_orig in liv_file_list) {
+for (f_orig in liv_file_list){
   dir_f = file.path(dir_chn_prep, "6.1_LIV")
-  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+  d = read.csv(file.path(dir_raw, "6.1_LIV", f_orig)); head(d); summary(d)
 
   if(f_orig == "le_livjob_chn2015_zb.csv" | f_orig == "le_livjobindustry_chn2015_zb.csv") {
     d = d %>%
@@ -300,8 +294,9 @@ for (f_orig in liv_file_list) {
            category = str_replace_all(category, "sea salt industry", 'seasalt'))
     }
 
+  if('province' %in% colnames(dn)){
   dn = add_rgn_id(d, fld_name = "province")
-
+}
   write_csv(dn, file.path(dir_f, f_orig))
   write_csv(dn, file.path(dir_layers, f_orig))
 }
@@ -311,7 +306,7 @@ eco_file_list = c("LE_eco_chn2015_zb.csv") #updated on 9/9/2015 on new data from
 
 for (f_orig in eco_file_list) {
   dir_f = file.path(dir_chn_prep, "6.2_ECO")
-  d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+  d = read.csv(file.path(dir_raw, "6.2_ECO", f_orig)); head(d); summary(d)
 
   dn = add_rgn_id(d, fld_name = "province") %>%
   mutate(value = str_replace(value, ',',''))
@@ -327,7 +322,7 @@ for (f_orig in eco_file_list) {
 # write.csv(gl_spp_trend, '10.1_SPP/gl_spp_all.csv', row.names=F)
 gl_spp_trend = read.csv(file.path(dir_chn_prep, '10.1_SPP/gl_spp_all.csv')); head(gl_spp_trend)
 
-china_spp = read.csv(file.path(dir_raw, 'spp_species_chn2015_LM.csv')); head(china_spp)
+china_spp = read.csv(file.path(dir_raw, '10.1_SPP', 'spp_species_chn2015_LM.csv')); head(china_spp)
 
 d = china_spp %>%
   rename(province_id = rgn_id,
@@ -386,7 +381,7 @@ cw_file_list = c('cw_phosphate_chn2015_LM.csv',
 
 for (f_orig in cw_file_list) {
 dir_f = file.path(dir_chn_prep, "8_CW")
-d = read.csv(file.path(dir_raw, f_orig)); head(d); summary(d)
+d = read.csv(file.path(dir_raw, "8_CW", f_orig)); head(d); summary(d)
 
 dn = add_rgn_id(d, fld_name = 'rgn_id')
 
@@ -394,10 +389,12 @@ write_csv(dn, file.path(dir_f, f_orig))
 write_csv(dn, file.path(dir_layers, f_orig)) }
 
 
-# PRESSURE & RESILIENCE DATA LAYERS ----
+# PRESSURE & RESILIENCE ----
+# data layers used in config.R ＃在 config.R 中用到的文件
+# first load layers from calculate_scores.R ＃先做完 calculate_scores.R 中 layers = Layers('layers.csv', 'layers') 这一步
 
-# cs_habitat_extent = Habitat extent * rank, per Carbon Storage habitats
-#                   = extent * contribution
+#＃ cs_habitat_extent = Habitat extent * rank, per Carbon Storage habitats
+#＃                   = extent * contribution
 
 extent = layers$data[['cs_extent']] %>%
   select(rgn_id, habitat, extent = hectare)
@@ -411,8 +408,8 @@ result = full_join(extent, contribution, by = c('rgn_id', 'habitat')) %>%
 
 write_csv(result, file.path(dir_layers, 'cs_habitat_extent_chn2015.csv'))
 
-# cp_habitat_extent_rank = Habitat extent * rank, per Coastal Protection habitats
-#                        = extent * weight
+#＃ cp_habitat_extent_rank = Habitat extent * rank, per Coastal Protection habitats
+#＃                        = extent * weight
 
 habitat.wt = c('saltmarshes' = 3,
                'mangroves' = 4,
@@ -431,7 +428,7 @@ m = layers$data[['cp_extent']] %>%
 
 write_csv(m, file.path(dir_layers, 'cp_habitat_extent_rank_chn2015.csv'))
 
-# hab_presence: 1 for presence, 0 for absence
+#＃ hab_presence: 1 for presence, 0 for absence
 
 m = layers$data[['cp_extent']] %>%
   group_by(rgn_id, habitat) %>%
