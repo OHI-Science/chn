@@ -18,18 +18,18 @@ FIS = function(layers){
            year,
            ct = tonnes)
 
-## Status model:
+  ## Status model:
 
   # delta_Ct:    0,              if mmsy_ref-Bt<0.05*mmsy_ref
   #              |mmsy_ref-Bt|,  if  |mmsy_ref-Bt|<mmsy_ref
   #              mmsy_ref,       otherwise.
   # xFIS = (1 - delta_Ct/mmsy_ref) * Tc
 
-    # before calculating status, we need to obtain r, K, and q:
-    # first, calcualte Ut = Ct/ft, and Ut+1
-    # then, run a multiple linear regression in the form of:
-    # Ut+1 - Ut - 1 = r - [r/(Kq)]*Ut - q*ft
-    # obtain r, K, q from linear model coefficients
+  # before calculating status, we need to obtain r, K, and q:
+  # first, calcualte Ut = Ct/ft, and Ut+1
+  # then, run a multiple linear regression in the form of:
+  # Ut+1 - Ut - 1 = r - [r/(Kq)]*Ut - q*ft
+  # obtain r, K, q from linear model coefficients
 
   ### To Mian: Real calculation of status and trend (40-108). But status results are all 0's, which screwed up trend calcualtion next.
   ### Intermediate steps (r, K, q, mmsy) have many unwanted negative numbers. my mmsy results are different from provided mmsy data (except for region 1 and 4)
@@ -38,55 +38,55 @@ FIS = function(layers){
   ### 不该有的负数值。导致趋势 (trend) 计算不能做。这里你该仔细看一看。为了FP计算，我暂时在109-120 我暂时做了占位符 （r.status, r.trend)->占位符已取消。
 
   # calculate needed variables (r, q, K, mmsy) from linear model (independent variables: ut, ft)
-D1 = ft %>%
-  left_join(ct, by = c("rgn_id", "year")) %>%
-  mutate(ut = ct/ft) %>%
-  group_by(rgn_id) %>%
-  mutate(ut_plus1 = c(ut[-1], NA), # lag: start from year 1, last year 2013 set as NA.
-                                   # Q: lost the most recent year's (2013) info. r, q, k, and mmsy can also be calculated up to 2012, and therefore status
-                                   # will only be calculated up to 2012.
-         y = ut_plus1/ut - 1) %>%
-  filter(!year=='2013')
+  D1 = ft %>%
+    left_join(ct, by = c("rgn_id", "year")) %>%
+    mutate(ut = ct/ft) %>%
+    group_by(rgn_id) %>%
+    mutate(ut_plus1 = c(ut[-1], NA), # lag: start from year 1, last year 2013 set as NA.
+           # Q: lost the most recent year's (2013) info. r, q, k, and mmsy can also be calculated up to 2012, and therefore status
+           # will only be calculated up to 2012.
+           y = ut_plus1/ut - 1) %>%
+    filter(!year=='2013')
 
-D2 = D1 %>%
-  do(dlm = lm(y ~ ut + ft, data = .)) %>%
-  # calculating r, q, and K from multiple linear regression
-  mutate(r = coef(dlm)[["(Intercept)"]],
-         r_Kq = -coef(dlm)[['ut']], # = r/Kq
-         q = -coef(dlm)[['ft']],
-         K = r/r_Kq/q,
-         mmsy = r*K/4,
-         mmsy_r = mmsy*0.75)  %>%
-  select(-dlm) %>%
-  ungroup; head(D2); summary(D2)
-### NOTE: take a look at D2, some mmsy values are negative.
-### 李冕：看一下D2，有几个q, K, mmsy 是负数。。。
+  D2 = D1 %>%
+    do(dlm = lm(y ~ ut + ft, data = .)) %>%
+    # calculating r, q, and K from multiple linear regression
+    mutate(r = coef(dlm)[["(Intercept)"]],
+           r_Kq = -coef(dlm)[['ut']], # = r/Kq
+           q = -coef(dlm)[['ft']],
+           K = r/r_Kq/q,
+           mmsy = r*K/4,
+           mmsy_r = mmsy*0.75)  %>%
+    select(-dlm) %>%
+    ungroup; head(D2); summary(D2)
+  ### NOTE: take a look at D2, some mmsy values are negative.
+  ### 李冕：看一下D2，有几个q, K, mmsy 是负数。。。
 
-## status:
-status.all.years = D2 %>%
-  select(rgn_id, mmsy_r) %>%
-  left_join(ct, by='rgn_id') %>%
-  filter(!year == max(year)) %>% # take out most recent eyar. See reasoning in D1.
-  mutate(abs = abs(mmsy_r - ct)) %>%
-  group_by(rgn_id, year) %>%
-  mutate(d_Ct = if (abs< 0.05*mmsy_r) {
-    0
-  } else if ( abs > 0.05*mmsy_r & abs < mmsy_r) {
-    abs
-  } else mmsy_r ) %>%
-  ungroup %>%
-  left_join(tc, by = 'rgn_id') %>%
-  mutate(x.fis = pmax(-1, pmin(1, (1-(d_Ct/mmsy_r))*tc)) *100)
+  ## status:
+  status.all.years = D2 %>%
+    select(rgn_id, mmsy_r) %>%
+    left_join(ct, by='rgn_id') %>%
+    filter(!year == max(year)) %>% # take out most recent eyar. See reasoning in D1.
+    mutate(abs = abs(mmsy_r - ct)) %>%
+    group_by(rgn_id, year) %>%
+    mutate(d_Ct = if (abs< 0.05*mmsy_r) {
+      0
+    } else if ( abs > 0.05*mmsy_r & abs < mmsy_r) {
+      abs
+    } else mmsy_r ) %>%
+    ungroup %>%
+    left_join(tc, by = 'rgn_id') %>%
+    mutate(x.fis = pmax(-1, pmin(1, (1-(d_Ct/mmsy_r))*tc)) *100)
 
-# # current status 最近一年现状 2012
-r.status = status.all.years %>%
-  filter(year==max(year)) %>% # year = 2012
-  mutate(goal = "FIS",
-         dimension = 'status') %>%
-  select(goal,
-         dimension,
-         region_id = rgn_id,
-         score = x.fis)
+  # # current status 最近一年现状 2012
+  r.status = status.all.years %>%
+    filter(year==max(year)) %>% # year = 2012
+    mutate(goal = "FIS",
+           dimension = 'status') %>%
+    select(goal,
+           dimension,
+           region_id = rgn_id,
+           score = x.fis)
 
   ###  trend
   ### 趋势计算
@@ -95,7 +95,7 @@ r.status = status.all.years %>%
     filter(year > (max(year)-5)) %>% # most recent 5 years of data
     group_by(rgn_id) %>%
     do(dml = lm(x.fis ~ year, data =.)) %>%
-    mutate(trend = max(-1, min(1, coef(dml)[['year']]*4)),
+    mutate(trend = max(-1, min(1, coef(dml)[['year']]*5)),
            goal = 'FIS',
            dimension = 'trend') %>%
     select(goal,
@@ -103,8 +103,8 @@ r.status = status.all.years %>%
            region_id = rgn_id,
            score = trend)
 
-scores_FIS = rbind(r.status, r.trend)
-return(scores_FIS)
+  scores_FIS = rbind(r.status, r.trend)
+  return(scores_FIS)
 }
 
 MAR = function(layers){
@@ -116,81 +116,81 @@ MAR = function(layers){
   mar_area = layers$data[['mar_ac']] #1994-2013
   mar_harvest = layers$data[['mar_yk']] #1994-2013
 
-D = full_join(mar_msi, mar_harvest, by=c("rgn_id", 'species' )) %>% # 合并数据
-  select(rgn_id,
-         species,
-         year,
-         harvest = tonnes,
-         msi = score) %>%
-  left_join(mar_area, by=c("rgn_id", "year")) %>%
-  select(-layer,
-         area = km2)
+  D = full_join(mar_msi, mar_harvest, by=c("rgn_id", 'species' )) %>% # 合并数据
+    select(rgn_id,
+           species,
+           year,
+           harvest = tonnes,
+           msi = score) %>%
+    left_join(mar_area, by=c("rgn_id", "year")) %>%
+    select(-layer,
+           area = km2)
 
-# status - using all years from word document equations
-# aggregate all weighted timeseries per province (group by province and year), and divide by area
-mar.status.all.years =
+  # status - using all years from word document equations
+  # aggregate all weighted timeseries per province (group by province and year), and divide by area
+  mar.status.all.years =
     D %>%
-      filter(!area == 0) %>% #  exclude cases where no harvest and no allowable area (rgn_id 6)
-                             #  should be filter(!(area == 0 & harvest == 0))
-      group_by(rgn_id, year) %>%
-      summarize(yc = sum(harvest*msi/area),
-                yc.log = log10(yc+1)) %>%
-      ungroup() %>%
-      mutate (ref = max(yc.log), #ref = highest yc.log across years and regions
-              x.mar = yc.log/ref*100); head(mar.status.all.years); summary(mar.status.all.years); sapply(mar.status.all.years, class)
+    filter(!area == 0) %>% #  exclude cases where no harvest and no allowable area (rgn_id 6)
+    #  should be filter(!(area == 0 & harvest == 0))
+    group_by(rgn_id, year) %>%
+    summarize(yc = sum(harvest*msi/area),
+              yc.log = log10(yc+1)) %>%
+    ungroup() %>%
+    mutate (ref = max(yc.log), #ref = highest yc.log across years and regions
+            x.mar = yc.log/ref*100); head(mar.status.all.years); summary(mar.status.all.years); sapply(mar.status.all.years, class)
 
-# Q1. In mar_yk data, region 6 (SH) has no MAR area, but molluscus and crabs have large harvest (1000's tonnes)
-# I confirmed with CHN team that it wasn't a data entry error, and it was recorded on Marine Yearbook as such.
-# But should we consider removing these data as outliers b/c they don't make sense?
-# 在mar_yk 数据中，region 6 上海 2012 年，虽然面积为0，但这两个物种收获非常高。虽然确认了这不是数据报告错误，
-# 但是否该考虑去除这两个数据：
-# 6, 2012, "Marine molluscs nei", 705550
-# 6, 2012, "Marine crabs nei", 33047
-# CHN answer: Yes.
+  # Q1. In mar_yk data, region 6 (SH) has no MAR area, but molluscus and crabs have large harvest (1000's tonnes)
+  # I confirmed with CHN team that it wasn't a data entry error, and it was recorded on Marine Yearbook as such.
+  # But should we consider removing these data as outliers b/c they don't make sense?
+  # 在mar_yk 数据中，region 6 上海 2012 年，虽然面积为0，但这两个物种收获非常高。虽然确认了这不是数据报告错误，
+  # 但是否该考虑去除这两个数据：
+  # 6, 2012, "Marine molluscs nei", 705550
+  # 6, 2012, "Marine crabs nei", 33047
+  # CHN answer: Yes.
 
-# Q2. Currently set reference point the highest yc.log across regions in the most recent (max) year. Is it right?
-# 参考点的取值，暂时取用最近一年最高 yc.log 值为参考点； 在文件叙述中没有表明。需要讨论。
-# CHN answer: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
+  # Q2. Currently set reference point the highest yc.log across regions in the most recent (max) year. Is it right?
+  # 参考点的取值，暂时取用最近一年最高 yc.log 值为参考点； 在文件叙述中没有表明。需要讨论。
+  # CHN answer: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
 
-# current status
-r.status = mar.status.all.years %>%
-  filter(year == max(year)) %>%
-  mutate(score = round(x.mar,2)) %>%
-  select(rgn_id,
-         score) %>%
-  rbind(data.frame(rgn_id = as.integer(6), #SH[6] has no MAR from 2007-2013, social preference to have no more mariculture. Add back as NA
-                   score  = NA)) %>%
-  arrange(rgn_id) %>%
-  mutate(dimension = 'status',
-         goal = 'MAR') %>%
-  select(goal,
-         dimension,
-         region_id = rgn_id,
-         score)
+  # current status
+  r.status = mar.status.all.years %>%
+    filter(year == max(year)) %>%
+    mutate(score = round(x.mar,2)) %>%
+    select(rgn_id,
+           score) %>%
+    rbind(data.frame(rgn_id = as.integer(6), #SH[6] has no MAR from 2007-2013, social preference to have no more mariculture. Add back as NA
+                     score  = NA)) %>%
+    arrange(rgn_id) %>%
+    mutate(dimension = 'status',
+           goal = 'MAR') %>%
+    select(goal,
+           dimension,
+           region_id = rgn_id,
+           score)
 
 
-# trend
-r.trend = mar.status.all.years %>%
-  select(rgn_id, year, x.mar) %>%
-  group_by(rgn_id) %>%
-  filter(year > (max(year)-5) & !rgn_id== 6) %>% #the most recent 5 years of data; ignore region 6 b/c no harvest in past 5 years
-  do(dml = lm(x.mar ~ year, data=.)) %>% # lm 线性方程
-  mutate(score = pmax(-1, pmin(1, coef(dml)[['year']]*4))) %>% # 4 intervals 4个间隔；year的系数
-                                                               # pmin(1, ...): 最大不超过1
-                                                               # pmax(-1, ...): 最小不超过－1
-  select(region_id = rgn_id,
-         score) %>%
-  rbind(data.frame(region_id = as.integer(6), score = NA)) %>% # rgn 6 (SH), again doesn't have a trend as there is no more MAR
-  mutate(dimension = 'trend',
-         goal = 'MAR') %>%
-  select(goal,
-         dimension,
-         region_id,
-         score) %>%
-  arrange(region_id)
+  # trend
+  r.trend = mar.status.all.years %>%
+    select(rgn_id, year, x.mar) %>%
+    group_by(rgn_id) %>%
+    filter(year > (max(year)-5) & !rgn_id== 6) %>% #the most recent 5 years of data; ignore region 6 b/c no harvest in past 5 years
+    do(dml = lm(x.mar ~ year, data=.)) %>% # lm 线性方程
+    mutate(score = pmax(-1, pmin(1, coef(dml)[['year']]*5))) %>%
+    # pmin(1, ...): 最大不超过1
+    # pmax(-1, ...): 最小不超过－1
+    select(region_id = rgn_id,
+           score) %>%
+    rbind(data.frame(region_id = as.integer(6), score = NA)) %>% # rgn 6 (SH), again doesn't have a trend as there is no more MAR
+    mutate(dimension = 'trend',
+           goal = 'MAR') %>%
+    select(goal,
+           dimension,
+           region_id,
+           score) %>%
+    arrange(region_id)
 
-scores_MAR = rbind(r.status, r.trend)
-return(scores_MAR)
+  scores_MAR = rbind(r.status, r.trend)
+  return(scores_MAR)
 }
 
 FP = function(layers, scores, debug=T){
@@ -244,7 +244,8 @@ FP = function(layers, scores, debug=T){
 
   scores_FP = s %>%
     full_join(w, by = 'region_id') %>%
-    mutate(score = w*FIS + (1-w)*MAR,
+    rowwise() %>%
+    mutate(score = sum(w*FIS, (1-w)*MAR, na.rm=T),
            goal = 'FP') %>%
     select(goal,
            dimension,
@@ -258,15 +259,16 @@ FP = function(layers, scores, debug=T){
 AO = function(layers){
 
   # status
-  # xAO = (APc/APr + AFc/AFr + AEc/AEr) / 3
+  # xAO = (APc/APr + AFc/AFr ＋ AEi) / 3
+  # AEi = Gr/Ir - Gc/Ic
 
   # cast data
   lyrs = c(#'ao_port',
-           #'ao_port_ref', # no year. couldn't join port data with the men and gas data properly
-          'ao_men',       #2003-2013
+           #'ao_port_ref',  # no year. couldn't join port data with the men and gas data properly
+          'ao_men',         #2003-2013
           'ao_men_ref',
-          'ao_gas',       #2010-2014
-          'ao_gas_ref')
+          'ao_diesel',       #2010-2013
+          'ao_income')       #2009-2013
   d = SelectLayersData(layers, layers=lyrs); head(d); summary(d)
 
   D = d %>%
@@ -277,22 +279,23 @@ AO = function(layers){
     spread(layer, val_num) %>%
     select(rgn_id,
            year,
-           gas = ao_gas,
-           gas_ref = ao_gas_ref,
+           diesel = ao_diesel,
+           income = ao_income,
            fishermen = ao_men,
            fishermen_ref = ao_men_ref) %>%
     full_join(layers$data[['ao_port']] %>%
                 select(rgn_id, port = count), by = 'rgn_id') %>% # join with ao_port and ao_port_ref
     full_join(layers$data[['ao_port_ref']] %>%
-                select(rgn_id, port_ref = count), by = 'rgn_id')
+                select(rgn_id, port_ref = count), by = 'rgn_id') %>%
+    mutate(ae_ref = max(diesel/income, na.rm = T),  # AE_reference point = maximum (diesel/income) across year and provinces
+           ae = ae_ref - diesel/income, # calculate AEi
+           fishermen_ref_new = max(fishermen_ref)) # new fishermen ref point, max across years. #CHN: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
 
-  # status
+  # status 2010 - 2013
   status.all.years = D %>%
-    group_by(rgn_id) %>%
-    filter(!is.na(gas) & !is.na(fishermen)) %>% # NA prevents further calculations; 去掉NA，因为无法计算
-    mutate(fishermen_ref_new = max(fishermen_ref), # new ref point, max across years.
-           gas_ref_new = max(gas_ref), #CHN: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
-      x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen_ref_new + gas/gas_ref_new)/3))*100 )
+    group_by(rgn_id, year) %>%
+    filter(!is.na(fishermen) & !is.na(diesel) & !is.na(income)) %>% # NA prevents further calculations; 去掉NA，因为无法计算
+    mutate(x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen_ref_new + ae)/3))*100)
   ## Q for CHN: only 2010-2013 have data in all three categories (port, fishermen, gas), and thus only those
   ## years have status scores. do you want to see score for 2014, using only gas and port data?
   ## 问题：只有2010-2013 有所有数据（port, fishermen, gas)， 所以只有这几年有现状得分。2014 只有gas 和port
@@ -311,7 +314,8 @@ AO = function(layers){
 
   # current status: 2013
   r.status = status.all.years %>%
-    filter(year == 2013) %>%
+    group_by(rgn_id) %>%
+    filter(year == max(year)) %>%
     mutate(goal = 'AO',
            dimension = 'status') %>%
     select(goal,
@@ -323,7 +327,7 @@ AO = function(layers){
   r.trend = status.all.years %>%
     group_by(rgn_id) %>%
     do(dml = lm(x.ao ~ year, data =.)) %>%
-    mutate(trend = coef(dml)[['year']]*3,  # 4 years, 3 intervals
+    mutate(trend = min(-1, max(1, coef(dml)[['year']]*5)),
            goal = "AO",
            dimension = "trend") %>%
     select(goal,
@@ -446,7 +450,7 @@ NP <- function(layers){
     group_by(rgn_id) %>%
     do(mdl = lm(status ~ year, data=.)) %>%
     summarize(region_id = rgn_id,
-              score = max(-1, min(1, coef(mdl)[['year']] * 4))) %>%
+              score = max(-1, min(1, coef(mdl)[['year']] * 5))) %>%
     rbind(data.frame(region_id = as.integer(6), score = NA)) %>%
     arrange(region_id) %>%
     mutate(goal = 'NP', dimension = 'trend') %>%
@@ -670,12 +674,6 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
                                  # 参考点使用 log(tour_per_area_S_1) 跨省最大值 （2010 上海）
            xTR = log/ref_point*100); head(d); summary(d)
 
-#     rgn_id year tourist    area tour_per_area tour_per_area_S tour_per_area_S_1  log ref_point   xTR
-#   1      1 2008 6487.79 2000000       3243.89         2552.95           2553.95 3.41      6.76 50.38
-#   2      1 2009 4223.38 2000000       2111.69         1661.90           1662.90 3.22      6.76 47.63
-#   3      1 2010 5503.80 2000000       2751.90         2165.75           2166.75 3.34      6.76 49.33
-#   4      1 2011 6775.49 2000000       3387.74         2666.16           2667.16 3.43      6.76 50.66
-
  # current TR status
 r.status = d %>%
   filter(year == 2011) %>%
@@ -693,7 +691,7 @@ r.trend = d %>%
   summarize(goal = 'TR',
             dimension = 'trend',
             region_id = as.integer(rgn_id),
-            score = max(min(coef(dml)[['year']] * 3, 1), -1)) %>%
+            score = max(min(coef(dml)[['year']] * 5, 1), -1)) %>%
   ungroup
 
 scores_TR = rbind(r.status, r.trend)
@@ -797,7 +795,7 @@ r.trend = left_join(jobs, wage, by=c('rgn_id', 'year')) %>%
     weight = weight,
     rgn_id = rgn_id,
     sector = sector,
-    sector_trend = pmax(-1, pmin(1, coef(mdl)[['year']] * 4))) %>% # 2007 - 2011: 4 intervals
+    sector_trend = pmax(-1, pmin(1, coef(mdl)[['year']] * 5))) %>%
   arrange(rgn_id, metric, sector) %>%
   # get weighted mean across sectors per region-metric
   group_by(metric, rgn_id) %>%
@@ -845,7 +843,7 @@ r.trend = xECO_all_years %>%
   group_by(rgn_id) %>%
   do(lmd = lm(xECO ~ year, data =.)) %>%
   summarize(region_id = rgn_id,
-            score = pmax(pmin(coef(lmd)[['year']] *4, 1) ,-1),
+            score = pmax(pmin(coef(lmd)[['year']] *5, 1) ,-1),
             dimension = 'trend',
             goal = 'ECO') %>%
   select(goal, dimension, region_id, score); head(r.trend)
@@ -982,7 +980,7 @@ LSP = function(layers){
    summarize( goal = 'LSP',
               dimension = 'trend',
               region_id = rgn_id,
-             score = max(min(coef(dlm)[['year']]*3, 1) -1)) ; head(r.trend)
+             score = max(min(coef(dlm)[['year']]*5, 1) -1)) ; head(r.trend)
 
 scores_LSP = rbind(r.status, r.trend)
 return(scores_LSP)
@@ -999,12 +997,6 @@ SP = function(scores){
     mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP), na.rm = T)), # na.rm 去除NA
            goal = 'SP') %>%
     select(goal, dimension, region_id, score); head(scores_SP)
-
-  ## b/c rgn_2 ICO trend score is NA, SP trend score is NA even after na.rm
-  ## 因为region 2 ICO 趋势是NA，SP趋势也是NA， 虽然经过了 na.rm 操作
-#     region_id dimension              ICO                LSP         score goal
-#   7          2    status 48.5714285714286                100  4.985714e+01   SP
-#   8          2     trend               NA                 -1            NA   SP
 
 return(rbind(scores, scores_SP))
 
@@ -1056,7 +1048,7 @@ CW = function(layers){
    group_by(rgn_id) %>%
    do(dml = lm(x.cw ~ year, data = .)) %>%
    summarize(region_id = rgn_id,
-             trend = max(-1, min(1, coef(dml)[['year']]))) %>%
+             trend = max(-1, min(1, coef(dml)[['year']]*5))) %>%
    mutate(goal = 'CW',
           dimension = 'trend') %>%
    select(goal,
@@ -1193,15 +1185,6 @@ BD = function(scores){
            dimension,
            region_id,
            score)
-
-  ## Same problem as SP: b/c rgn_2 SPP trend score is NA, BD trend score is NA even after na.rm
-  ## 和SP同样的问题：因为region 2 SPP 趋势是NA，BD趋势也是NA， 虽然经过了 na.rm 操作
-
-#   region_id dimension                 HAB              SPP      BD
-#   1          1    status                  65 58.0526315789474 41.3508772
-#   2          1     trend -0.0999915874484731             -0.3  0.2000028
-#   3          2    status                  50 67.1176470588235 39.3725490
-#   4          2     trend                -0.1               NA         NA
 
   return(rbind(scores, scores_BD))
 
