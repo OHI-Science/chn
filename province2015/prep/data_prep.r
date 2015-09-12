@@ -275,12 +275,12 @@ liv_file_list = c("le_livwage_chn2015_zb.csv", # all three data layers updated o
                  "le_livjobindustry_chn2015_zb.csv",
                  "le_livjobprovince_chn2015_zb.csv")
 
-for (f_orig in liv_file_list){
+for (f_orig in liv_file_list){ #f_orig = "le_livjobindustry_chn2015_zb.csv"
   dir_f = file.path(dir_chn_prep, "6.1_LIV")
   d = read.csv(file.path(dir_raw, "6.1_LIV", f_orig)); head(d); summary(d)
 
-  if(f_orig == "le_livjob_chn2015_zb.csv" | f_orig == "le_livjobindustry_chn2015_zb.csv") {
-    d = d %>%
+  if(f_orig == "le_livjobindustry_chn2015_zb.csv") {
+    dn = d %>%
     mutate(category = str_replace_all(category, "beach placer industry", 'mining'),
            category = str_replace_all(category, "coastal tourism", 'tourism'),
            category = str_replace_all(category, "marein engineering architecture", 'egineering_arch'),
@@ -294,7 +294,7 @@ for (f_orig in liv_file_list){
            category = str_replace_all(category, "sea salt industry", 'seasalt'))
     }
 
-  if('province' %in% colnames(dn)){
+  if('province' %in% names(d)){
   dn = add_rgn_id(d, fld_name = "province")
 }
   write_csv(dn, file.path(dir_f, f_orig))
