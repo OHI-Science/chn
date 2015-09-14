@@ -27,21 +27,12 @@ Data sources:
 - [International Union for Conservation of Nature (IUCN)](http://www.iucnredlist.org/technical-documents/classification-schemes/threats-classification-scheme)
 ","category","category","ico_spp_extinction_status_gl2014.csv","rgn_id",,"sciname",,,"category",TRUE,,,,,FALSE,,,,11,
 "ICO SPP","spp_iucn_trends","IUCN population trends","International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists","trend_score","score","spp_iucn_trends_chn2015.csv","rgn_id",,"sciname",,"trend_score",,TRUE,,,-0.5,0,FALSE,,,,11,FALSE
-"LE","le_gdp","GDP","Gross Domestic Product (GDP) data (reported in 2012 US dollars) from The World Bank.
-
-Data sources:
-
-- [The World Bank](data.worldbank.org/indicator/NY.GDP.MKTP.CD)
-","usd","2010 USD","le_gdp_sc2014-popn-inland25km.csv","rgn_id",,,"year","usd",,TRUE,1998,2011,10451195089.0777,2562578339284.71,FALSE,,,,11,FALSE
-"LE","le_jobs_sector_year","Jobs","gapfilled","value","jobs","le_jobs_sector_year_gl2014.csv","rgn_id",,"sector","year","value",,TRUE,1998,2010,0,4357951.343308,FALSE,,,,11,FALSE
-"LE","le_unemployment","Unemployment","gapfilled","percent","percent unemployed","le_unemployment_gl2014.csv","rgn_id",,,"year","percent",,TRUE,1998,2010,3.10000081,4.30000027,FALSE,,,,11,FALSE
-"LE","le_wage_sector_year","Wages","gapfilled","value","2010 USD","le_wage_sector_year_gl2014.csv","rgn_id",,"sector","year","value",,TRUE,2003,2008,1635.48274461361,69002.1153637486,FALSE,,,,11,FALSE
-"LE","le_workforcesize_adj","Modeled Livelihoods & Economies data","adjusted workforce size","jobs","jobs","le_workforcesize_adj_sc2014-popn-inland25km.csv","rgn_id",,,"year","jobs",,TRUE,1990,2012,5566587.10743865,266826151.733338,FALSE,,,,11,FALSE
 "LE pressures","le_sector_weight","Jobs weighting","Jobs weighting by sector (defaulting to 1)","weight","value","le_sector_weight_chn2015.csv","rgn_id",,"sector",,"weight",,TRUE,,,1,1,TRUE,,,,11,FALSE
-"LIV ECO","le_popn","Total population by subregion","Population data from The World Bank","count","count","le_popn_gl2014.csv","rgn_id",,,"year","count",,TRUE,1960,2012,660330000,1350695000,FALSE,,,,11,FALSE
-"LIV","le_livjob","Employment","number of employment in sea-related industry in costal region","value","10,000 people","le_livjob_chn2015_zb.csv","rgn_id",,"datalayer","year","value",,TRUE,2007,2011,249,1363640,FALSE,,,,11,FALSE
-"LIV","le_livwage","Income","average income of urban and rural households in costal provinces ","value","Chinese Yuan","le_livwage_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2011,7791.71,28293,FALSE,,,,11,FALSE
-"ECO","le_eco","Economy","total economy of sea-related industries in coastal provinces ","value","Billion Yuan","le_eco_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2011,343.5,10506.6,FALSE,,,,11,FALSE
+"LIV","liv_job","Employment per industry per province","number of employment in sea-related industry in costal region","value","10,000 people","le_livjob_chn2015_zb.csv","rgn_id",,"datalayer","year","value",,TRUE,2007,2011,249,1363640,FALSE,,,,11,FALSE
+"LIV","liv_job_industry","Employment in each industry cross-country","number of employment in each sea-related industry in the country, not province-specific","value","10,000 people","le_livjobindustry_chn2015_zb.csv",,,"category","year","value",,TRUE,2007,2011,0.9,565.5,FALSE,,,,11,FALSE
+"LIV","liv_job_province","Employment in all industries in each province","total number of employment in all sea-related industries in each provinces, not industry-specific","value","10,000 people","le_livjobprovince_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2011,86.7,820.4,FALSE,,,,11,FALSE
+"LIV","liv_wage","Income","average income of urban and rural households in costal provinces ","value","Chinese Yuan","le_livwage_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2011,7791.71,28293,FALSE,,,,11,FALSE
+"ECO","eco_eco","Economy","total economy of sea-related industries in coastal provinces ","value","Billion Yuan","le_eco_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2011,343.5,10506.6,FALSE,,,,11,FALSE
 "LSP","lsp_cmpa","Coastal marine protected area_CMPA","Coastal marine protected area_CMPA)","km2","km2","lsp_cmpa_chn2015_YWW.csv","rgn_id",,,"year","km2",,TRUE,2009,2012,70.17,34476.7,FALSE,,,,11,FALSE
 "LSP","lsp_marinearea","Jurisdictional marine area","Area of sea within jurisdiction of each province","km2","km2","lsp_marinearea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,3000,2e+06,FALSE,,,,11,FALSE
 "MAR","mar_smk","MSI of each species ","Mariculture sustainability index (MSI) of each species","score","value","mar_smk_chn2015_LZH.csv","rgn_id",,"species",,"score",,TRUE,,,0.367,0.867,TRUE,,,,11,FALSE
