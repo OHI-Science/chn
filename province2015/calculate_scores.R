@@ -1,5 +1,5 @@
 # load required libraries
- suppressWarnings(require(ohicore))
+suppressWarnings(require(ohicore))
 library(tidyr) #install.packages('tidyr')
 library(dplyr) #install.packages('dplyr)
 
