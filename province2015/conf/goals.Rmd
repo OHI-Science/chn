@@ -42,14 +42,22 @@ $$
 the opportunity to fish artisanally, independent of how many fish are caught
 
 $$
-x_{AO} =\frac{\frac{AP_{c}}{AP_{r}} + \frac{AF_{c}}{AF_{r}} + \frac{AE_{c}}{AE_{r}} }{3}
+x_{AO} =\frac{\frac{AP_{c}}{AP_{r}} + \frac{AF_{c}}{AF_{r}} + AE_{i} }{3}
+$$
+
+$$
+AE_{i} = \frac{G_{r}}{I_{r}} - \frac{G_{c}}{I_{c}}
 $$
 
 - $AP$ = number of ports, current [$c$] or reference [$r$]
 
 - $AF$ = number of fishermen, current [$c$] or reference [$r$]
 
-- $AE$ = gas price, current [$c$] or reference [$r$] 
+- $AE$ = economic factor to affect artisinal fishing 
+
+- $G$ = diesel price, current [$c$] or reference [$r$] 
+
+- $I$ = average yearly disposable income, current [$c$] or reference [$r$]
 
 
 ## Natural Products
@@ -183,31 +191,26 @@ threat categories: IUCN
 # Sense of Place: Lasting Special Places
 Aesthetic connections to and cultural identity with a given region measured through the status of meaningful locations
 
+
 $$
-x_{LSP} = \frac{(\frac{M}{M_{r}} + \frac{C}{C_{r}})}{2} 
+x_{LSP} = \frac{\%{CMPA}}{\%CMPA_{Ref}} 
 $$
 
-- $M$ = percent protected marine coastal area compared to reference [$r$] $C$ = percent protected coastline compared to reference [$r$]
+- ${\%CMPA}$ = percent protected marine coastal area of the coastal region within jurisdiction
 
-- $C$ = managed area on coastal land (0-1mi)
-
-- $C_{t}$ = total coastal land area 
+- ${\%CMPA_{Ref}}$ = %5, reference percent protected marine costal area of the coastal region within jurisdiction
 
 
 ## Clean Waters
 The degree to which coastal waters are free of contaminants
 
 $$
-x_{CW} = \sqrt[4]{a * u * l * d}
+x_{CW} = \sqrt[4]{\prod{a_{i}}}
 $$
 
-- $a$  = number of coastal people without access to sanitation  
+- $a$  = water quality input
 
-- $u$ = 1 – (nutrient input)  
-
-- $l$ = 1 – (chemical input)  
-
-- $d$ = 1 – (marine debris input, by country)  
+- $i$ = type of pollution, including phosphate, nitrogen, chemical oxygen demand, and oil pollution
 
 
 ## Biodiversity: Habitats
