@@ -700,19 +700,47 @@ return(scores_TR)
 
 LIV = function(layers){
 
+  # CHN model:
+  # x.LIV = ( sum(jobs_c)/sum(jobs_ref) + wage_c/wage_r )/2
+
 # select data
 
- jobs = layers$data[['le_livjob']] %>%
-   select(rgn_id, sector = datalayer, jobs = value, year); head(jobs)
+#  jobs = layers$data[['le_livjob']] %>%
+#    select(rgn_id, sector = datalayer, jobs = value, year); head(jobs)
 
- wage = layers$data[['le_livwage']] %>%
+ jobs_industry = layers$data[['liv_job_industry']] %>%
+   select(industry = category,
+          year,
+          jobs_ind = value)
+
+ jobs_province = layers$data[['liv_job_province']] %>%
+   select(rgn_id,
+          year,
+          jobs_prov = value)
+
+ wage = layers$data[['liv_wage']] %>%
    select(rgn_id, wage = value, year); head(wage)
 
 
-  # China model:
-  # xLIV = ( sum(jobs) / sum(jobs_ref) + wage / wage_ref) /2
-
  #LIV status:
+
+ # calcualte jobs in each industry in each province:
+ # j = N *(x/sum(x)) = jobs_province * (jobs_industry / jobs_all_industries)
+
+ jobs = jobs_industry %>%
+   group_by(year) %>%
+   mutate(jobs_all_industry = sum(jobs_ind),
+          industry_proportion = jobs_ind / jobs_all_industry) %>% #proportion of all industries that is one particular industry
+   select(industry,
+          year,
+          industry_proportion) %>%
+   ungroup %>%
+   full_join(jobs_province, by = 'year') %>% #join with jobs_province
+   mutate(jobs = jobs_prov * industry_proportion) %>% # number of employment in each industry, each province, each year
+   select(rgn_id,
+          year,
+          industry,
+          jobs)
 
  # calculate job and wage score. find reference points: "from model description: the maximum quantity in each category has been
  # used as the reference point".
@@ -732,12 +760,12 @@ LIV = function(layers){
                       'seasalt' = 1)
 
   jobs = jobs %>%
-  mutate(multiplier = jobs_multiplier[sector],
+  mutate(multiplier = jobs_multiplier[industry],
          jobs_adj = jobs * multiplier)
 
  # calculate jobs, wages scores, and then status of all years
   jobs_score = jobs %>%
-   group_by(sector) %>%
+   group_by(industry) %>%
    mutate(jobs_ref = max(jobs_adj)) %>% # find reference point for each industry, across all regions and all years (2007-2011)。 no info on
                                         # on coasta line length and therefore couldn't calculate max quantity per unit coast line
                                         # 取总量最大值为参考点，没有海岸线长度资料，无法计算单位海岸线最大值。
@@ -754,9 +782,10 @@ LIV = function(layers){
  xLIV_all_years = full_join(jobs_score, #calculate status scores for each year
                   select(wage_score, rgn_id, year, wage_score), by = c('rgn_id','year')) %>%
                   mutate(xLIV = (jobs_score + wage_score)/2*100 )
+
  # current status
  r.status = xLIV_all_years %>%
-   filter(year == max(year)) %>%
+   filter(year == max(year)) %>% #2011
    mutate(dimension = 'status',
           goal = 'LIV') %>%
    select(goal,
@@ -764,43 +793,37 @@ LIV = function(layers){
           region_id = rgn_id,
           score = xLIV); head(r.status)
 
-#      region_id    score dimension goal
-#  1          1 46.94071    status  LIV
-#  2          2 29.34375    status  LIV
-#  3          3 47.84660    status  LIV
-
 # LIV trend
-# From SOM p. 29: trend was calculated as the slope in the individual sector values (not summed sectors)
+# From SOM p. 29: trend was calculated as the slope in the individual sector/industry values (not summed sectors)
 # over the most recent five years...
 # with the average weighted by the number of jobs in each sector
 # ... averaging slopes across sectors weighted by the revenue in each sector
 
 r.trend = left_join(jobs, wage, by=c('rgn_id', 'year')) %>%
   # get sector weight as total jobs across years for given region
-  arrange(rgn_id, year, sector) %>%
-  group_by(rgn_id, sector) %>%
-  mutate(
-    weight = sum(jobs_adj, na.rm=T)) %>%
+  arrange(rgn_id, year, industry) %>%
+  group_by(rgn_id, industry) %>%
+  mutate(weight = sum(jobs_adj, na.rm=T)) %>%
   # reshape into jobs and wages columns into single metric to get slope of both with one do() call
-  reshape2::melt(id=c('rgn_id','year','sector','weight'), variable='metric', value.name='value') %>%
+  reshape2::melt(id=c('rgn_id','year','industry','weight'), variable='metric', value.name='value') %>%
   mutate(
-    sector = as.character(sector),
+    industry = as.character(industry),
     metric = as.character(metric)) %>%
   filter(metric == 'jobs_adj' | metric == 'wage') %>%
   # get linear model coefficient per metric
-  group_by(metric, rgn_id, sector, weight) %>%
+  group_by(metric, rgn_id, industry, weight) %>%
   do(mdl = lm(value ~ year, data=.)) %>%
   summarize(
     metric = metric,
     weight = weight,
     rgn_id = rgn_id,
-    sector = sector,
-    sector_trend = pmax(-1, pmin(1, coef(mdl)[['year']] * 5))) %>%
-  arrange(rgn_id, metric, sector) %>%
+    industry = industry,
+    industry_trend = pmax(-1, pmin(1, coef(mdl)[['year']] * 5))) %>%
+  arrange(rgn_id, metric, industry) %>%
   # get weighted mean across sectors per region-metric
   group_by(metric, rgn_id) %>%
   summarize(
-    metric_trend = weighted.mean(sector_trend, weight, na.rm=T)) %>%
+    metric_trend = weighted.mean(industry_trend, weight, na.rm=T)) %>%
   # get mean trend across metrics (jobs, wages) per region
   group_by(rgn_id) %>%
   summarize(
@@ -819,7 +842,7 @@ ECO = function(layers){
 # xECO = income / income_ref
 
 # cast data
-income = layers$data[['le_eco']] %>%
+income = layers$data[['eco_eco']] %>%
   select(rgn_id, income = value, year); head(income)
 
 # ECO status calculation
