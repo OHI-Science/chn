@@ -72,17 +72,17 @@ for (f_orig in cs_file_list) { #f_orig = 'cs_contribtion_chn2015_HHM.csv.xlsx'
 # Julie finish
 # np_file_list = str_match(chn_file_list, 'cs_')
 
-np_file_list = c('np _weight_chn2015_HHM.csv.xlsx',
-                 'np_harvest_chn2015_HHM.csv.xlsx',
-                 'np_exposure_chn2015_HHM.csv.xlsx',
-                 'np_risk_chn2015_HHM.csv.xlsx')
+np_file_list = c('np _weight_chn2015_HHM.csv',
+                 'np_harvest_chn2015_HHM.xlsx',
+                 'np_exposure_chn2015_HHM.csv',
+                 'np_risk_chn2015_HHM.csv')
 
 for (f_orig in np_file_list) {  # f_orig =  'np _weight_chn2015_HHM.csv.xlsx'
 
   dir_f = file.path(dir_chn_prep, '3_NP')
 
   d = read_excel(file.path(dir_raw, '3_NP', f_orig)); head(d); summary(d)
-  f_new = file_path_sans_ext(file_path_sans_ext(f_orig))
+  f_new = file_path_sans_ext(f_orig)
   f_new = str_replace(f_new, ' ', '')
 
   # typo correction for column header (needs an if statement)
@@ -102,16 +102,16 @@ for (f_orig in np_file_list) {  # f_orig =  'np _weight_chn2015_HHM.csv.xlsx'
   # add rgn_id from prep_functions.r
   dn = add_rgn_id(d, fld_name = 'rgn_id'); head(dn); summary(dn)
 
-  # np_weight can't have NAs. This is not the most elegant fix to this problem.
-  if (f_orig == 'np _weight_chn2015_HHM.csv.xlsx') {
-    dn = dn %>%
-      filter(rgn_id != 6) %>%
-      bind_rows(data.frame(
-        rgn_id = 6,
-        product = c('sea_medicine', 'seasalt', 'sea_chemicals'),
-        weight = c(0.2, 0.4, 0.4))) %>%
-      arrange(product, rgn_id)
-  }
+#   # np_weight can't have NAs. This is not the most elegant fix to this problem.
+#   if (f_orig == 'np _weight_chn2015_HHM.csv.xlsx') {
+#     dn = dn %>%
+#       filter(rgn_id != 6) %>%
+#       bind_rows(data.frame(
+#         rgn_id = 6,
+#         product = c('sea_medicine', 'seasalt', 'sea_chemicals'),
+#         weight = c(0.2, 0.4, 0.4))) %>%
+#       arrange(product, rgn_id)
+#   }
 
   # save as csv
   write_csv(dn, file.path(dir_f, paste0(f_new, '.csv'))) # save a copy in prep
