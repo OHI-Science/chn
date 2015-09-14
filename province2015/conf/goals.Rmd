@@ -208,7 +208,7 @@ $$
 x_{CW} = \sqrt[4]{\prod{a_{i}}}
 $$
 
-- $a$  = water quality input
+- $a$  = water pollution input
 
 - $i$ = type of pollution, including phosphate, nitrogen, chemical oxygen demand, and oil pollution
 
@@ -217,28 +217,25 @@ $$
 Existence values people hold for biodiversity measured through the status of key habitats
 
 $$
-x_{HAB} =  \sum_{i=1}^{k} \frac{C_{c,k}}{C_{r,k}} * \frac{A_{c,k}}{A_{T}}
+x_{HAB} = \frac{ \sum_{i=1}^{k} \frac{C_{c,k}}{C_{r,k}}}{N}
 $$
 
 - $C$ = condition of habitat k, current [$c$] or reference[$r$]
 
-- $A$ = area of habitat k, current [$c$] or total of all habitats [T]
+- $N$ = total number of habitat assessed in the region
 
-habitats: seagrass beds, salt marshes, subtidal soft-bottom habitats, mangroves, coral reefs, sea ice edge
+Habitats include seagrass beds, salt marshes, mangroves
 
 
 ## Biodiversity: Species
 Existence values people hold for biodiversity measured through the status of native species
 
 $$
-x_{SPP} = \frac{\sum_{k=1}^{M} (\frac{\sum_{i=1}^{N} w_{i}}{N}) * A_{C}}{A_{T}} 
+x_{SPP} = 1 - \frac{\sum_{i=1}^{N} w_{i}}{N}
 $$
 
-- $M$ = number of grid cells in the assessment region
 
-- $N$ = number species in a grid cell $c$
-
-- $A$ = total area of a grid cell [$c$] the assessment region [T]
+- $N$ = number of assessed species in the province
 
 - $w_{i}$ = status weight assigned per threat 
 
