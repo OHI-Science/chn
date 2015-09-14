@@ -138,24 +138,29 @@ $$
 x_{LIV} = \frac{\frac{\sum_{i=1}^{k} j_{c,k}}{\sum_{i=1}^{k} j_{r,k}} + \frac{g_{c}} {g_{r}}}{2}
 $$
 
-- $j$ = number of jobs within sector $k$ at current [$c$] or reference [$r$] time
+$$
+j_{c(c, k)} = N_{k} * \frac{x}{\sum{x}}
+$$
 
-- $g$ = average wages per job for sector $k$  at current [$m$] or reference [$r$] region
+- $j$ = number of jobs within sector $k$ at current [$c$] time or reference [$r$] level
+
+- $g$ = sum of average urban and rural family income in current time [$c$] or reference [$r$] level
 
 - sectors ($k$): tourism, commercial fishing, marine mammal watching, aquarium fishing, wave & tidal energy, mariculture, transportation & shipping, ports & harbors, ship & boatbuilding
+
+- $N$ = total number of employment in each sector [$k$] across all regions
+
+- $x$ = total number of employments across all sectors in each region
 
 
 ## Livelihoods & Economies: Economies
 Revenue from marine associated sectors
 
 $$
-x_{ECO} = \sum_{i=1}^{k} \frac{e_{c,k}}{e_{r,k}} 
+x_{ECO} = \frac{e_{c}}{e_{r}} 
 $$
 
-- $e$ = total adjusted revenue generated from each sector $k$ at current [$c$] or reference [$r$] time
-
-- sectors ($k$): tourism, commercial fishing, marine mammal watching, aquarium fishing, wave & tidal energy, mariculture, transportation & shipping, ports & harbors, ship & boatbuilding
-
+- $e$ = total revenue generated from all sectors at current time [$c$] or reference [$r$] level
 
 ## Sense of Place: Iconic Species
 Aesthetic connections to and cultural identity with a given region measured through the status of iconic species
