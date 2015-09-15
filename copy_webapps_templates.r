@@ -1,6 +1,6 @@
 # copy_webapps_templates.r
 
-# INSTRUCTIONS 
+# INSTRUCTIONS
 # Run this script one time only. This will download the WebApps'
 # template files to your local repository. You will then edit the files using
 # RStudio. When editing, save, commit, and push all files normally and they will
@@ -21,7 +21,7 @@
 
 
 # install packages to render goals.Rmd
-devtools:install_github("rmarkdown", "rstudio")
+devtools::install_github("rmarkdown", "rstudio")
 
 # setup for dopying WebApp template files
 library(httr)
@@ -37,10 +37,10 @@ for (f in c('regions.brew.md',   # ohi-science.org/chn/regions -> renders with l
             'goals.brew.md',     # ohi-science.org/chn/goals   -> renders with conf/goals.Rmd
             'scores.brew.md'     # ohi-science.org/chn/scores  -> renders with scores.csv
 )){
-  
+
   url_in = file.path(url_loc, f)
   f_out  = file.path(dir_gh, f)
   writeBin(httr::content(GET(url_in)), f_out)
-  
+
 }
 
