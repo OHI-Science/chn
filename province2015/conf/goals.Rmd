@@ -3,20 +3,79 @@ output: html_document
 ---
 
 ## Food Provision: Fisheries
-Amount of sustainable wild-caught seafood compared to the max sustainable
+Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [$mMSY_{R}]
 
 $$
-x_{FIS} =  (\prod_{g=1}^{6} SS_{i,g}^{C_{i,g}})^\frac{1}{\sum{C_{i,g}}}
+x_{FIS} =  (1 - \frac{\delta{C_{t}}}{mMSY_{R}})
+$$  
+
+\[ \delta{C_{t}} = 
+   \begin{cases}
+    0                      &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {{0.05}*{mMSY_{r}}}\\
+    |{mMSY_{r}}-{C_{t}}|   &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {mMSY_{r}}\\
+    {mMSY_{r}}                 &\quad \text{otherwise }
+   \end{cases}
+\]
+
+\textit{How to calculate mMSY:}
+How to calculate mMSY:
+
+$$
+B_{t+1} = B_{t} + rB_{t}(1 - \frac{B_{t}}{k}) - C_{t}
 $$
 
-- $SS$ stock status score, based on B/Bmsy (biomass / maximum sustainable yield of biomass) and an underharvest penalty adjustment
+$$
+C_{t} = qB_{t}f_{t}
+$$
 
-- $C$ total catch
+$$
+B_{t} = U_{t}/q
+$$
 
-- $i$ OHI reporting region
+$$
+U_{t} = \frac{C_{t}}{f_{t}}
+$$
 
-- $g$ level of taxonomic grouping (ISSCAAP)
+$$
+\frac{U_{t+1}}{q} = \frac{U_{t}}{q} + \frac{rU_{t}}{q[1-\frac{U_{t}}{Kq}]} - U_{t}{f_t}
+$$
 
+$$
+\frac{U_{t+1}}{U_t} = r - \frac{rU_{t}}{Kq} - qf_{t}
+$$
+
+This equation can be converted to a linear regrssion model:
+$$
+Y = b_{o} + b_{1}x_{1} + b_{2}x_{2}
+$$
+$r$,$q$,$K$ values can be obtained by solving the linear regression, and thus $mMSY$
+
+$$
+mMSY = rK/4
+$$
+$$
+mMSY_{r} = 0.75 * mMSY
+$$
+
+
+
+- $mMSY_{r}$ = Reference Maxium sustainable yield ($0.75*mMMSY$)
+
+- $C$ = total catch at time [$t$]
+
+- $\delta{C_{t}}$ = absolute difference between total landed biomass at time [$t$] and mMSY_{r}
+
+- $B$ = total biomass at time [$t$]
+
+- $r$ = natural growth rate
+
+- $K$ = carry capacity
+
+- $C$ = total landed biomass at time [$t$]
+
+- $q$ = catch coefficient
+
+- $U$ = fishing efforts at time [$t$]
 
 ## Food Provision: Mariculture
 Amount of sustainable farm-raised seafood compared to max sustainable
