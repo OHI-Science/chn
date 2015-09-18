@@ -506,9 +506,8 @@ CS = function(layers){
 
 
   ## status model calculations 现状
-  #  for each region, for each habitat, it's the (sum of extent*condition*contribution)/sum(extent)
   #  xCS = sum(ck           * Cc/Cr     * Ak) / At
-  #  xCS = sum(contribution * condition * extent_per_habitat) / total_extent_all_habitats
+  #      = sum(contribution * condition * extent_per_habitat) / total_extent_all_habitats
 
   xCS = rk %>%
     mutate(c_c_a = contribution * condition * extent) %>%  # 另加 calculate for each region, each habitat
@@ -547,12 +546,10 @@ CS = function(layers){
 
   # format to combine with other goals **variable must be called r.trend with the following formatting**
   r.trend = trendCS %>%
+    select(region_id,
+           score) %>%
     mutate(goal      = 'CS',
-           dimension = 'trend') %>%
-    select(goal,
-           dimension,
-           region_id,
-           score)
+           dimension = 'trend')
 
   # r.trend formatting
   #    region_id goal dimension     score
