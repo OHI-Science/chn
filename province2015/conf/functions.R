@@ -524,18 +524,10 @@ CS = function(layers){
   # format to combine with other goals **variable must be called r.status with the proper formatting**
   # 一定要取名：r.status (和r.trend)
     r.status = xCS %>%
+      select(region_id,
+             score)  %>%
     mutate(goal      = 'CS',
-           dimension = 'status') %>%
-    select(goal, # 选择,只选需要的竖行
-           dimension,
-           region_id,
-           score); head(r.status) #一定要是这个顺序
-
-  # r.status formatting
-  #   region_id goal dimension    score
-  #            1   CS    status 68.25393
-  #            2   CS    status 68.25393
-  #            3   CS    status 68.25393
+           dimension = 'status'); head(r.status)
 
 
   # trend calculations 趋势计算
@@ -715,9 +707,15 @@ LIV = function(layers){
           year,
           jobs_prov = value)
 
- wage = layers$data[['liv_wage']] %>%
-   select(rgn_id, wage = value, year); head(wage)
+ wage_urban = layers$data[['liv_wage_urban']] %>%
+   select(rgn_id,
+          year,
+          wage_urban = value)
 
+ wage_rural = layers$data[['liv_wage_rural']] %>%
+   select(rgn_id,
+          year,
+          wage_rural = value)
 
  #LIV status:
 
@@ -725,6 +723,7 @@ LIV = function(layers){
  # j = N *(x/sum(x)) = jobs_province * (jobs_industry / jobs_all_industries)
 
  jobs = jobs_industry %>%
+   filter(!is.na(year)) %>%
    group_by(year) %>%
    mutate(jobs_all_industry = sum(jobs_ind),
           industry_proportion = jobs_ind / jobs_all_industry) %>% #proportion of all industries that is one particular industry
@@ -744,31 +743,29 @@ LIV = function(layers){
 
  # jobs multiplier placeholders were added (original multipliers are found in Table S10 from Halpern et al 2012 SOM)
  # all set to be 1, so that it doesn't affect the results. To be updated in the future
- jobs_multiplier = c('mining' = 1,
-                      'tourism' = 1,
-                      'egineering_arch' = 1,
-                      'biomedicine' = 1,
-                      'chemical' = 1,
-                      'comm_transport' = 1,
-                      'electric' = 1,
-                      'fishing' = 1,
-                      'ship_building' = 1,
-                      'oil_gas' = 1,
-                      'seasalt' = 1)
+ jobs_multiplier = data.frame(
+   industry  = c('mining', 'tourism', 'egineering_arch', 'biomedicine', 'chemical', 'comm_transport', 'electric', 'fishing', 'ship_building', 'oil_gas', 'seasalt'),
+   multiplier =c(1,         1,         1,                 1,             1,          1,                1,          1,         1,               1,         1))
 
   jobs = jobs %>%
-  mutate(multiplier = jobs_multiplier[industry],
-         jobs_adj = jobs * multiplier)
+    left_join(jobs_multiplier, by = c('industry')) %>%
+    mutate(jobs_adj = jobs * multiplier) %>%
+    group_by(industry) %>%
+    mutate(jobs_ref = max(jobs_adj)) %>%    # find reference point for each industry, across all regions and all years (2007-2013)。 no info on
+                                            # on coasta line length and therefore couldn't calculate max quantity per unit coast line
+                                            # 每个行业的参考点为跨省跨年度的最大值 （2007-2013）
+                                            # 取总量最大值为参考点，没有海岸线长度资料，无法计算单位海岸线最大值。
+    ungroup
 
- # calculate jobs, wages scores, and then status of all years
+ # status: calculate jobs, wages scores, and status of all years
+  # Jobs score
   jobs_score = jobs %>%
-   group_by(industry) %>%
-   mutate(jobs_ref = max(jobs_adj)) %>% # find reference point for each industry, across all regions and all years (2007-2011)。 no info on
-                                        # on coasta line length and therefore couldn't calculate max quantity per unit coast line
-                                        # 取总量最大值为参考点，没有海岸线长度资料，无法计算单位海岸线最大值。
-   ungroup() %>%
    group_by(rgn_id, year) %>%
    summarize(jobs_score = sum(jobs_adj)/sum(jobs_ref)); head(jobs_score)
+
+  # Wage score
+ wage = left_join(wage_urban, wage_rural, by = c('rgn_id', 'year')) %>%
+    mutate(wage = (wage_urban + wage_rural)/2)
 
  wage_score = wage %>%
  mutate(wage_ref = max(wage), # reference point: max wage across all regions, all years; no info on
@@ -776,6 +773,7 @@ LIV = function(layers){
                               # 取总量最大值为参考点，没有海岸线长度资料，无法计算单位海岸线最大值。
         wage_score = wage/wage_ref)
 
+ # status all years
  xLIV_all_years = full_join(jobs_score, #calculate status scores for each year
                   select(wage_score, rgn_id, year, wage_score), by = c('rgn_id','year')) %>%
                   mutate(xLIV = (jobs_score + wage_score)/2*100 )
