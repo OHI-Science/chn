@@ -720,23 +720,22 @@ LIV = function(layers){
  #LIV status:
 
  # calcualte jobs in each industry in each province:
- # j = N *(x/sum(x)) = jobs_province * (jobs_industry / jobs_all_industries)
+ # j = N *(x/sum(x)) = jobs_industry * (jobs_province / jobs_all_provinces)
 
- jobs = jobs_industry %>%
-   filter(!is.na(year)) %>%
+ jobs = jobs_province %>%
    group_by(year) %>%
-   mutate(jobs_all_industry = sum(jobs_ind),
-          industry_proportion = jobs_ind / jobs_all_industry) %>% #proportion of all industries that is one particular industry
-   select(industry,
-          year,
-          industry_proportion) %>%
+   mutate(jobs_all_provinces = sum(jobs_prov),
+          proportion = jobs_prov/jobs_all_provinces) %>%
    ungroup %>%
-   full_join(jobs_province, by = 'year') %>% #join with jobs_province
-   mutate(jobs = jobs_prov * industry_proportion) %>% # number of employment in each industry, each province, each year
+   full_join(jobs_industry, by = 'year') %>%
+   mutate(jobs = jobs_ind * proportion) %>%
    select(rgn_id,
           year,
           industry,
-          jobs)
+          jobs) %>%
+   filter(!is.na(year))
+
+
 
  # calculate job and wage score. find reference points: "from model description: the maximum quantity in each category has been
  # used as the reference point".
