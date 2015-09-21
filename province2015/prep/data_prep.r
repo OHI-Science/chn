@@ -271,12 +271,14 @@ for (f_orig in lsp_file_list) {
 liv_file_list = c( # all data layers updated on 9/15/2015 on new data from CHN
                  "le_livjobindustry_chn2015_zb.csv",
                  "le_livjobprovince_chn2015_zb.csv",
-                 "LE_livwagetown_chn2015_zb.csv",
-                 "LE_livwagevillage_chn2015_zb.csv")
+                 "le_livwagetown_chn2015_zb.csv",
+                 "le_livwagevillage_chn2015_zb.csv")
 
 for (f_orig in liv_file_list){ #f_orig = "le_livjobindustry_chn2015_zb.csv"
   dir_f = file.path(dir_chn_prep, "6.1_LIV")
   d = read.csv(file.path(dir_raw, "6.1_LIV", f_orig)); head(d); summary(d)
+
+  d = d[, colSums(is.na(d)) !=nrow(d)] #remove NA columns
 
   if(f_orig == "le_livjobindustry_chn2015_zb.csv") {
     dn = d %>%
