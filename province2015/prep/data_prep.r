@@ -279,6 +279,8 @@ for (f_orig in liv_file_list){ #f_orig = "le_livjobindustry_chn2015_zb.csv"
   d = read.csv(file.path(dir_raw, "6.1_LIV", f_orig)); head(d); summary(d)
 
   d = d[, colSums(is.na(d)) !=nrow(d)] #remove NA columns
+  d = d[!is.na(d[1,]),] #remove NA rows
+
 
   if(f_orig == "le_livjobindustry_chn2015_zb.csv") {
     dn = d %>%
