@@ -3,7 +3,7 @@ output: html_document
 ---
 
 ## Food Provision: Fisheries
-Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [$mMSY_{R}]
+Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [$mMSY_{R}$]
 
 $$
 x_{FIS} =  (1 - \frac{\delta{C_{t}}}{mMSY_{R}})
