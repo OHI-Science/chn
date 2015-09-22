@@ -244,7 +244,7 @@ x_{ICO} = \frac{\sum_{i=1}^{N} S_{i} * w_{i}}{\sum_{i=1}^{N} S_{i}}
 
 <p>threat categories: IUCN</p>
 
-<h1>Sense of Place: Lasting Special Places</h1>
+<h2>Sense of Place: Lasting Special Places</h2>
 
 <p>Aesthetic connections to and cultural identity with a given region measured through the status of meaningful locations</p>
 
