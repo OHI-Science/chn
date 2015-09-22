@@ -506,20 +506,16 @@ CS = function(layers){
 
 
   ## status model calculations 现状
-  #  xCS = sum(ck           * Cc/Cr     * Ak) / At
-  #      = sum(contribution * condition * extent_per_habitat) / total_extent_all_habitats
+  #  xCS = sum(ck           * Cc/Cr     *                 Ak / At)
+  #      = sum(contribution * condition * extent_per_habitat / total_extent_all_habitats)
 
   xCS = rk %>%
-    mutate(c_c_a = contribution * condition * extent) %>%  # 另加 calculate for each region, each habitat
     group_by(region_id) %>%
-    summarize(sum_c_c_a  = sum(c_c_a),          # summarize will act based on group_by; aggregate for each region
-              total_extent = sum(extent)) %>%   # compare by substituting 'mutate' in place of 'summarize'; summarize
-                                                # gives one aggregated sum_c_c_a to each region, while mutate would simply add
-                                                # one new column and give one sum_c_c_a to each region and habitat
-                                                # 摘要，和另加相似，但会聚集一组数据，结果指给一个
-    ungroup() %>% #always a good practice to ungroup before next operation
-    mutate(xCS_calc = sum_c_c_a/total_extent,
-           score = pmin(1, xCS_calc) * 100); head(xCS) #score can't exceed 100
+    mutate(total_extent = sum(extent),
+           extent_ratio = extent/total_extent) %>%
+    summarize(xCS = sum(contribution * condition * extent_ratio),
+              score = pmax(-1, pmin(1, xCS))*100)
+
 
   # format to combine with other goals **variable must be called r.status with the proper formatting**
   # 一定要取名：r.status (和r.trend)
