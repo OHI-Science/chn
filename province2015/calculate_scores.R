@@ -25,5 +25,20 @@ scores = CalculateAll(conf, layers, debug=F)
 write.csv(scores, 'scores.csv', na='', row.names=F)
 
 
+# merge to published branch (to display on app)
+merge_branches = F
+
+if (merge_branches) {
+  # switch to draft branch and get latest
+  system('git checkout draft; git pull')
+
+  # merge published with the draft branch
+  system('git checkout published')
+  system('git merge draft')
+  system('git push origin published')
+
+  # switch to draft branch and get latest
+  system('git checkout draft; git pull')
+}
 
 

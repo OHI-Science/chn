@@ -109,7 +109,7 @@ FIS = function(layers){
 
 MAR = function(layers){
   # CHN model: Yc = sum(harvest * msi) / area
-  #        status = log10(Yc+1)
+  #        status = log10(Yc + 1)
 
   # cast data 取数据
   mar_msi = layers$data[['mar_smk']]
