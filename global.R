@@ -3,7 +3,7 @@
 suppressPackageStartupMessages({
   require(plyr)
   require(dplyr)
-  require(shiny) 
+  require(shiny)
   require(RJSONIO)
   require(RColorBrewer)
   require(rCharts)
