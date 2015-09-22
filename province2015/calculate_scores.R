@@ -25,7 +25,7 @@ scores = CalculateAll(conf, layers, debug=F)
 write.csv(scores, 'scores.csv', na='', row.names=F)
 
 
-# merge to published branch (to display on app)
+# merge to published branch (to display on app). Make sure all local work is committed.
 merge_branches = F
 
 if (merge_branches) {
