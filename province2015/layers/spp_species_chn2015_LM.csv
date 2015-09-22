@@ -1,5 +1,6 @@
 "rgn_id","sciname","CHN_class","IUCN_class","value"
-1,"Acipenser sinensis",1,"",0.46
+1,"Acipenser sinensis Gray
+",1,"",0.46
 1,"Pseudorca crassidens",2,"",0.17
 1,"Eumetopias jubatus ",2,"VU",0.4
 1,"Balaenoptera borealis",2,"EN",0.6
@@ -27,7 +28,7 @@
 2,"Cephalochordata",2,"",0.17
 2,"Delphinus delphis ",2,"LC",0
 2,"Chlidonias niger",2,"",0.17
-2,"Chlidonias niger",1,"",0.46
+2,"Ciconia nigra",1,"",0.46
 2,"Coelomactra antiquata",NA,"EN",0.6
 2,"Fenneropenaeus chinensis",NA,"EN",0.6
 2,"Nihonotrypaea harmandi ",NA,"EN",0.6
@@ -133,7 +134,9 @@
 7,"Physeter catodon Linnaeus",2,"",0.17
 7,"Lagenodelphis hosei",2,"VU",0.4
 7,"Hirundapus cochinchinensis ",2,"",0.17
-7,"Grampus griseus",NA,"LC",0
+7,"Grampus Griseus 
+ 
+",NA,"LC",0
 7,"Haliaeetus albicilla ",1,"",0.46
 7,"Ciconia ciconia ",1,"",0.46
 7,"Delphinus delphis ",2,"LC",0
@@ -145,13 +148,16 @@
 7,"Tachpleus tridentatus",NA,"EN",0.6
 7,"Panulirus stimposoni Holthuis",NA,"EN",0.6
 7,"Hemicentrotus pulcherrimus ",NA,"EN",0.6
-7,"Anthocidaris crassispina",NA,"EN",0.6
+7,"Anthocidaris crassispina 
+",NA,"EN",0.6
 7,"Hydrolagus tsengi",NA,"EN",0.6
 8,"Tursiops aduncus ",2,"",0.17
 8,"Sousa chinensis",1,"",0.46
 8,"Acipenser sinensis",1,"",0.46
 8,"Pseudorca crassidens",2,"",0.17
-8,"Dugong dugon",1,"",0.46
+8,"Dugong dugon 
+ 
+",1,"",0.46
 8,"Hippocampus kelloggi ",2,"",0.17
 8,"Hemiprocne coronata ",2,"",0.17
 8,"Lagenorhynchus obliquidens ",2,"LC",0
@@ -164,7 +170,8 @@
 8,"Ziphius cavirostris",2,"",0.17
 8,"Dermochelys coriacea ",2,"",0.17
 8,"Phalacrocorax pelagicus",2,"",0.17
-8,"Stenella frontalis",2,"",0.17
+8,"Stenella frontalis
+",2,"",0.17
 8,"Haliaeetus albicilla ",1,"",0.46
 8,"Platalea leucorodia",2,"",0.17
 8,"Ciconia ciconia ",1,"",0.46
@@ -183,7 +190,9 @@
 8,"Fenneropenaeus merguiensis",NA,"EN",0.6
 8,"Fenneropenaeus penicillatus ",NA,"EN",0.6
 8,"Metapenaeus joyneri",NA,"EN",0.6
-8,"Panulirus japonicus ",NA,"EN",0.6
+8,"Panulirus japonicus 
+ 
+",NA,"EN",0.6
 8,"Panulirus stimposoni Holthuis",NA,"EN",0.6
 8,"Philyra sagittifera ",NA,"EN",0.6
 8,"Leucosia sinica",NA,"EN",0.6
@@ -194,7 +203,9 @@
 8,"Colochirus anceps ",NA,"EN",0.6
 8,"Colochirus quadrangularis ",NA,"EN",0.6
 8,"Hemicentrotus pulcherrimus ",NA,"EN",0.6
-8,"Anthocidaris crassispina",NA,"EN",0.6
+8,"Anthocidaris crassispina 
+ 
+",NA,"EN",0.6
 8,"Branchiostoma belcheri Gray",NA,"EN",0.6
 9,"Sousa chinensis",1,"",0.46
 9,"Pseudorca crassidens",2,"",0.17
@@ -217,9 +228,11 @@
 9,"Thalasseus bernsteini ",2,"CR",0.8
 9,"Tachpleus tridentatus",NA,"EN",0.6
 9,"Turbinaria crater ",NA,"EN",0.6
-9,"Acropora cytherea",NA,"EN",0.6
+9,"Acropora cytherea 
+ 
+",NA,"EN",0.6
 9,"Pavona decussata ",NA,"EN",0.6
-9,"Pavona frondifera Lamarck",NA,"EN",0.6
+9,"",NA,"EN",0.6
 9,"Echinophyllia aspera ",NA,"EN",0.6
 9,"Oliva oliva",NA,"EN",0.6
 9,"Atrina vexillum ",NA,"EN",0.6
@@ -227,7 +240,9 @@
 9,"Fenneropenaeus penicillatus ",NA,"EN",0.6
 9,"Coelomactra antiquata",NA,"EN",0.6
 9,"Metapenaeus joyneri",NA,"EN",0.6
-9,"Panulirus japonicus",NA,"EN",0.6
+9,"Panulirus japonicus 
+ 
+",NA,"EN",0.6
 9,"Panulirus stimposoni Holthuis",NA,"EN",0.6
 9,"Philyra tuberculosa ",NA,"EN",0.6
 9,"Elamera longidactylis Yang & Sun",NA,"EN",0.6
@@ -251,7 +266,9 @@
 9,"Mensamaria intercedens ",NA,"EN",0.6
 9,"Colochirus anceps ",NA,"EN",0.6
 9,"Colochirus quadrangularis ",NA,"EN",0.6
-9,"Anthocidaris crassispina",NA,"EN",0.6
+9,"Anthocidaris crassispina 
+ 
+",NA,"EN",0.6
 9,"Branchiostoma belcheri Gray",NA,"EN",0.6
 10,"Sousa chinensis",1,"",0.46
 10,"Pseudorca crassidens",2,"",0.17
@@ -267,7 +284,6 @@
 10,"Ciconia ciconia ",1,"",0.46
 10,"Steno bredanensis ",2,"",0.17
 10,"Ichthyaetus relictus",1,"VU",0.4
-10,"Stenella longirostris ",2,"",0.17
 10,"Stenella longirostris ",2,"DD",0.17
 10,"Chlidonias niger",1,"",0.46
 10,"Tachpleus tridentatus",NA,"EN",0.6
@@ -297,7 +313,9 @@
 10,"Mensamaria intercedens ",NA,"EN",0.6
 10,"Colochirus anceps ",NA,"EN",0.6
 10,"Colochirus quadrangularis ",NA,"EN",0.6
-10,"Anthocidaris crassispina",NA,"EN",0.6
+10,"Anthocidaris crassispina 
+ 
+",NA,"EN",0.6
 11,"Pseudorca crassidens",2,"",0.17
 11,"Hippocampus kelloggi",2,"",0.17
 11,"Cassis cornuta ",2,"",0.17
@@ -321,7 +339,9 @@
 11,"Tachpleus tridentatus",NA,"EN",0.6
 11,"Turbinaria crater ",NA,"EN",0.6
 11,"Acropora cerealis ",NA,"EN",0.6
-11,"Acropora cytherea",NA,"EN",0.6
+11,"Acropora cytherea 
+ 
+",NA,"EN",0.6
 11,"Acropora florida ",NA,"EN",0.6
 11,"Acropora formosa ",NA,"EN",0.6
 11,"Acropora hyacinthus ",NA,"EN",0.6
@@ -420,7 +440,9 @@
 11,"Asteropsis carinifera ",NA,"EN",0.6
 11,"Stomopneustes variolaris ",NA,"EN",0.6
 11,"Tripneustes gratilla ",NA,"EN",0.6
-11,"Anthocidaris crassispina",NA,"EN",0.6
+11,"Anthocidaris crassispina 
+ 
+",NA,"EN",0.6
 11,"Heterocentrotus mammillatus ",NA,"EN",0.6
 11,"Eucidaris metularia ",NA,"EN",0.6
 11,"Branchiostoma belcheri Gray",NA,"EN",0.6

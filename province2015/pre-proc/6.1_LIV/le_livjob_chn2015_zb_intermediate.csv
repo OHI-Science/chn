@@ -1,0 +1,606 @@
+province,datalayer,value,year
+TJ,beach placer industry,762 ,2007
+TJ,beach placer industry,762 ,2008
+TJ,beach placer industry,812 ,2009
+TJ,beach placer industry,813 ,2010
+TJ,beach placer industry,812 ,2011
+HB,beach placer industry,415 ,2007
+HB,beach placer industry,415 ,2008
+HB,beach placer industry,443 ,2009
+HB,beach placer industry,443 ,2010
+HB,beach placer industry,443 ,2011
+LN,beach placer industry,1403 ,2007
+LN,beach placer industry,1403 ,2008
+LN,beach placer industry,1497 ,2009
+LN,beach placer industry,1496 ,2010
+LN,beach placer industry,1496 ,2011
+SD,beach placer industry,2290 ,2007
+SD,beach placer industry,2290 ,2008
+SD,beach placer industry,2442 ,2009
+SD,beach placer industry,2442 ,2010
+SD,beach placer industry,2443 ,2011
+SH,beach placer industry,912 ,2007
+SH,beach placer industry,913 ,2008
+SH,beach placer industry,974 ,2009
+SH,beach placer industry,973 ,2010
+SH,beach placer industry,973 ,2011
+JS,beach placer industry,837 ,2007
+JS,beach placer industry,837 ,2008
+JS,beach placer industry,892 ,2009
+JS,beach placer industry,893 ,2010
+JS,beach placer industry,893 ,2011
+ZJ,beach placer industry,1835 ,2007
+ZJ,beach placer industry,1835 ,2008
+ZJ,beach placer industry,1958 ,2009
+ZJ,beach placer industry,1957 ,2010
+ZJ,beach placer industry,1958 ,2011
+FJ,beach placer industry,1859 ,2007
+FJ,beach placer industry,1859 ,2008
+FJ,beach placer industry,1983 ,2009
+FJ,beach placer industry,1983 ,2010
+FJ,beach placer industry,1983 ,2011
+GD,beach placer industry,3617 ,2007
+GD,beach placer industry,3617 ,2008
+GD,beach placer industry,3858 ,2009
+GD,beach placer industry,3858 ,2010
+GD,beach placer industry,3858 ,2011
+GX,beach placer industry,493 ,2007
+GX,beach placer industry,493 ,2008
+GX,beach placer industry,526 ,2009
+GX,beach placer industry,526 ,2010
+GX,beach placer industry,526 ,2011
+HN,beach placer industry,577 ,2007
+HN,beach placer industry,577 ,2008
+HN,beach placer industry,615 ,2009
+HN,beach placer industry,615 ,2010
+HN,beach placer industry,616 ,2011
+TJ,coastal tourism,59460 ,2007
+TJ,coastal tourism,60684 ,2008
+TJ,coastal tourism,61633 ,2009
+TJ,coastal tourism,63176 ,2010
+TJ,coastal tourism,64518 ,2011
+HB,coastal tourism,32402 ,2007
+HB,coastal tourism,33087 ,2008
+HB,coastal tourism,33598 ,2009
+HB,coastal tourism,34426 ,2010
+HB,coastal tourism,35191 ,2011
+LN,coastal tourism,109539 ,2007
+LN,coastal tourism,111770 ,2008
+LN,coastal tourism,113561 ,2009
+LN,coastal tourism,116346 ,2010
+LN,coastal tourism,118874 ,2011
+SD,coastal tourism,178754 ,2007
+SD,coastal tourism,182424 ,2008
+SD,coastal tourism,185310 ,2009
+SD,coastal tourism,189903 ,2010
+SD,coastal tourism,194038 ,2011
+SH,coastal tourism,71232 ,2007
+SH,coastal tourism,72708 ,2008
+SH,coastal tourism,73878 ,2009
+SH,coastal tourism,75685 ,2010
+SH,coastal tourism,77331 ,2011
+JS,coastal tourism,65328 ,2007
+JS,coastal tourism,66659 ,2008
+JS,coastal tourism,67718 ,2009
+JS,coastal tourism,69412 ,2010
+JS,coastal tourism,70906 ,2011
+ZJ,coastal tourism,143287 ,2007
+ZJ,coastal tourism,146201 ,2008
+ZJ,coastal tourism,148540 ,2009
+ZJ,coastal tourism,152191 ,2010
+ZJ,coastal tourism,155522 ,2011
+FJ,coastal tourism,145118 ,2007
+FJ,coastal tourism,148105 ,2008
+FJ,coastal tourism,150443 ,2009
+FJ,coastal tourism,154170 ,2010
+FJ,coastal tourism,157502 ,2011
+GD,coastal tourism,282351 ,2007
+GD,coastal tourism,288144 ,2008
+GD,coastal tourism,292711 ,2009
+GD,coastal tourism,299976 ,2010
+GD,coastal tourism,306487 ,2011
+GX,coastal tourism,38494 ,2007
+GX,coastal tourism,39286 ,2008
+GX,coastal tourism,39907 ,2009
+GX,coastal tourism,40885 ,2010
+GX,coastal tourism,41804 ,2011
+HN,coastal tourism,45034 ,2007
+HN,coastal tourism,45970 ,2008
+HN,coastal tourism,46701 ,2009
+HN,coastal tourism,47830 ,2010
+HN,coastal tourism,48902 ,2011
+TJ,marein engineering architecture,29451 ,2007
+TJ,marein engineering architecture,30063 ,2008
+TJ,marein engineering architecture,30563 ,2009
+TJ,marein engineering architecture,31283 ,2010
+TJ,marein engineering architecture,31980 ,2011
+HB,marein engineering architecture,16049 ,2007
+HB,marein engineering architecture,16391 ,2008
+HB,marein engineering architecture,16661 ,2009
+HB,marein engineering architecture,17047 ,2010
+HB,marein engineering architecture,17443 ,2011
+LN,marein engineering architecture,54255 ,2007
+LN,marein engineering architecture,55371 ,2008
+LN,marein engineering architecture,56313 ,2009
+LN,marein engineering architecture,57612 ,2010
+LN,marein engineering architecture,58922 ,2011
+SD,marein engineering architecture,88537 ,2007
+SD,marein engineering architecture,90373 ,2008
+SD,marein engineering architecture,91892 ,2009
+SD,marein engineering architecture,94035 ,2010
+SD,marein engineering architecture,96180 ,2011
+SH,marein engineering architecture,35282 ,2007
+SH,marein engineering architecture,36020 ,2008
+SH,marein engineering architecture,36635 ,2009
+SH,marein engineering architecture,37477 ,2010
+SH,marein engineering architecture,38331 ,2011
+JS,marein engineering architecture,32357 ,2007
+JS,marein engineering architecture,33023 ,2008
+JS,marein engineering architecture,33580 ,2009
+JS,marein engineering architecture,34371 ,2010
+JS,marein engineering architecture,35146 ,2011
+ZJ,marein engineering architecture,70971 ,2007
+ZJ,marein engineering architecture,72428 ,2008
+ZJ,marein engineering architecture,73658 ,2009
+ZJ,marein engineering architecture,75361 ,2010
+ZJ,marein engineering architecture,77088 ,2011
+FJ,marein engineering architecture,71878 ,2007
+FJ,marein engineering architecture,73371 ,2008
+FJ,marein engineering architecture,74602 ,2009
+FJ,marein engineering architecture,76341 ,2010
+FJ,marein engineering architecture,78069 ,2011
+GD,marein engineering architecture,139849 ,2007
+GD,marein engineering architecture,142746 ,2008
+GD,marein engineering architecture,145150 ,2009
+GD,marein engineering architecture,148541 ,2010
+GD,marein engineering architecture,151917 ,2011
+GX,marein engineering architecture,19066 ,2007
+GX,marein engineering architecture,19462 ,2008
+GX,marein engineering architecture,19789 ,2009
+GX,marein engineering architecture,20246 ,2010
+GX,marein engineering architecture,20721 ,2011
+HN,marein engineering architecture,22306 ,2007
+HN,marein engineering architecture,22774 ,2008
+HN,marein engineering architecture,23158 ,2009
+HN,marein engineering architecture,23684 ,2010
+HN,marein engineering architecture,24239 ,2011
+TJ,marine biomedicine,457 ,2007
+TJ,marine biomedicine,457 ,2008
+TJ,marine biomedicine,457 ,2009
+TJ,marine biomedicine,508 ,2010
+TJ,marine biomedicine,508 ,2011
+HB,marine biomedicine,249 ,2007
+HB,marine biomedicine,249 ,2008
+HB,marine biomedicine,249 ,2009
+HB,marine biomedicine,277 ,2010
+HB,marine biomedicine,277 ,2011
+LN,marine biomedicine,842 ,2007
+LN,marine biomedicine,842 ,2008
+LN,marine biomedicine,842 ,2009
+LN,marine biomedicine,935 ,2010
+LN,marine biomedicine,935 ,2011
+SD,marine biomedicine,1374 ,2007
+SD,marine biomedicine,1374 ,2008
+SD,marine biomedicine,1374 ,2009
+SD,marine biomedicine,1527 ,2010
+SD,marine biomedicine,1527 ,2011
+SH,marine biomedicine,547 ,2007
+SH,marine biomedicine,548 ,2008
+SH,marine biomedicine,548 ,2009
+SH,marine biomedicine,608 ,2010
+SH,marine biomedicine,608 ,2011
+JS,marine biomedicine,502 ,2007
+JS,marine biomedicine,502 ,2008
+JS,marine biomedicine,502 ,2009
+JS,marine biomedicine,558 ,2010
+JS,marine biomedicine,558 ,2011
+ZJ,marine biomedicine,1101 ,2007
+ZJ,marine biomedicine,1101 ,2008
+ZJ,marine biomedicine,1101 ,2009
+ZJ,marine biomedicine,1223 ,2010
+ZJ,marine biomedicine,1224 ,2011
+FJ,marine biomedicine,1115 ,2007
+FJ,marine biomedicine,1115 ,2008
+FJ,marine biomedicine,1115 ,2009
+FJ,marine biomedicine,1239 ,2010
+FJ,marine biomedicine,1239 ,2011
+GD,marine biomedicine,2170 ,2007
+GD,marine biomedicine,2170 ,2008
+GD,marine biomedicine,2170 ,2009
+GD,marine biomedicine,2411 ,2010
+GD,marine biomedicine,2411 ,2011
+GX,marine biomedicine,296 ,2007
+GX,marine biomedicine,296 ,2008
+GX,marine biomedicine,296 ,2009
+GX,marine biomedicine,329 ,2010
+GX,marine biomedicine,329 ,2011
+HN,marine biomedicine,346 ,2007
+HN,marine biomedicine,346 ,2008
+HN,marine biomedicine,346 ,2009
+HN,marine biomedicine,384 ,2010
+HN,marine biomedicine,385 ,2011
+TJ,marine chemical industry,12237 ,2007
+TJ,marine chemical industry,12492 ,2008
+TJ,marine chemical industry,12692 ,2009
+TJ,marine chemical industry,13001 ,2010
+TJ,marine chemical industry,13249 ,2011
+HB,marine chemical industry,6669 ,2007
+HB,marine chemical industry,6811 ,2008
+HB,marine chemical industry,6919 ,2009
+HB,marine chemical industry,7084 ,2010
+HB,marine chemical industry,7227 ,2011
+LN,marine chemical industry,22544 ,2007
+LN,marine chemical industry,23009 ,2008
+LN,marine chemical industry,23386 ,2009
+LN,marine chemical industry,23943 ,2010
+LN,marine chemical industry,24411 ,2011
+SD,marine chemical industry,36789 ,2007
+SD,marine chemical industry,37553 ,2008
+SD,marine chemical industry,38161 ,2009
+SD,marine chemical industry,39080 ,2010
+SD,marine chemical industry,39846 ,2011
+SH,marine chemical industry,14660 ,2007
+SH,marine chemical industry,14968 ,2008
+SH,marine chemical industry,15214 ,2009
+SH,marine chemical industry,15575 ,2010
+SH,marine chemical industry,15880 ,2011
+JS,marine chemical industry,13445 ,2007
+JS,marine chemical industry,13722 ,2008
+JS,marine chemical industry,13945 ,2009
+JS,marine chemical industry,14284 ,2010
+JS,marine chemical industry,14561 ,2011
+ZJ,marine chemical industry,29489 ,2007
+ZJ,marine chemical industry,30097 ,2008
+ZJ,marine chemical industry,30589 ,2009
+ZJ,marine chemical industry,31319 ,2010
+ZJ,marine chemical industry,31936 ,2011
+FJ,marine chemical industry,29866 ,2007
+FJ,marine chemical industry,30489 ,2008
+FJ,marine chemical industry,30981 ,2009
+FJ,marine chemical industry,31726 ,2010
+FJ,marine chemical industry,32343 ,2011
+GD,marine chemical industry,58110 ,2007
+GD,marine chemical industry,59317 ,2008
+GD,marine chemical industry,60278 ,2009
+GD,marine chemical industry,61731 ,2010
+GD,marine chemical industry,62937 ,2011
+GX,marine chemical industry,7922 ,2007
+GX,marine chemical industry,8087 ,2008
+GX,marine chemical industry,8218 ,2009
+GX,marine chemical industry,8414 ,2010
+GX,marine chemical industry,8584 ,2011
+HN,marine chemical industry,9268 ,2007
+HN,marine chemical industry,9463 ,2008
+HN,marine chemical industry,9617 ,2009
+HN,marine chemical industry,9843 ,2010
+HN,marine chemical industry,10042 ,2011
+TJ,marine communication and trasportation industry,38591 ,2007
+TJ,marine communication and trasportation industry,39355 ,2008
+TJ,marine communication and trasportation industry,40006 ,2009
+TJ,marine communication and trasportation industry,40983 ,2010
+TJ,marine communication and trasportation industry,41878 ,2011
+HB,marine communication and trasportation industry,21030 ,2007
+HB,marine communication and trasportation industry,21458 ,2008
+HB,marine communication and trasportation industry,21808 ,2009
+HB,marine communication and trasportation industry,22333 ,2010
+HB,marine communication and trasportation industry,22843 ,2011
+LN,marine communication and trasportation industry,71093 ,2007
+LN,marine communication and trasportation industry,72487 ,2008
+LN,marine communication and trasportation industry,73711 ,2009
+LN,marine communication and trasportation industry,75475 ,2010
+LN,marine communication and trasportation industry,77160 ,2011
+SD,marine communication and trasportation industry,116014 ,2007
+SD,marine communication and trasportation industry,118309 ,2008
+SD,marine communication and trasportation industry,120284 ,2009
+SD,marine communication and trasportation industry,123192 ,2010
+SD,marine communication and trasportation industry,125949 ,2011
+SH,marine communication and trasportation industry,46231 ,2007
+SH,marine communication and trasportation industry,47154 ,2008
+SH,marine communication and trasportation industry,47954 ,2009
+SH,marine communication and trasportation industry,49098 ,2010
+SH,marine communication and trasportation industry,50195 ,2011
+JS,marine communication and trasportation industry,42399 ,2007
+JS,marine communication and trasportation industry,43230 ,2008
+JS,marine communication and trasportation industry,43955 ,2009
+JS,marine communication and trasportation industry,45028 ,2010
+JS,marine communication and trasportation industry,46025 ,2011
+ZJ,marine communication and trasportation industry,92996 ,2007
+ZJ,marine communication and trasportation industry,94816 ,2008
+ZJ,marine communication and trasportation industry,96416 ,2009
+ZJ,marine communication and trasportation industry,98728 ,2010
+ZJ,marine communication and trasportation industry,100949 ,2011
+FJ,marine communication and trasportation industry,94184 ,2007
+FJ,marine communication and trasportation industry,96052 ,2008
+FJ,marine communication and trasportation industry,97652 ,2009
+FJ,marine communication and trasportation industry,100012 ,2010
+FJ,marine communication and trasportation industry,102234 ,2011
+GD,marine communication and trasportation industry,183251 ,2007
+GD,marine communication and trasportation industry,186872 ,2008
+GD,marine communication and trasportation industry,189997 ,2009
+GD,marine communication and trasportation industry,194598 ,2010
+GD,marine communication and trasportation industry,198939 ,2011
+GX,marine communication and trasportation industry,24983 ,2007
+GX,marine communication and trasportation industry,25478 ,2008
+GX,marine communication and trasportation industry,25903 ,2009
+GX,marine communication and trasportation industry,26523 ,2010
+GX,marine communication and trasportation industry,27135 ,2011
+HN,marine communication and trasportation industry,29228 ,2007
+HN,marine communication and trasportation industry,29813 ,2008
+HN,marine communication and trasportation industry,30313 ,2009
+HN,marine communication and trasportation industry,31028 ,2010
+HN,marine communication and trasportation industry,31742 ,2011
+TJ,maren electric power and seawater utilization industry,508 ,2007
+TJ,maren electric power and seawater utilization industry,559 ,2008
+TJ,maren electric power and seawater utilization industry,558 ,2009
+TJ,maren electric power and seawater utilization industry,559 ,2010
+TJ,maren electric power and seawater utilization industry,558 ,2011
+HB,maren electric power and seawater utilization industry,277 ,2007
+HB,maren electric power and seawater utilization industry,305 ,2008
+HB,maren electric power and seawater utilization industry,304 ,2009
+HB,maren electric power and seawater utilization industry,304 ,2010
+HB,maren electric power and seawater utilization industry,305 ,2011
+LN,maren electric power and seawater utilization industry,935 ,2007
+LN,maren electric power and seawater utilization industry,1029 ,2008
+LN,maren electric power and seawater utilization industry,1029 ,2009
+LN,maren electric power and seawater utilization industry,1029 ,2010
+LN,maren electric power and seawater utilization industry,1029 ,2011
+SD,maren electric power and seawater utilization industry,1527 ,2007
+SD,maren electric power and seawater utilization industry,1679 ,2008
+SD,maren electric power and seawater utilization industry,1679 ,2009
+SD,maren electric power and seawater utilization industry,1679 ,2010
+SD,maren electric power and seawater utilization industry,1679 ,2011
+SH,maren electric power and seawater utilization industry,608 ,2007
+SH,maren electric power and seawater utilization industry,669 ,2008
+SH,maren electric power and seawater utilization industry,669 ,2009
+SH,maren electric power and seawater utilization industry,669 ,2010
+SH,maren electric power and seawater utilization industry,669 ,2011
+JS,maren electric power and seawater utilization industry,558 ,2007
+JS,maren electric power and seawater utilization industry,614 ,2008
+JS,maren electric power and seawater utilization industry,614 ,2009
+JS,maren electric power and seawater utilization industry,614 ,2010
+JS,maren electric power and seawater utilization industry,614 ,2011
+ZJ,maren electric power and seawater utilization industry,1224 ,2007
+ZJ,maren electric power and seawater utilization industry,1346 ,2008
+ZJ,maren electric power and seawater utilization industry,1346 ,2009
+ZJ,maren electric power and seawater utilization industry,1346 ,2010
+ZJ,maren electric power and seawater utilization industry,1346 ,2011
+FJ,maren electric power and seawater utilization industry,1239 ,2007
+FJ,maren electric power and seawater utilization industry,1363 ,2008
+FJ,maren electric power and seawater utilization industry,1363 ,2009
+FJ,maren electric power and seawater utilization industry,1363 ,2010
+FJ,maren electric power and seawater utilization industry,1363 ,2011
+GD,maren electric power and seawater utilization industry,2411 ,2007
+GD,maren electric power and seawater utilization industry,2652 ,2008
+GD,maren electric power and seawater utilization industry,2652 ,2009
+GD,maren electric power and seawater utilization industry,2653 ,2010
+GD,maren electric power and seawater utilization industry,2653 ,2011
+GX,maren electric power and seawater utilization industry,329 ,2007
+GX,maren electric power and seawater utilization industry,362 ,2008
+GX,maren electric power and seawater utilization industry,362 ,2009
+GX,maren electric power and seawater utilization industry,362 ,2010
+GX,maren electric power and seawater utilization industry,362 ,2011
+HN,maren electric power and seawater utilization industry,385 ,2007
+HN,maren electric power and seawater utilization industry,423 ,2008
+HN,maren electric power and seawater utilization industry,423 ,2009
+HN,maren electric power and seawater utilization industry,423 ,2010
+HN,maren electric power and seawater utilization industry,423 ,2011
+TJ,marine fishery and the related industries,264447 ,2007
+TJ,marine fishery and the related industries,269801 ,2008
+TJ,marine fishery and the related industries,274151 ,2009
+TJ,marine fishery and the related industries,280942 ,2010
+TJ,marine fishery and the related industries,287055 ,2011
+HB,marine fishery and the related industries,144108 ,2007
+HB,marine fishery and the related industries,147104 ,2008
+HB,marine fishery and the related industries,149446 ,2009
+HB,marine fishery and the related industries,153090 ,2010
+HB,marine fishery and the related industries,156575 ,2011
+LN,marine fishery and the related industries,487175 ,2007
+LN,marine fishery and the related industries,496932 ,2008
+LN,marine fishery and the related industries,505129 ,2009
+LN,marine fishery and the related industries,517385 ,2010
+LN,marine fishery and the related industries,528899 ,2011
+SD,marine fishery and the related industries,795004 ,2007
+SD,marine fishery and the related industries,811063 ,2008
+SD,marine fishery and the related industries,824280 ,2009
+SD,marine fishery and the related industries,844486 ,2010
+SD,marine fishery and the related industries,863326 ,2011
+SH,marine fishery and the related industries,316805 ,2007
+SH,marine fishery and the related industries,323263 ,2008
+SH,marine fishery and the related industries,328616 ,2009
+SH,marine fishery and the related industries,336566 ,2010
+SH,marine fishery and the related industries,344067 ,2011
+JS,marine fishery and the related industries,290543 ,2007
+JS,marine fishery and the related industries,296366 ,2008
+JS,marine fishery and the related industries,301218 ,2009
+JS,marine fishery and the related industries,308671 ,2010
+JS,marine fishery and the related industries,315478 ,2011
+ZJ,marine fishery and the related industries,637267 ,2007
+ZJ,marine fishery and the related industries,650012 ,2008
+ZJ,marine fishery and the related industries,660720 ,2009
+ZJ,marine fishery and the related industries,676785 ,2010
+ZJ,marine fishery and the related industries,691957 ,2011
+FJ,marine fishery and the related industries,645411 ,2007
+FJ,marine fishery and the related industries,658480 ,2008
+FJ,marine fishery and the related industries,669188 ,2009
+FJ,marine fishery and the related industries,685585 ,2010
+FJ,marine fishery and the related industries,700767 ,2011
+GD,marine fishery and the related industries,1255751 ,2007
+GD,marine fishery and the related industries,1281097 ,2008
+GD,marine fishery and the related industries,1302011 ,2009
+GD,marine fishery and the related industries,1333976 ,2010
+GD,marine fishery and the related industries,1363636 ,2011
+GX,marine fishery and the related industries,171201 ,2007
+GX,marine fishery and the related industries,174665 ,2008
+GX,marine fishery and the related industries,177509 ,2009
+GX,marine fishery and the related industries,181815 ,2010
+GX,marine fishery and the related industries,185996 ,2011
+HN,marine fishery and the related industries,200289 ,2007
+HN,marine fishery and the related industries,204384 ,2008
+HN,marine fishery and the related industries,207731 ,2009
+HN,marine fishery and the related industries,212699 ,2010
+HN,marine fishery and the related industries,217577 ,2011
+TJ,marine shipbuilting industry,15639 ,2007
+TJ,marine shipbuilting industry,15945 ,2008
+TJ,marine shipbuilting industry,16195 ,2009
+TJ,marine shipbuilting industry,16607 ,2010
+TJ,marine shipbuilting industry,16954 ,2011
+HB,marine shipbuilting industry,8523 ,2007
+HB,marine shipbuilting industry,8694 ,2008
+HB,marine shipbuilting industry,8828 ,2009
+HB,marine shipbuilting industry,9049 ,2010
+HB,marine shipbuilting industry,9248 ,2011
+LN,marine shipbuilting industry,28811 ,2007
+LN,marine shipbuilting industry,29369 ,2008
+LN,marine shipbuilting industry,29840 ,2009
+LN,marine shipbuilting industry,30583 ,2010
+LN,marine shipbuilting industry,31238 ,2011
+SD,marine shipbuilting industry,47016 ,2007
+SD,marine shipbuilting industry,47934 ,2008
+SD,marine shipbuilting industry,48694 ,2009
+SD,marine shipbuilting industry,49918 ,2010
+SD,marine shipbuilting industry,50990 ,2011
+SH,marine shipbuilting industry,18736 ,2007
+SH,marine shipbuilting industry,19105 ,2008
+SH,marine shipbuilting industry,19413 ,2009
+SH,marine shipbuilting industry,19895 ,2010
+SH,marine shipbuilting industry,20322 ,2011
+JS,marine shipbuilting industry,17183 ,2007
+JS,marine shipbuilting industry,17515 ,2008
+JS,marine shipbuilting industry,17794 ,2009
+JS,marine shipbuilting industry,18246 ,2010
+JS,marine shipbuilting industry,18633 ,2011
+ZJ,marine shipbuilting industry,37688 ,2007
+ZJ,marine shipbuilting industry,38416 ,2008
+ZJ,marine shipbuilting industry,39031 ,2009
+ZJ,marine shipbuilting industry,40005 ,2010
+ZJ,marine shipbuilting industry,40869 ,2011
+FJ,marine shipbuilting industry,38169 ,2007
+FJ,marine shipbuilting industry,38916 ,2008
+FJ,marine shipbuilting industry,39532 ,2009
+FJ,marine shipbuilting industry,40525 ,2010
+FJ,marine shipbuilting industry,41389 ,2011
+GD,marine shipbuilting industry,74265 ,2007
+GD,marine shipbuilting industry,75713 ,2008
+GD,marine shipbuilting industry,76915 ,2009
+GD,marine shipbuilting industry,78852 ,2010
+GD,marine shipbuilting industry,80540 ,2011
+GX,marine shipbuilting industry,10125 ,2007
+GX,marine shipbuilting industry,10323 ,2008
+GX,marine shipbuilting industry,10486 ,2009
+GX,marine shipbuilting industry,10747 ,2010
+GX,marine shipbuilting industry,10985 ,2011
+HN,marine shipbuilting industry,11845 ,2007
+HN,marine shipbuilting industry,12079 ,2008
+HN,marine shipbuilting industry,12271 ,2009
+HN,marine shipbuilting industry,12573 ,2010
+HN,marine shipbuilting industry,12851 ,2011
+TJ,offshore oil and natural gas industry,9394 ,2007
+TJ,offshore oil and natural gas industry,9598 ,2008
+TJ,offshore oil and natural gas industry,9748 ,2009
+TJ,offshore oil and natural gas industry,10025 ,2010
+TJ,offshore oil and natural gas industry,10203 ,2011
+HB,offshore oil and natural gas industry,5119 ,2007
+HB,offshore oil and natural gas industry,5233 ,2008
+HB,offshore oil and natural gas industry,5314 ,2009
+HB,offshore oil and natural gas industry,5463 ,2010
+HB,offshore oil and natural gas industry,5565 ,2011
+LN,offshore oil and natural gas industry,17306 ,2007
+LN,offshore oil and natural gas industry,17677 ,2008
+LN,offshore oil and natural gas industry,17960 ,2009
+LN,offshore oil and natural gas industry,18462 ,2010
+LN,offshore oil and natural gas industry,18799 ,2011
+SD,offshore oil and natural gas industry,28240 ,2007
+SD,offshore oil and natural gas industry,28852 ,2008
+SD,offshore oil and natural gas industry,29308 ,2009
+SD,offshore oil and natural gas industry,30134 ,2010
+SD,offshore oil and natural gas industry,30686 ,2011
+SH,offshore oil and natural gas industry,11254 ,2007
+SH,offshore oil and natural gas industry,11499 ,2008
+SH,offshore oil and natural gas industry,11684 ,2009
+SH,offshore oil and natural gas industry,12010 ,2010
+SH,offshore oil and natural gas industry,12229 ,2011
+JS,offshore oil and natural gas industry,10321 ,2007
+JS,offshore oil and natural gas industry,10543 ,2008
+JS,offshore oil and natural gas industry,10710 ,2009
+JS,offshore oil and natural gas industry,11014 ,2010
+JS,offshore oil and natural gas industry,11213 ,2011
+ZJ,offshore oil and natural gas industry,22637 ,2007
+ZJ,offshore oil and natural gas industry,23123 ,2008
+ZJ,offshore oil and natural gas industry,23492 ,2009
+ZJ,offshore oil and natural gas industry,24150 ,2010
+ZJ,offshore oil and natural gas industry,24595 ,2011
+FJ,offshore oil and natural gas industry,22926 ,2007
+FJ,offshore oil and natural gas industry,23424 ,2008
+FJ,offshore oil and natural gas industry,23793 ,2009
+FJ,offshore oil and natural gas industry,24464 ,2010
+FJ,offshore oil and natural gas industry,24908 ,2011
+GD,offshore oil and natural gas industry,44607 ,2007
+GD,offshore oil and natural gas industry,45573 ,2008
+GD,offshore oil and natural gas industry,46294 ,2009
+GD,offshore oil and natural gas industry,47601 ,2010
+GD,offshore oil and natural gas industry,48469 ,2011
+GX,offshore oil and natural gas industry,6081 ,2007
+GX,offshore oil and natural gas industry,6213 ,2008
+GX,offshore oil and natural gas industry,6311 ,2009
+GX,offshore oil and natural gas industry,6488 ,2010
+GX,offshore oil and natural gas industry,6611 ,2011
+HN,offshore oil and natural gas industry,7115 ,2007
+HN,offshore oil and natural gas industry,7271 ,2008
+HN,offshore oil and natural gas industry,7386 ,2009
+HN,offshore oil and natural gas industry,7590 ,2010
+HN,offshore oil and natural gas industry,7733 ,2011
+TJ,sea salt industry,11374 ,2007
+TJ,sea salt industry,11629 ,2008
+TJ,sea salt industry,11829 ,2009
+TJ,sea salt industry,12087 ,2010
+TJ,sea salt industry,12386 ,2011
+HB,sea salt industry,6198 ,2007
+HB,sea salt industry,6340 ,2008
+HB,sea salt industry,6448 ,2009
+HB,sea salt industry,6586 ,2010
+HB,sea salt industry,6756 ,2011
+LN,sea salt industry,20954 ,2007
+LN,sea salt industry,21419 ,2008
+LN,sea salt industry,21795 ,2009
+LN,sea salt industry,22259 ,2010
+LN,sea salt industry,22821 ,2011
+SD,sea salt industry,34194 ,2007
+SD,sea salt industry,34958 ,2008
+SD,sea salt industry,35566 ,2009
+SD,sea salt industry,36332 ,2010
+SD,sea salt industry,37250 ,2011
+SH,sea salt industry,13626 ,2007
+SH,sea salt industry,13933 ,2008
+SH,sea salt industry,14179 ,2009
+SH,sea salt industry,14480 ,2010
+SH,sea salt industry,14846 ,2011
+JS,sea salt industry,12496 ,2007
+JS,sea salt industry,12774 ,2008
+JS,sea salt industry,12997 ,2009
+JS,sea salt industry,13280 ,2010
+JS,sea salt industry,13612 ,2011
+ZJ,sea salt industry,27409 ,2007
+ZJ,sea salt industry,28017 ,2008
+ZJ,sea salt industry,28509 ,2009
+ZJ,sea salt industry,29117 ,2010
+ZJ,sea salt industry,29856 ,2011
+FJ,sea salt industry,27760 ,2007
+FJ,sea salt industry,28382 ,2008
+FJ,sea salt industry,28874 ,2009
+FJ,sea salt industry,29496 ,2010
+FJ,sea salt industry,30236 ,2011
+GD,sea salt industry,54011 ,2007
+GD,sea salt industry,55218 ,2008
+GD,sea salt industry,56179 ,2009
+GD,sea salt industry,57391 ,2010
+GD,sea salt industry,58838 ,2011
+GX,sea salt industry,7363 ,2007
+GX,sea salt industry,7528 ,2008
+GX,sea salt industry,7659 ,2009
+GX,sea salt industry,7822 ,2010
+GX,sea salt industry,8025 ,2011
+HN,sea salt industry,8615 ,2007
+HN,sea salt industry,8809 ,2008
+HN,sea salt industry,8963 ,2009
+HN,sea salt industry,9151 ,2010
+HN,sea salt industry,9388 ,2011

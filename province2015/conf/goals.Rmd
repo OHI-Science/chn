@@ -3,20 +3,79 @@ output: html_document
 ---
 
 ## Food Provision: Fisheries
-Amount of sustainable wild-caught seafood compared to the max sustainable
+Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [$mMSY_{R}]
 
 $$
-x_{FIS} =  (\prod_{g=1}^{6} SS_{i,g}^{C_{i,g}})^\frac{1}{\sum{C_{i,g}}}
+x_{FIS} =  (1 - \frac{\delta{C_{t}}}{mMSY_{R}})
+$$  
+
+\[ \delta{C_{t}} = 
+   \begin{cases}
+    0                      &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {{0.05}*{mMSY_{r}}}\\
+    |{mMSY_{r}}-{C_{t}}|   &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {mMSY_{r}}\\
+    {mMSY_{r}}                 &\quad \text{otherwise }
+   \end{cases}
+\]
+
+\textit{How to calculate mMSY:}
+How to calculate mMSY:
+
+$$
+B_{t+1} = B_{t} + rB_{t}(1 - \frac{B_{t}}{k}) - C_{t}
 $$
 
-- $SS$ stock status score, based on B/Bmsy (biomass / maximum sustainable yield of biomass) and an underharvest penalty adjustment
+$$
+C_{t} = qB_{t}f_{t}
+$$
 
-- $C$ total catch
+$$
+B_{t} = U_{t}/q
+$$
 
-- $i$ OHI reporting region
+$$
+U_{t} = \frac{C_{t}}{f_{t}}
+$$
 
-- $g$ level of taxonomic grouping (ISSCAAP)
+$$
+\frac{U_{t+1}}{q} = \frac{U_{t}}{q} + \frac{rU_{t}}{q[1-\frac{U_{t}}{Kq}]} - U_{t}{f_t}
+$$
 
+$$
+\frac{U_{t+1}}{U_t} = r - \frac{rU_{t}}{Kq} - qf_{t}
+$$
+
+This equation can be converted to a linear regrssion model:
+$$
+Y = b_{o} + b_{1}x_{1} + b_{2}x_{2}
+$$
+$r$,$q$,$K$ values can be obtained by solving the linear regression, and thus $mMSY$
+
+$$
+mMSY = rK/4
+$$
+$$
+mMSY_{r} = 0.75 * mMSY
+$$
+
+
+
+- $mMSY_{r}$ = Reference Maxium sustainable yield ($0.75*mMMSY$)
+
+- $C$ = total catch at time [$t$]
+
+- $\delta{C_{t}}$ = absolute difference between total landed biomass at time [$t$] and mMSY_{r}
+
+- $B$ = total biomass at time [$t$]
+
+- $r$ = natural growth rate
+
+- $K$ = carry capacity
+
+- $C$ = total landed biomass at time [$t$]
+
+- $q$ = catch coefficient
+
+- $U$ = fishing efforts at time [$t$]
 
 ## Food Provision: Mariculture
 Amount of sustainable farm-raised seafood compared to max sustainable
@@ -26,7 +85,7 @@ x_{MAR} =  \frac{Y_{c}}{Y_{r}}
 $$
 
 $$
-Y_{c} = \frac{\sum{1}^{k} Y_{k} * S_{M,k}}{P_{c}}
+Y_{c} = \frac{\sum_{1}^{k} Y_{k} * S_{M,k}}{P_{c}}
 $$
 
 - $Y$ = current sustainably harvested total yield, current [$c$] or reference [$r$] 
@@ -42,20 +101,22 @@ $$
 the opportunity to fish artisanally, independent of how many fish are caught
 
 $$
-x_{AO} = (1 - D_{U}) * S_{AO}
+x_{AO} =\frac{\frac{AP_{c}}{AP_{r}} + \frac{AF_{c}}{AF_{r}} + AE_{i} }{3}
 $$
 
 $$
-D_{U} = (1 - P) * (1 - O_{AO})
+AE_{i} = \frac{G_{r}}{I_{r}} - \frac{G_{c}}{I_{c}}
 $$
 
-- $D_{U}$ = unmet demand
+- $AP$ = number of ports, current [$c$] or reference [$r$]
 
-- $S_{AO}$ = sustainability of fishing methods   
+- $AF$ = number of fishermen, current [$c$] or reference [$r$]
 
-- $O_{AO}$ = access to artisanal fishing
+- $AE$ = economic factor to affect artisinal fishing 
 
-- $P$ = gross domestic product (GDP) per capita, adjusted by purchasing power parity (PPP)
+- $G$ = diesel price, current [$c$] or reference [$r$] 
+
+- $I$ = average yearly disposable income, current [$c$] or reference [$r$]
 
 
 ## Natural Products
@@ -85,19 +146,23 @@ $$
 
 - $R$ = risk term
 
-￼products:aquaria fishes, corals, sponges, shells, seaweeds, fish oil
+- $N$ = number of natural products
+
+￼products:seasalt, marine chemicals, biomedicine
 
 
 ## Carbon Storage
 Extent and condition of coastal habitats that store and sequester atmospheric carbon 
 
 $$
-x_{CS} =  \sum_{1}^{k} \frac{C_{s}}{C_{r}} * \frac{A_{k}}{A_{T}}
+x_{CS} =  \sum_{1}^{k} ( c_k * \frac{C_{c}}{C_{r}} * \frac{A_{k}}{A_{T}} )
 $$
 
 - $C$ = condition of habitat $k$, current [$c$] or reference[$r$]
 
 - $A$ = area of habitat $k$, current [$c$] or total area covered by all habitats assessed [T]
+
+- ${c_k}$ = relative contribution to carbon storage by each habitat
 
 habitats: seagrass beds, salt marshes, mangroves
 
@@ -106,24 +171,15 @@ habitats: seagrass beds, salt marshes, mangroves
 Protection from inundation or erosion compared to the local natural potential
 
 $$
-x_{CP} =  \sum_{k}^{n} \alpha_{k} * \frac{C_{c,k}}{C_{r,k}}
+x_{CP} =  \sum_{i=1}^{k} ( \frac{C_c}{C_r} * \frac {w_k}{w_max} * \frac{A_k}{A_T} )
 $$
 
-$$
-\alpha_{k} = \frac{w_{k}*A_{k}}{\sum{w_{k}*A_{k}}}
-$$
-
-$$
-w_{k} = \frac{r_{k}}{\sum{r_{k}}}
-$$
 
 - $C$ = condition of habitat $k$, current [$c$] and reference [$r$]
 
-- $\alpha$ = weighted area of habitat $k$  
+- $w$ = weighted capacity of habitat $k$ to protect the coast
 
-- $A$ = area of habitat $k$ 
-
-- $r$ = habitat protective ability rank weight 
+- $A$ = coverage area of habitat $k$ 
 
 habitats: salt marshes, seagrass beds, mangroves, coral reefs, sea ice
 
@@ -132,51 +188,46 @@ habitats: salt marshes, seagrass beds, mangroves, coral reefs, sea ice
 Tourism & recreation value, independent of monetary exchange
 
 $$
-x_{TR} = E_{t} * S_{t} 
+x_{TR} = \log (\frac{A_t}{V_t} * {S_t} + {1})
 $$
 
-$$
-E_{t} = E_{W} / (L_{t} - L_{t} * U_{t})
-$$
+- $A$ = number of tourists in year $t$ 
 
-- $E$ = tourism employment proportion
+- $V$ = area within jurisdiction 
 
-- $S$ = sustainability measure
-
-- $E_{W}$ = number of employees in travel and tourism sectors
-
-- $L$ = total labor force
-
-- $U$ = percent unemployment
-
-- $t$ = current year
+- $S$ = sustainability coefficient, set as 0.787 (China TTCI, 2009)
 
 
 ## Livelihoods & Economies: Livelihoods
 Number of jobs and job quality from marine-associated sectors
 
 $$
-x_{LIV} = \frac{\frac{\sum_{i=1}^{k} j_{c,k}}{\sum_{i=1}^{k} j_{r,k}} + \frac{\sum_{i=1}^{k} g_{m,k}}{\sum_{i=1}^{k} g_{r,k}}}{2}
+x_{LIV} = \frac{\frac{\sum_{i=1}^{k} j_{c,k}}{\sum_{i=1}^{k} j_{r,k}} + \frac{g_{c}} {g_{r}}}{2}
 $$
 
-- $j$ = number of jobs within sector $k$ at current [$c$] or reference [$r$] time
+$$
+j_{c(c, k)} = N_{k} * \frac{x}{\sum{x}}
+$$
 
-- $g$ = average wages per job for sector $k$  at current [$m$] or reference [$r$] region
+- $j$ = number of jobs within sector $k$ at current [$c$] time or reference [$r$] level
+
+- $g$ = sum of average urban and rural family income in current time [$c$] or reference [$r$] level
 
 - sectors ($k$): tourism, commercial fishing, marine mammal watching, aquarium fishing, wave & tidal energy, mariculture, transportation & shipping, ports & harbors, ship & boatbuilding
+
+- $N$ = total number of employment in each sector [$k$] across all regions
+
+- $x$ = total number of employments across all sectors in each region
 
 
 ## Livelihoods & Economies: Economies
 Revenue from marine associated sectors
 
 $$
-x_{ECO} = \sum_{i=1}^{k} \frac{e_{c,k}}{e_{r,k}} 
+x_{ECO} = \frac{e_{c}}{e_{r}} 
 $$
 
-- $e$ = total adjusted revenue generated from each sector $k$ at current [$c$] or reference [$r$] time
-
-- sectors ($k$): tourism, commercial fishing, marine mammal watching, aquarium fishing, wave & tidal energy, mariculture, transportation & shipping, ports & harbors, ship & boatbuilding
-
+- $e$ = total revenue generated from all sectors at current time [$c$] or reference [$r$] level
 
 ## Sense of Place: Iconic Species
 Aesthetic connections to and cultural identity with a given region measured through the status of iconic species
@@ -199,59 +250,51 @@ threat categories: IUCN
 # Sense of Place: Lasting Special Places
 Aesthetic connections to and cultural identity with a given region measured through the status of meaningful locations
 
+
 $$
-x_{LSP} = \frac{(\frac{M}{M_{r}} + \frac{C}{C_{r}})}{2} 
+x_{LSP} = \frac{\%{CMPA}}{\%CMPA_{Ref}} 
 $$
 
-- $M$ = percent protected marine coastal area compared to reference [$r$] $C$ = percent protected coastline compared to reference [$r$]
+- ${\%CMPA}$ = percent protected marine coastal area of the coastal region within jurisdiction
 
-- $C$ = managed area on coastal land (0-1mi)
-
-- $C_{t}$ = total coastal land area 
+- ${\%CMPA_{Ref}}$ = %5, reference percent protected marine costal area of the coastal region within jurisdiction
 
 
 ## Clean Waters
 The degree to which coastal waters are free of contaminants
 
 $$
-x_{CW} = \sqrt[4]{a * u * l * d}
+x_{CW} = \sqrt[4]{\prod{a_{i}}}
 $$
 
-- $a$  = number of coastal people without access to sanitation  
+- $a$  = water pollution input
 
-- $u$ = 1 – (nutrient input)  
-
-- $l$ = 1 – (chemical input)  
-
-- $d$ = 1 – (marine debris input, by country)  
+- $i$ = type of pollution, including phosphate, nitrogen, chemical oxygen demand, and oil pollution
 
 
 ## Biodiversity: Habitats
 Existence values people hold for biodiversity measured through the status of key habitats
 
 $$
-x_{HAB} =  \sum_{i=1}^{k} \frac{C_{c,k}}{C_{r,k}} * \frac{A_{c,k}}{A_{T}}
+x_{HAB} = \frac{ \sum_{i=1}^{k} \frac{C_{c,k}}{C_{r,k}}}{N}
 $$
 
 - $C$ = condition of habitat k, current [$c$] or reference[$r$]
 
-- $A$ = area of habitat k, current [$c$] or total of all habitats [T]
+- $N$ = total number of habitat assessed in the region
 
-habitats: seagrass beds, salt marshes, subtidal soft-bottom habitats, mangroves, coral reefs, sea ice edge
+Habitats include seagrass beds, salt marshes, mangroves
 
 
 ## Biodiversity: Species
 Existence values people hold for biodiversity measured through the status of native species
 
 $$
-x_{SPP} = \frac{\sum_{k=1}^{M} (\frac{\sum_{i=1}^{N} w_{i}}{N}) * A_{C}}{A_{T}} 
+x_{SPP} = 1 - \frac{\sum_{i=1}^{N} w_{i}}{N}
 $$
 
-- $M$ = number of grid cells in the assessment region
 
-- $N$ = number species in a grid cell $c$
-
-- $A$ = total area of a grid cell [$c$] the assessment region [T]
+- $N$ = number of assessed species in the province
 
 - $w_{i}$ = status weight assigned per threat 
 
