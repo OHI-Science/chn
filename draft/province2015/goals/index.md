@@ -21,7 +21,8 @@ The following goal models are from the global assessment in 2014. These models s
 x_{FIS} =  (1 - \frac{\delta{C_{t}}}{mMSY_{R}})
 \]  </p>
 
-<p>\[ \delta{C_{t}} = 
+<p>\[
+\delta{C_{t}} = 
    \begin{cases}
     0                      &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {{0.05}*{mMSY_{r}}}\\
     |{mMSY_{r}}-{C_{t}}|   &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {mMSY_{r}}\\
