@@ -15,7 +15,7 @@ The following goal models are from the global assessment in 2014. These models s
 
 <h2>Food Provision: Fisheries</h2>
 
-<p>Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [$mMSY_{R}]</p>
+<p>Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [\(mMSY_{R}\)]</p>
 
 <p>\[
 x_{FIS} =  (1 - \frac{\delta{C_{t}}}{mMSY_{R}})
@@ -244,7 +244,7 @@ x_{ICO} = \frac{\sum_{i=1}^{N} S_{i} * w_{i}}{\sum_{i=1}^{N} S_{i}}
 
 <p>threat categories: IUCN</p>
 
-<h1>Sense of Place: Lasting Special Places</h1>
+<h2>Sense of Place: Lasting Special Places</h2>
 
 <p>Aesthetic connections to and cultural identity with a given region measured through the status of meaningful locations</p>
 

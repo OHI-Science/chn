@@ -15,7 +15,7 @@ The following goal models are from the global assessment in 2014. These models s
 
 <h2>Food Provision: Fisheries</h2>
 
-<p>Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [$mMSY_{R}]</p>
+<p>Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [\(mMSY_{R}\)]</p>
 
 <p>\[
 x_{FIS} =  (1 - \frac{\delta{C_{t}}}{mMSY_{R}})
