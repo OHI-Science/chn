@@ -33,9 +33,7 @@ FIS = function(layers){
 
   ### To Mian: Real calculation of status and trend (40-108). But status results are all 0's, which screwed up trend calcualtion next.
   ### Intermediate steps (r, K, q, mmsy) have many unwanted negative numbers. my mmsy results are different from provided mmsy data (except for region 1 and 4)
-  ### So I made a placeholder status and trend data set after this session (line 109-122). You should check on this.
-  ### 李冕，现状（status) 计算结果很奇怪，因为中间计算的的 r, K, q, mmsy 结果奇怪，有很多
-  ### 不该有的负数值。导致趋势 (trend) 计算不能做。这里你该仔细看一看。为了FP计算，我暂时在109-120 我暂时做了占位符 （r.status, r.trend)->占位符已取消。
+  ### Checked with CHN team, the error is a result of the raw data. There might have been reporting errors.
 
   # calculate needed variables (r, q, K, mmsy) from linear model (independent variables: ut, ft)
   D1 = ft %>%
@@ -60,7 +58,6 @@ FIS = function(layers){
     select(-dlm) %>%
     ungroup; head(D2); summary(D2)
   ### NOTE: take a look at D2, some mmsy values are negative.
-  ### 李冕：看一下D2，有几个q, K, mmsy 是负数。。。
 
   ## status:
   status.all.years = D2 %>%
@@ -126,8 +123,6 @@ MAR = function(layers){
     select(-layer,
            area = km2)
 
-  # status - using all years from word document equations
-  # aggregate all weighted timeseries per province (group by province and year), and divide by area
   mar.status.all.years =
     D %>%
     filter(!area == 0) %>% #  exclude cases where no harvest and no allowable area (rgn_id 6)
