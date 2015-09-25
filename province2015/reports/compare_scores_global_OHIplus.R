@@ -56,7 +56,7 @@ cols = assign('score_diff', cut(cols,
                                  include.lowest = TRUE, labels=pal))
  
 hwrite(scores_compare, 
-       file.path(wd, 'reports', 'compare_scores_OHIplus_global.html'), br=TRUE, center=TRUE, border=0, 
+       file.path(wd, 'reports', 'compare_scores_global_OHIplus.html'), br=TRUE, center=TRUE, border=0, 
        row.style=list(goal='text-align:center'), table.style='padding: 10px; margin:20px;', 
        col.bgcolor=list(scenario='#fff',dimension='#fff',country='#fff', region_id='#fff', score_diff=cols))
       
