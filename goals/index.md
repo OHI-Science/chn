@@ -24,7 +24,7 @@ x_{FIS} =  (1 - \frac{\delta{C_{t}}}{mMSY_{R}})
 <p>\[
 \delta{C_{t}} = 
    \begin{cases}
-    0                      &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {0.05*{mMSY_{r}}}\\
+    0                      &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < 0.05*{mMSY_{r}}\\
     |{mMSY_{r}}-{C_{t}}|   &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {mMSY_{r}}\\
     |{mMSY_{r}}                 &\quad \text{otherwise }
    \end{cases}
