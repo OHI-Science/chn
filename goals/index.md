@@ -24,9 +24,9 @@ x_{FIS} =  (1 - \frac{\delta{C_t}}{mMSY_R})\\
 <p>\[
 \delta{C_t} = 
    \begin{cases}
-    0                      &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < 0.05*{mMSY_{r}}\\
-    |{mMSY_{r}}-{C_{t}}|   &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {mMSY_{r}}\\
-    |{mMSY_{r}}                 &\quad \text{otherwise }
+    0                      &\quad \text{if }\ |{mMSY_r}-{C_t}| < 0.05*{mMSY_r}\\
+    |{mMSY_r}-{C_t}|   &\quad \text{if }\ |{mMSY_r}-{C_t}| < {mMSY_r}\\
+    |{mMSY_r}                 &\quad \text{otherwise }
    \end{cases}
 \]</p>
 
@@ -34,7 +34,7 @@ x_{FIS} =  (1 - \frac{\delta{C_t}}{mMSY_R})\\
 How to calculate mMSY:</p>
 
 <p>\[
-B_{t+1} = B_{t} + rB_{t}(1 - \frac{B_{t}}{k}) - C_{t}
+B_{t+1} = B_{t} + rB_{t}(1 - \frac{B_t}{k}) - C_{t}
 \]</p>
 
 <p>\[
@@ -46,7 +46,7 @@ B_{t} = U_{t}/q
 \]</p>
 
 <p>\[
-U_{t} = \frac{C_{t}}{f_{t}}
+U_{t} = \frac{C_{t}}{f_t}
 \]</p>
 
 <p>\[
