@@ -18,7 +18,7 @@ The following goal models are for the China assessment in 2014.
 <p>Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [\(mMSY_{R}\)]</p>
 
 <p>\[
-x_{FIS} =  (1 - \frac{\delta{C_{t}}}{mMSY_{R}})
+x_{FIS} =  (1 - \frac{\delta{C_{t}}}{mMSY_{R}})\\
 \]  </p>
 
 <p>\[
