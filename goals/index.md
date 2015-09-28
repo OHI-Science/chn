@@ -30,8 +30,7 @@ x_{FIS} =  (1 - \frac{\delta{C_t}}{mMSY_R})
    \end{cases}
 \]</p>
 
-<p>\textit{How to calculate mMSY:}
-How to calculate mMSY:</p>
+<p>How to calculate mMSY:</p>
 
 <p>\[
 B_{t+1} = B_{t} + rB_{t}(1 - \frac{B_t}{k}) - C_{t}
