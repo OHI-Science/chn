@@ -4,7 +4,7 @@
 # Run this script one time only. This will download the WebApps'
 # template files to your local repository. You will then edit the files using
 # RStudio. When editing, save, commit, and push all files normally and they will
-# automatically be updated on the WebApp at 00:00 GMT every day.
+# automatically be updated on the WebApp every hour.
 #
 # To edit the equations displayed on the WebApp's goals page, you will edit
 # conf/goals.Rmd. The equations are written in a format similar to LaTex; use
