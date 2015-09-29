@@ -708,6 +708,9 @@ LIV = function(layers){
           year,
           wage_rural = value)
 
+#testing:
+ wage.lyr = SelectLayersData(layers, c('le_livwagetown_chn2015_zb.csv', 'le_livewagevillage_chn2015_zb.csv'))
+
  #LIV status:
 
  # calcualte jobs in each industry in each province:
@@ -872,7 +875,7 @@ LE = function(scores, layers){
   scores_LE = scores %>%
     filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
-   mutate(score = rowMeans(cbind(ECO, LIV, na.rm=T))) %>%
+    mutate(score = rowMeans(cbind(ECO, LIV), na.rm=TRUE)) %>%
     mutate(goal = 'LE') %>%
    select(goal, dimension, region_id, score)
 
@@ -997,12 +1000,12 @@ return(scores_LSP)
 SP = function(scores){
   #  During testing-individual-goal phase, run this line instead of the first two lines of code:
   # 在单独查看LE目标时，用这个line 代替第一，二行程序
-  # scores_SP = rbind(scores_ICO, scores_LSP) %>%
+  scores_SP = rbind(scores_ICO, scores_LSP) %>%
 
-  scores_SP = scores %>%
-        filter(goal %in% c('ICO','LSP') & dimension %in% c('status','trend','score','future')) %>%
+#   scores_SP = scores %>%
+#         filter(goal %in% c('ICO','LSP') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
-    mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP), na.rm = T)), # na.rm 去除NA
+    mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP)), na.rm=TRUE),
            goal = 'SP') %>%
     select(goal, dimension, region_id, score); head(scores_SP)
 
@@ -1187,7 +1190,7 @@ BD = function(scores){
   scores_BD = scores %>%
       filter(goal %in% c('HAB','SPP') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
-    mutate(score = rowMeans(cbind(as.numeric(HAB), as.numeric(SPP), na.rm = T)),
+    mutate(score = rowMeans(cbind(as.numeric(HAB), as.numeric(SPP)), na.rm=TRUE),
            goal = 'BD') %>%
     select(goal,
            dimension,
