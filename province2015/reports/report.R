@@ -7,7 +7,7 @@ library(reshape2)
 
 # options:
 overwrite  = T
-israel_only= F
+chn_only= F
 do_flowers = T
 do_tables  = T # tables not saved
 
@@ -49,7 +49,7 @@ goal_labels = gsub('\\n', '\n', with(conf$goals, setNames(name_flower, goal))[na
 rgn_names = SelectLayersData(layers, layers=conf$config$layer_region_labels, narrow=T) %>%
   select(region_id = id_num,
          rgn_name  = val_chr)
-rgn_names = rbind(data.frame(region_id=0, rgn_name='ISRAEL'),
+rgn_names = rbind(data.frame(region_id=0, rgn_name='China'),
                   arrange(rgn_names, rgn_name))
 
 # determine regions
