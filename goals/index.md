@@ -9,31 +9,32 @@ toc: true
 output: html_document
 ---
 
-The following goal models are for the China assessment in 2014.
+The following goal models are from the global assessment in 2014. These models should be modified when better data or indicators are available.
 
 <nav class="navbar navbar-default" role="navigation">   <div class="container-fluid">     <div class="navbar-header">       <a class="navbar-brand" href="#">Branch/Scenario</a>     </div>     <div class="collapse navbar-collapse" id="navbar-1">       <ul class="nav navbar-nav">         <li class="dropdown">           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">published/province2015<span class="caret"></span></a>           <ul class="dropdown-menu" role="menu">                       <li><a href="{{ site.baseurl }}/draft/province2015/goals/">draft/province2015</a></li>                     </ul>         </li>       </ul>     </div>   </div> </nav> 
 
 <h2>Food Provision: Fisheries</h2>
 
-<p>Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [\(mMSY_R\)]</p>
+<p>Amount of sustainable wild-caught seafood compared to the reference multi-species max sustainable yield [\(mMSY_{R}\)]</p>
 
 <p>\[
-x_{FIS} =  (1 - \frac{\delta{C_t}}{mMSY_R})
+x_{FIS} =  (1 - \frac{\delta{C_{t}}}{mMSY_{R}})
 \]  </p>
 
 <p>\[
-\delta{C_t} = 
+\delta{C_{t}} = 
    \begin{cases}
-    0                      &\quad \text{if }\ |{mMSY_r}-{C_t}| < 0.05*mMSY_r
-    |{mMSY_r}-{C_t}|   &\quad \text{if }\ |{mMSY_r}-{C_t}| < {mMSY_r}
-    {mMSY_r}                 &\quad \text{otherwise}
+    0                      &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {{0.05}*{mMSY_{r}}}\\
+    |{mMSY_{r}}-{C_{t}}|   &\quad \text{if }\ |{mMSY_{r}}-{C_{t}}| < {mMSY_{r}}\\
+    {mMSY_{r}}                 &\quad \text{otherwise }
    \end{cases}
 \]</p>
 
-<p>How to calculate mMSY:</p>
+<p>\textit{How to calculate mMSY:}
+How to calculate mMSY:</p>
 
 <p>\[
-B_{t+1} = B_{t} + rB_{t}(1 - \frac{B_t}{k}) - C_{t}
+B_{t+1} = B_{t} + rB_{t}(1 - \frac{B_{t}}{k}) - C_{t}
 \]</p>
 
 <p>\[
@@ -45,7 +46,7 @@ B_{t} = U_{t}/q
 \]</p>
 
 <p>\[
-U_{t} = \frac{C_{t}}{f_t}
+U_{t} = \frac{C_{t}}{f_{t}}
 \]</p>
 
 <p>\[
