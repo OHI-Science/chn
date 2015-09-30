@@ -22,7 +22,10 @@ layers = Layers('layers.csv', 'layers')
 
 # calculate scenario scores
 scores = CalculateAll(conf, layers, debug=F)
+
+# save scores as .csv file, tables and figures
 write.csv(scores, 'scores.csv', na='', row.names=F)
+source('~/github/chn/province2015/reports/report.r')
 
 
 # merge to published branch (to display on app). Make sure all local work is committed.
