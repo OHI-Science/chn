@@ -13,7 +13,7 @@ do_tables  = T # tables not saved
 
 
 # create directories
-dir_report  = 'reports'
+dir_report  = '~/github/chn/province2015/reports'
 dir.create(dir_report, recursive=T, showWarnings=F)
 
 # set viz options
@@ -59,9 +59,13 @@ if (chn_only){
   rgns = rgn_names$region_id
 }
 
-# directory to store figures
+# directories to store figures and tables
 dir_fig = file.path(dir_report, 'figures')
-dir.create(dir_fig, showWarnings=F)
+if(!dir.exists(dir_fig)) dir.create(dir_fig, showWarnings=F)
+
+dir_tab = file.path(dir_report, 'tables')
+if(!dir.exists(dir_tab)) dir.create(dir_tab, showWarnings=F)
+
 
 # use factors to sort by goal and dimension in scores
 conf$goals = arrange(conf$goals, order_hierarchy)
@@ -70,8 +74,7 @@ scores$goal_label = factor(
   levels = c('Index', conf$goals$goal),
   labels = c('Index', ifelse(!is.na(conf$goals$parent),
                              sprintf('. %s', conf$goals$name),
-                             conf$goals$name)),
-  ordered=T)
+                             conf$goals$name)),ordered=T)
 scores$dimension_label = factor(
   scores$dimension,
   levels = names(conf$config$dimension_descriptions),
@@ -131,11 +134,16 @@ for (rgn_id in rgns){ # rgn_id=0
   # table md
   if (do_tables){
 
-    x = dcast(subset(scores, region_id==rgn_id), goal_label ~ dimension_label, value.var='score')
-    row.names(x) = x$goal_label; x = x[, names(x)!='goal_label']
-    #     knitr::kable(x, format='markdown')
+    scores_csv = sprintf('%s/scores_%s.csv', dir_tab, gsub(' ','_', rgn_name))
+
+    scores %>%
+      filter(region_id == rgn_id) %>%
+      select(goal_label, dimension_label, score) %>%
+      spread(dimension_label, score) %>%
+      dplyr::rename(' '=goal_label) %>%
+      write.csv(scores_csv, row.names=F, na='')
+
   }
 }
 
-dir_scen = getwd()
-cat(sprintf('\nfigures saved in %s\n', file.path(dir_scen, dir_fig)))
+cat(sprintf('\nfigures and tables saved in %s\n\n', dir_report))
