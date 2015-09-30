@@ -1001,10 +1001,10 @@ return(scores_LSP)
 SP = function(scores){
   #  During testing-individual-goal phase, run this line instead of the first two lines of code:
   # 在单独查看LE目标时，用这个line 代替第一，二行程序
-  scores_SP = rbind(scores_ICO, scores_LSP) %>%
+  # scores_SP = rbind(scores_ICO, scores_LSP) %>%
 
-#   scores_SP = scores %>%
-#         filter(goal %in% c('ICO','LSP') & dimension %in% c('status','trend','score','future')) %>%
+  scores_SP = scores %>%
+        filter(goal %in% c('ICO','LSP') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
     mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP)), na.rm=TRUE),
            goal = 'SP') %>%
