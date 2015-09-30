@@ -149,7 +149,7 @@ MAR = function(layers){
 
   # current status
   r.status = mar.status.all.years %>%
-    filter(year == max(year)) %>%
+    filter(year == 2012) %>% # choose 2012 to match status year of FIS
     mutate(score = round(x.mar,2)) %>%
     select(rgn_id,
            score) %>%
@@ -198,11 +198,11 @@ FP = function(layers, scores, debug=T){
 # cast data needed for w calculation: Ct, Yk, Tc from FIS and MAR data layers and calculations
   mar_yk = layers$data[['mar_yk']] %>%
     group_by(rgn_id) %>%
-    filter(year == max(year)) %>% # mar: status of 2013； MAR 现状用2013
+    filter(year == 2012) %>%
     summarize(sum.yk = sum(tonnes)) %>%
     dplyr::rename(region_id = rgn_id)
 
-  fis_ct = layers$data[['fis_ct']] %>% # catch at time t: 2012
+  fis_ct = layers$data[['fis_ct']] %>%
     filter(year == 2012) %>%
     select(region_id = rgn_id,
            ct = tonnes)
@@ -215,16 +215,17 @@ FP = function(layers, scores, debug=T){
 ## is it okay?
 ## 问题：FIS用2012， MAR2013。暂时用这个数据合并来计算FP得分。可以吗？
 
-### To replace line 252 - 253 after all calcuations are done and stored in scores.csv
+# combine fis and mar scores during testing individual goals
+#   s = rbind(scores_FIS, scores_MAR) %>%
+#     spread(goal, score)
+
 ### 计算现状
   s = scores %>%
     filter(goal %in% c('MAR', 'FIS'),
            !dimension %in% c('pressures','resilience')) %>%
     tidyr::spread(goal, score)
 
-  # combine fis and mar scores during testing individual goals
-#   s = rbind(scores_FIS, scores_MAR) %>%
-#     spread(goal, score)
+
 
 
   # calcualte w
@@ -708,6 +709,9 @@ LIV = function(layers){
           year,
           wage_rural = value)
 
+#testing:
+ wage.lyr = SelectLayersData(layers, c('le_livwagetown_chn2015_zb.csv', 'le_livewagevillage_chn2015_zb.csv'))
+
  #LIV status:
 
  # calcualte jobs in each industry in each province:
@@ -872,7 +876,7 @@ LE = function(scores, layers){
   scores_LE = scores %>%
     filter(goal %in% c('LIV','ECO') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
-   mutate(score = rowMeans(cbind(ECO, LIV, na.rm=T))) %>%
+    mutate(score = rowMeans(cbind(ECO, LIV), na.rm=TRUE)) %>%
     mutate(goal = 'LE') %>%
    select(goal, dimension, region_id, score)
 
@@ -1002,7 +1006,7 @@ SP = function(scores){
   scores_SP = scores %>%
         filter(goal %in% c('ICO','LSP') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
-    mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP), na.rm = T)), # na.rm 去除NA
+    mutate(score = rowMeans(cbind(as.numeric(ICO), as.numeric(LSP)), na.rm=TRUE),
            goal = 'SP') %>%
     select(goal, dimension, region_id, score); head(scores_SP)
 
@@ -1187,7 +1191,7 @@ BD = function(scores){
   scores_BD = scores %>%
       filter(goal %in% c('HAB','SPP') & dimension %in% c('status','trend','score','future')) %>%
     spread(goal, score) %>%
-    mutate(score = rowMeans(cbind(as.numeric(HAB), as.numeric(SPP), na.rm = T)),
+    mutate(score = rowMeans(cbind(as.numeric(HAB), as.numeric(SPP)), na.rm=TRUE),
            goal = 'BD') %>%
     select(goal,
            dimension,
