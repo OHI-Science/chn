@@ -36,3 +36,27 @@ This summary shows how much local data was used in the assessment. The rest of t
 
 #### Regional distribution of scores <br/ ><br/ >
 ![regional distribution](https://raw.githubusercontent.com/OHI-Science/chn/draft/province2015/reports/figures/regions_600x400.png)
+
+#### Results Table 
+|                                 | score | status | future |
+|---------------------------------|-------|--------|--------|
+| Index                           | 52.6  |        | 51.65  |
+| Food Provision                  | 33    | 31.79  | 34.22  |
+| . Fisheries                     | 13.85 | 13.36  | 14.34  |
+| . Mariculture                   | 51.93 | 49.76  | 54.1   |
+| Artisanal Fishing Opportunity   | 17.65 | 26.45  | 8.84   |
+| Natural Products                | 90.91 | 88.54  | 93.27  |
+| Carbon Storage                  | 39.62 | 40.33  | 38.91  |
+| Coastal Protection              | 37.24 | 37.82  | 36.67  |
+| Tourism & Recreation            | 81.95 | 77.21  | 86.69  |
+| Coastal Livelihoods & Economies | 58.39 | 44.2   | 72.58  |
+| . Livelihoods                   | 62.73 | 47.29  | 78.18  |
+| . Economies                     | 54.05 | 41.11  | 66.98  |
+| Sense of Place                  | 41.94 | 54.28  | 29.6   |
+| . Iconic Species                | 29.43 | 33.34  | 25.52  |
+| . Lasting Special Places        | 54.45 | 75.22  | 33.69  |
+| Clean Waters                    | 73.07 | 78.4   | 67.74  |
+| Biodiversity                    | 54.54 | 58.67  | 50.41  |
+| . Habitats                      | 53.79 | 55.01  | 52.58  |
+| . Species                       | 55.29 | 62.34  | 48.24  |
+
