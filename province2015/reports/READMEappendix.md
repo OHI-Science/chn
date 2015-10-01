@@ -31,13 +31,9 @@ This summary shows how much local data was used in the assessment. The rest of t
   - 36.36 percent of resilience data was local 
 
 ## Results <br/ ><br/ >
-#### Flower plot of country-level scores <br/ ><br/ >
-![Flower plot of country-level scores](https://raw.githubusercontent.com/OHI-Science/chn/draft/province2015/reports/figures/flower_China.png)  <br/ ><br/ >
-
-#### Regional distribution of scores <br/ ><br/ >
-![regional distribution](https://raw.githubusercontent.com/OHI-Science/chn/draft/province2015/reports/figures/regions_600x400.png)
-
 #### Results Table 
+Ten goals were weighted equally to calculate the overall OHI score. 
+
 |                                 | score | status | future |
 |---------------------------------|-------|--------|--------|
 | Index                           | 52.6  |        | 51.65  |
@@ -59,4 +55,11 @@ This summary shows how much local data was used in the assessment. The rest of t
 | Biodiversity                    | 54.54 | 58.67  | 50.41  |
 | . Habitats                      | 53.79 | 55.01  | 52.58  |
 | . Species                       | 55.29 | 62.34  | 48.24  |
+
+#### Flower plot of country-level scores <br/ ><br/ >
+![Flower plot of country-level scores](https://raw.githubusercontent.com/OHI-Science/chn/draft/province2015/reports/figures/flower_China.png)  <br/ ><br/ >
+
+#### Regional distribution of scores <br/ ><br/ >
+![regional distribution](https://raw.githubusercontent.com/OHI-Science/chn/draft/province2015/reports/figures/regions_600x400.png)
+
 
