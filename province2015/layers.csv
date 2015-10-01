@@ -20,12 +20,6 @@
 "CP","cp_condition","Condition","Ratio of current status and reference status for each habitat","value","value","cp_condition_chn2015_zb.csv","rgn_id",,"habitat",,"value",,TRUE,,,0.2,0.8,TRUE,,,,11,FALSE
 "CP","cp_extent","Extent","Total area of habitats in each province ","Hectare","Hectare","cp_extent_chn2015_zb.csv","rgn_id",,"habitat","year","hectare",,TRUE,1997,2013,19.9,2513980,FALSE,,,,11,FALSE
 "ICO","ico_species","Species","Number of assessed species in threat category i","value","value","ico_species_chn2015_YWW.csv","rgn_id",,"category",,"value",,TRUE,,,1,10,FALSE,,,,11,FALSE
-"ICO","ico_spp_extinction_status","IUCN extinction risk category for iconic species","International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists
-
-Data sources:
-
-- [International Union for Conservation of Nature (IUCN)](http://www.iucnredlist.org/technical-documents/classification-schemes/threats-classification-scheme)
-","category","category","ico_spp_extinction_status_gl2014.csv","rgn_id",,"sciname",,,"category",TRUE,,,,,FALSE,,,,11,
 "ICO SPP","spp_iucn_trends","IUCN population trends","International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists","trend_score","score","spp_iucn_trends_chn2015.csv","rgn_id",,"sciname",,"trend_score",,TRUE,,,-0.5,0,FALSE,,,,11,FALSE
 "LE pressures","le_sector_weight","Jobs weighting","Jobs weighting by sector (defaulting to 1)","weight","value","le_sector_weight_chn2015.csv","rgn_id",,"sector",,"weight",,TRUE,,,1,1,TRUE,,,,11,FALSE
 "LIV","liv_job_industry","Employment in each industry cross-country","number of employment in each sea-related industry in the country, not province-specific","value","10,000 people","le_livjobindustry_chn2015_zb.csv",,,"category","year","value",,TRUE,2007,2013,0.9,580.8,FALSE,,,,11,FALSE
@@ -42,18 +36,6 @@ Data sources:
 "NP","np_risk","Risk","Risk of natural products","value","value","np_risk_chn2015_HHM.csv","rgn_id",,"product",,"value",,TRUE,,,0,0.5,TRUE,,,,11,FALSE
 "NP","np_exposure","Exposure","Exposure of natural products","value","value","np_exposure_chn2015_HHM.csv","rgn_id",,"product",,"value",,TRUE,,,0,0.4,TRUE,,,,11,FALSE
 "NP","np_harvest_weight","Weight","Weight of a single product relative to the output of all products","weight","weight","np_weight_chn2015_HHM.csv","rgn_id",,"product",,"weight",,TRUE,,,0,1,TRUE,,,,11,FALSE
-"SPP","spp_status","Species lists and IUCN threat categories as a proxy for iconic species status","International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists.
-
-Data sources:
-
-- [International Union for Conservation of Nature (IUCN)](http://www.iucnredlist.org/technical-documents/classification-schemes/threats-classification-scheme)
-","score","status score","spp_status_gl2014.csv","rgn_id",,,,"score",,TRUE,,,0.845809296480868,0.845809296480868,TRUE,,,,11,FALSE
-"SPP","spp_trend","Species lists and IUCN threat categories as a proxy for iconic species trend","International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists.
-
-Data sources:
-
-- [International Union for Conservation of Nature (IUCN)](http://www.iucnredlist.org/technical-documents/classification-schemes/threats-classification-scheme)
-","score","trend score","spp_trend_gl2014.csv","rgn_id",,,,"score",,TRUE,,,-0.254331358915499,-0.254331358915499,FALSE,,,,11,FALSE
 "SPP","spp_species","Species lists, China and IUCN threat categories as a proxy for iconic species trend","China's protected species list, and International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists.","value","value","spp_species_chn2015_LM.csv","rgn_id",,"sciname",,"value",,TRUE,,,0,0.8,TRUE,"chn_class,iucn_class",,,11,FALSE
 "TR","tr_marinearea","Marine area","Area of sea within jurisdiction of each province","km2","km2","tr_marinearea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,3000,2e+06,FALSE,,,,11,FALSE
 "TR","tr_tourist","Number of tourists ","number of tourists in year t","million","millions","tr_tourist_chn2015_YWW.csv","rgn_id",,,"year","million",,TRUE,2008,2011,568.93,229472,FALSE,,,,11,FALSE
