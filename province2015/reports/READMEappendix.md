@@ -32,7 +32,7 @@ This summary shows how much local data was used in the assessment. The rest of t
 
 ## Results <br/ ><br/ >
 #### Flower plot of country-level scores <br/ ><br/ >
-![Flower plot of country-level scores](https://raw.githubusercontent.com/OHI-Science/chn/draft/province2015/reports/figures/flower_China.png)
+![Flower plot of country-level scores](https://raw.githubusercontent.com/OHI-Science/chn/draft/province2015/reports/figures/flower_China.png)  <br/ ><br/ >
 
 #### Regional distribution of scores <br/ ><br/ >
 ![regional distribution](https://raw.githubusercontent.com/OHI-Science/chn/draft/province2015/reports/figures/regions_600x400.png)
