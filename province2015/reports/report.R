@@ -1,5 +1,6 @@
 # Ocean Health Index Report
 # 'chn' is the name of the entire study area: it is all 11 regions combined
+# 2015 is the year when the assessment is done
 
 library(dplyr)
 library(reshape2)
@@ -147,3 +148,30 @@ for (rgn_id in rgns){ # rgn_id=0
 }
 
 cat(sprintf('\nfigures and tables saved in %s\n\n', dir_report))
+
+## This part should be automated and displayed on README:
+### To calculate the percentage of local data vs. global data
+setwd('~/github/chn/province2015')
+layers = read.csv('layers.csv')
+library(stringr)
+local_data = layers %>%
+  filter(str_detect(layers$filename, "chn"))
+percent_local = round(nrow(local_data)/nrow(layers)*100, 2)
+cat(sprintf('%s percent of all data was local \n', percent_local))
+
+### Goal data
+goal_data = filter(layers, !layers$target %in% c("pressures", "resilience", "spatial"))
+local_data_goal = filter(goal_data, str_detect(goal_data$filename, "chn"))
+percent_local_goal = round(nrow(local_data_goal)/nrow(goal_data)*100, 2)
+cat(sprintf('%s percent of goal data was local \n', percent_local_goal))
+
+### Pressure/Resilience data
+pressure_data = filter(layers, str_detect(layers$targets, "pressures"))
+local_pressure = filter(pressure_data, str_detect(pressure_data$filename, "chn"))
+percent_local_press = nrow(local_pressure)/nrow(pressure_data) * 100
+cat(sprintf('%s percent of pressures data was local \n', percent_local_press))
+
+resilience_data = filter(layers, str_detect(layers$targets, "resilience"))
+local_resilience = filter(resilience_data, str_detect(resilience_data$filename, "chn"))
+percent_local_resilience = round(nrow(local_resilience)/nrow(resilience_data)*100, 2)
+cat(sprintf('%s percent of resilience data was local \n', percent_local_resilience))
