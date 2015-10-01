@@ -23,8 +23,8 @@ This table compares models and reference points from the OHI 2014 global assessm
 **Habitats** | Status model is based on the amount and/or condition (depending on data availability) of marine habitat(s) relative to their reference states in the early 1980's. | Status model is the same as in global assessments, and a temporal reference point for each habitat is set to its condition in 1980's. <br /><br /> Three types of habitats were assessed: seagrasses, saltmarsh, and mangroves. Not all habitat exist in all provinces and time-series data of extent is poor for some. Time-series data on the condition of each habitat is not obtainable. However, rough estimate of relative change in coverage areas since the 1980's was found in literature. |
 **Species** | Status model is based on the average extinction risk of all assessed species, calculated as the weighted sum of area and the number of species in each threat category, where an increasing weight is assigned by level of extinction risk of the threat category. The reference point is to have the risk status of all assessed species at lowest risk of extinction. | Status model is similar to global assessments. However, average extinction risk of all assessed species was only calculated as the weighted sum of the number of species in each threat category, since habitat area per species is not obtainable. <br /><br /> The reference point is to have the risk status of all iconic species at lowest risk of extinction. |
 
-**Data Summary**
-This summary presents at a glance how much local data was used in the assessment. The rest of the data was from 2014 OHI Global assessment.
+**Data Summary** <br/ ><br/ >
+This summary shows how much local data was used in the assessment. The rest of the data was from 2014 OHI Global assessment.
   - 72.04 percent of all data was local 
   - 100 percent of goal data was local 
   - 80 percent of pressures data was local 
