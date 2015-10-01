@@ -30,4 +30,4 @@ This summary shows how much local data was used in the assessment. The rest of t
   - 80 percent of pressures data was local 
   - 36.36 percent of resilience data was local 
   
-
+![flower](https://github.com/OHI-Science/chn/blob/draft/province2015/reports/figures/flower_China.pdf)
