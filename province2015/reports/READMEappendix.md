@@ -11,10 +11,10 @@ Regional assessment scores of CW, LSP, NP, and TR are higher than the global ass
 Most goal scores are lower than their counterparts in the global study. AO has the most drastic reduction in score. This is due to the change in goal model. (Need to edit: The structure of the goal model automatically produces low scores, and needs to be revisited.) Model and/or data were changed for the other goals to suit local conditions and incorporate local data, which resulted in the decrease in score. 
 
 **Major Improvements** <br/ ><br/ >
-  - LSP's reference point is changed to 5% protection, which is a management goal set by Chinese marine resource management and protection agencies to achieve by 2020. 
-  - For MAR, we used coastal area permitted for mariculture as the area data, which leads to a more realistic representation of mariculture status than using the entire coastal area for calculation. 
-  - CS model included a new variable, relative carbon sequestration rate of each habitat. Together with habitat extent, these two variables provide a more complete picture of how habitats contribute to CS than extent alone. 
-  - TR incorporated both international and local tourists data. 
+  * LSP's reference point is changed to 5% protection, which is a management goal set by Chinese marine resource management and protection agencies to achieve by 2020. 
+  * For MAR, we used coastal area permitted for mariculture as the area data, which leads to a more realistic representation of mariculture status than using the entire coastal area for calculation. 
+  * CS model included a new variable, relative carbon sequestration rate of each habitat. Together with habitat extent, these two variables provide a more complete picture of how habitats contribute to CS than extent alone. 
+  * TR incorporated both international and local tourists data. 
   
 **Major areas for improvement** <br/ ><br/ >
 Mostly we need higher quality, time-series data<br/ ><br/ >
