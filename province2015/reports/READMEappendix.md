@@ -63,7 +63,21 @@ Ten goals were weighted equally to calculate the overall OHI score.
 ![regional distribution](https://raw.githubusercontent.com/OHI-Science/chn/draft/province2015/reports/figures/regions_600x400.png)
 
 #### Comparison with Global 2014 scores
-This [link](http://htmlpreview.github.io/?https://github.com/OHI-Science/chn/blob/draft/province2015/reports/compare_scores_global_OHIplus.html) displays how China's local assessment compare with the global assessment in 2014. 
+This [link](http://htmlpreview.github.io/?https://github.com/OHI-Science/chn/blob/draft/province2015/reports/compare_scores_global_OHIplus.html) displays how China's local assessment compare with the global assessment in 2014. Scores are only comapred at the country-level. 
+
+In summary, the overall index score is 52, lower compared to 62 in the global study. Local assessment scores of CW, LSP, NP, and TR are higher than the global assessments. Reasons vary. CW adn TR modified the model and incorporated different variables. LSP and NP changed reference points, which are easier to achieve than those in the global study. 
+
+Most goal scores are lower than their counterparts in the global study. AO has the most drastic reduction in score. This is due to the change in goal model. (Need to edit: The structure of the goal model needs to be revisited.) Model and/or data were changed for the other goals to suit local conditions and incorporate local data, which resulted in the decrease in score. 
+
+**Major Improvements** 
+  - LSP's reference point is changed to 5% protection, which is a goal set by Chinese marine resource management and protection agencies to achieve by 2020. 
+  - For MAR, we used coastal area permitted for mariculture as the area data, which leads to a more realistic representation of mariculture than using the entire coastal area for calculation. 
+  - CS model included a new variable, relative carbon sequestration rate of each habitat. Together with habitat extent, these two variables provide a better comparison of how habitats contribute to CS. 
+  - TR incorporated both international and local tourists data. 
+  
+**Major areas for improvement**
+  - 
+
 
 
 
