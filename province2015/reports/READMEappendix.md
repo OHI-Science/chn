@@ -6,15 +6,15 @@ output: html_document
 ## Summary 
 The overall index score from the regional study (54) is slightly lower than that of the global study (62). This [link](http://htmlpreview.github.io/?https://github.com/OHI-Science/chn/blob/draft/province2015/reports/compare_scores_global_OHIplus.html) displays how the two assessments compare at the country-level. 
 
-Regional assessment scores of CW, LSP, NP, and TR are higher than the global assessments. Reasons vary. CW adn TR modified the model and incorporated different variables. LSP and NP changed reference points, which are easier to achieve than those in the global study. 
+Regional assessment scores of CW, LSP, NP, and TR are higher than the global assessments. Reasons vary. CW and TR models are modified and different variables are incorporated. LSP and NP reference points are changed, which are easier to achieve than those in the global study. 
 
-Most goal scores are lower than their counterparts in the global study. AO has the most drastic reduction in score. This is due to the change in goal model. (Need to edit: The structure of the goal model automatically produces low scores, and needs to be revisited.) Model and/or data were changed for the other goals to suit local conditions and incorporate local data, which resulted in the decrease in score. 
+Most goal scores are lower than their counterparts in the global study. AO has the most drastic reduction in score. This is due to the change in goal model. (Need to edit: The structure of the goal model automatically produces low scores, and needs to be revisited.) Model and/or data are changed for the other goals to suit local conditions and incorporate local data, which resulted in the decrease in score. 
 
 **Major Improvements**
 
 - LSP's reference point is changed to 5% protection, which is a management goal set by Chinese marine resource management and protection agencies to achieve by 2020.
-- For MAR, we used coastal area permitted for mariculture as the area data, which leads to a more realistic representation of mariculture status than using the entire coastal area for calculation.
-- CS model included a new variable, relative carbon sequestration rate of each habitat. Together with habitat extent, these two variables provide a more complete picture of how habitats contribute to CS than extent alone.
+- For MAR, we used coastal area permitted for mariculture as the area data, which produces a more realistic representation of mariculture status than using the entire coastal area for calculation.
+- CS model included a new variable, relative carbon sequestration rate of each habitat. Together with habitat extent, these two variables provide a more complete picture of how habitats contribute to CS than extent alone could do.
 - TR incorporated both international and local tourists data. 
   
 **Major areas for improvement** 
@@ -22,9 +22,9 @@ Most goal scores are lower than their counterparts in the global study. AO has t
 Mostly we need higher quality, time-series data.
 
 - Habitat data are scarce for some regions. Habitat trend was calculated based on available data. When there was only one year of data, the trend was assumed to be -0.1. 
-- Species area data was missing. SPP model wasn't able to incorporate area data at all, which results in an incomplete picture of the status of SPP and BD. 
+- Species area data was missing. SPP model wasn't able to incorporate area data at all, reslting in an incomplete picture of the status of SPP and BD. 
 - AO model needs to be revisited. (Need to edit: Current model is not good)
-- FIS catch data collection needs to be standardized and at finer scale. See Goal Model Comparison table for more detail. 
+- FIS catch data collection needs to be standardized and at finer scale. See the Goal Model Comparison table below for more detail. 
 
 ## Goal model description and reference points
 This table compares models and reference points from the OHI 2014 global assessment with the OHI+ China assessment. Note that while most global models are unchanged from the original 2012 assessment, some approches have been modified and are indicated in the table below.
@@ -48,6 +48,7 @@ This table compares models and reference points from the OHI 2014 global assessm
 
 ## Data Summary <br/ ><br/ >
 This summary shows how much local data was used in the assessment. The rest of the data was from 2014 OHI Global assessment.
+
   - 72.04 percent of all data was local 
   - 100 percent of goal data was local 
   - 80 percent of pressures data was local 
