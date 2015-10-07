@@ -2,9 +2,16 @@
 # 'chn' is the name of the entire study area: it is all 11 regions combined
 # 2015 is the year when the assessment is done
 
+suppressWarnings(require(ohicore))
+library(tidyr)
 library(dplyr)
 library(reshape2)
 
+# set working directory and load files
+setwd('~/github/chn/province2015')
+conf = Conf('conf')
+layers = Layers('layers.csv', 'layers')
+scores = read.csv('scores.csv')
 
 # options:
 overwrite  = T
@@ -13,7 +20,8 @@ do_flowers = T
 do_tables  = T # tables not saved
 
 
-# create directories
+# set working directory and create directories
+setwd('~/github/chn/province2015')
 dir_report  = '~/github/chn/province2015/reports'
 dir.create(dir_report, recursive=T, showWarnings=F)
 
