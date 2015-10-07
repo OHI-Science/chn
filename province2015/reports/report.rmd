@@ -6,7 +6,7 @@ output:
 ---
 
 ## Summary 
-The overall index score from the regional study (53) is slightly lower than that of the global study (62). This [link](http://htmlpreview.github.io/?https://github.com/OHI-Science/chn/blob/draft/province2015/reports/compare_scores_global_OHIplus.html) displays how the two assessments compare at the country-level. 
+The overall index score from the regional study (53) is slightly lower than that of the global study (62). [This link displays a table of **2014 global OHI scores** (for China), **China OHI+ scores** and the **differences between them**](http://htmlpreview.github.io/?https://github.com/OHI-Science/chn/blob/draft/province2015/reports/compare_scores_global_OHIplus.html), colors differences are colored from blue to red, with dark blue indicating the largest positive difference and red indicating the largest negative difference. 
 
 Regional assessment scores of CW, LSP, NP, and TR are higher than the global assessments. Reasons vary. CW and TR models are modified and different variables are incorporated. LSP and NP reference points are changed, which are easier to achieve than those in the global study. 
 
