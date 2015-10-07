@@ -27,9 +27,9 @@ This section records areas for improvement for future studies. Example:
   - _Species area data was missing. SPP model wasn't able to incorporate area data at all, reslting in an incomplete picture of the status of SPP and BD._
 
 ``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
-# country_code = 'chn' is the name of the entire study area: it is all 11 regions combined
-# country = 'China'
-# year is the year when the assessment is done
+
+# 'chn' is the name of the entire study area: it is all 11 regions combined
+# 2015 is the year when the assessment is done
 
 # Call packages
 suppressWarnings(require(ohicore))
