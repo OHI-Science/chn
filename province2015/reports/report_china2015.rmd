@@ -173,7 +173,7 @@ Flower plots represent Index scores (inside circle) and individual goal scores (
 
 The purpose of any OHI+ assessment is to customize the OHI framework methodology to best represent the local context being assessed, which can mean different visions of what a healthy ocean is and what it should provide. This makes OHI+ scores not directly comparable to scores calculated in any other assessment, including global assessments that are based on coarser-scale information, models, and reference points. 
 
-However, while direct, quantitative comparison of scores China with scores from other assessments is limited, qualitative comparisons can be made because assessments use a consistent framework. It it can be valuable to make such comparisons to see which locations are closer to achieving their stated management targets and learn about how goals were modeled and targets were set. 
+However, while direct, quantitative comparison of scores from China with scores from other assessments is limited, qualitative comparisons can be made because assessments use a consistent framework. It can be valuable to make such comparisons to see which locations are closer to achieving their stated management targets and learn about how goals were modeled and targets were set. 
 
 ### Methods comparison table
 
