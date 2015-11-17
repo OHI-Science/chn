@@ -131,21 +131,9 @@ MAR = function(layers){
     summarize(yc = sum(harvest*msi/area),
               yc.log = log10(yc+1)) %>%
     ungroup() %>%
-    mutate (ref = max(yc.log), #ref = highest yc.log across years and regions
-            x.mar = yc.log/ref*100); head(mar.status.all.years); summary(mar.status.all.years); sapply(mar.status.all.years, class)
-
-  # Q1. In mar_yk data, region 6 (SH) has no MAR area, but molluscus and crabs have large harvest (1000's tonnes)
-  # I confirmed with CHN team that it wasn't a data entry error, and it was recorded on Marine Yearbook as such.
-  # But should we consider removing these data as outliers b/c they don't make sense?
-  # 在mar_yk 数据中，region 6 上海 2012 年，虽然面积为0，但这两个物种收获非常高。虽然确认了这不是数据报告错误，
-  # 但是否该考虑去除这两个数据：
-  # 6, 2012, "Marine molluscs nei", 705550
-  # 6, 2012, "Marine crabs nei", 33047
-  # CHN answer: Yes.
-
-  # Q2. Currently set reference point the highest yc.log across regions in the most recent (max) year. Is it right?
-  # 参考点的取值，暂时取用最近一年最高 yc.log 值为参考点； 在文件叙述中没有表明。需要讨论。
-  # CHN answer: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
+    # set reference point, to CHN's request on 10.16.2015: Guangdong, most recent year -> rgn 9, year 2013
+    mutate(ref = yc.log[rgn_id == 9 & year == 2013],
+           x.mar = pmax(0, pmin(1, yc.log/ref)) * 100)
 
   # current status
   r.status = mar.status.all.years %>%
@@ -171,8 +159,6 @@ MAR = function(layers){
     filter(year > (max(year)-5) & !rgn_id== 6) %>% #the most recent 5 years of data; ignore region 6 b/c no harvest in past 5 years
     do(dml = lm(x.mar ~ year, data=.)) %>% # lm 线性方程
     mutate(score = pmax(-1, pmin(1, coef(dml)[['year']]*5))) %>%
-    # pmin(1, ...): 最大不超过1
-    # pmax(-1, ...): 最小不超过－1
     select(region_id = rgn_id,
            score) %>%
     rbind(data.frame(region_id = as.integer(6), score = NA)) %>% # rgn 6 (SH), again doesn't have a trend as there is no more MAR
@@ -262,7 +248,6 @@ AO = function(layers){
   lyrs = c(#'ao_port',
            #'ao_port_ref',  # no year. couldn't join port data with the men and gas data properly
           'ao_men',         #2003-2013
-          'ao_men_ref',
           'ao_diesel',       #2010-2013
           'ao_income')       #2009-2013
   d = SelectLayersData(layers, layers=lyrs); head(d); summary(d)
@@ -277,21 +262,21 @@ AO = function(layers){
            year,
            diesel = ao_diesel,
            income = ao_income,
-           fishermen = ao_men,
-           fishermen_ref = ao_men_ref) %>%
+           fishermen = ao_men) %>%
     full_join(layers$data[['ao_port']] %>%
-                select(rgn_id, port = count), by = 'rgn_id') %>% # join with ao_port and ao_port_ref
-    full_join(layers$data[['ao_port_ref']] %>%
-                select(rgn_id, port_ref = count), by = 'rgn_id') %>%
+                select(rgn_id, port = count), by = 'rgn_id') %>% # join with ao_port
+    filter(!is.na(rgn_id)) %>%
     mutate(ae_ref = max(diesel/income, na.rm = T),  # AE_reference point = maximum (diesel/income) across year and provinces
            ae = ae_ref - diesel/income, # calculate AEi
-           fishermen_ref_new = max(fishermen_ref)) # new fishermen ref point, max across years. #CHN: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
+           fishermen_ref = max(fishermen), # new fishermen ref point, max across years. #CHN: 所有的参考点的取值，都取跨年的最高值，也就是历史的最高值
+           port_ref = max(port))
 
   # status 2010 - 2013
   status.all.years = D %>%
-    group_by(rgn_id, year) %>%
     filter(!is.na(fishermen) & !is.na(diesel) & !is.na(income)) %>% # NA prevents further calculations; 去掉NA，因为无法计算
-    mutate(x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen_ref_new + ae)/3))*100)
+ #   rowwise %>%
+    group_by(rgn_id, year) %>%
+    mutate(x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen + ae)/3))*100)
   ## Q for CHN: only 2010-2013 have data in all three categories (port, fishermen, gas), and thus only those
   ## years have status scores. do you want to see score for 2014, using only gas and port data?
   ## 问题：只有2010-2013 有所有数据（port, fishermen, gas)， 所以只有这几年有现状得分。2014 只有gas 和port
@@ -323,7 +308,8 @@ AO = function(layers){
   r.trend = status.all.years %>%
     group_by(rgn_id) %>%
     do(dml = lm(x.ao ~ year, data =.)) %>%
-    mutate(trend = min(-1, max(1, coef(dml)[['year']]*5)),
+    #mutate(trend = coef(dml)[['year']]*5)
+    mutate(trend = max(-1, min(1, coef(dml)[['year']]*5)),
            goal = "AO",
            dimension = "trend") %>%
     select(goal,

@@ -1,0 +1,412 @@
+---
+title: "OHI+ China 2015 Assessment Report"
+output:
+  html_document:
+    toc: true
+---
+
+``` {r setup, echo = FALSE, message = FALSE, warning = FALSE}
+
+# The entire assessment area 'chn' is all 11 regions combined by weighted average.
+# This report is for the China assessment in 2015.
+
+# load packages
+suppressWarnings(require(ohicore))
+library(tidyr) 
+library(dplyr)
+library(stringr)
+library(DT)
+library(RColorBrewer)  # install.packages('RColorBrewer')
+library(hwriter)       # install.packages('hwriter')
+
+
+# set directories
+dir_scenario     = '~/github/chn/province2015'
+dir_report       = file.path(dir_scenario, 'reports')
+dir_fig          = file.path(dir_report, 'figures')
+dir_tab          = file.path(dir_report, 'tables')
+
+# create directories if needed
+if(!dir.exists(dir_report)) dir.create(dir_report, recursive=T, showWarnings=F)
+if(!dir.exists(dir_fig)) dir.create(dir_fig, showWarnings=F)
+if(!dir.exists(dir_tab)) dir.create(dir_tab, showWarnings=F)
+
+# figure options
+overwrite  = T
+chn_only= F
+do_flowers = T
+do_tables  = T # tables not saved
+
+
+# load chn variables
+conf   = Conf(file.path(dir_scenario, 'conf'))
+layers = Layers(file.path(dir_scenario, 'layers.csv'), 
+                file.path(dir_scenario, 'layers'))
+scores =  left_join(
+  read.csv(file.path(dir_scenario, 'scores.csv')),
+  rbind(
+    read.csv(file.path(dir_scenario, 'layers/rgn_labels.csv')) %>%
+      select(region_id = rgn_id, region_name = label),
+    data.frame(region_id = 0, region_name = 'China')),
+  by = 'region_id') %>%
+  mutate(score = round(score, 1)) %>%
+  arrange(region_id) %>%
+  select(goal, dimension, region_id, region_name, score) 
+
+# for table display
+scores_neat = scores %>% 
+  filter(dimension == 'score') %>%
+  select(-region_id, -dimension) 
+
+```
+
+## Introduction
+
+The Ocean Health Index (OHI) framework assesses how healthy oceans are by using available information to score a suite of benefits called goals. Independent assessments using the OHI framework are called 'OHI+' assessments, and scores are calculated using the best available local information, incorporated as inputs and target reference points to calculate goal models. The purpose of OHI+ assessments is to customize the OHI framework methodology to best represent the local context being assessed, encompassing the local vision of what a healthy ocean is and what it should provide. 
+
+Note that OHI goals have a two-letter code (example: FP = Food Provision) and any sub-goals have a three-letter code (example: MAR = Mariculture).
+
+## Summary: OHI+ China 2015 
+
+### Assessment information
+
+```{r summary_calcs, echo = FALSE, message = FALSE, warning = FALSE}
+
+### info for in-line markdown text ----
+
+# chn score
+score_chn_index = scores %>% 
+  filter(goal == 'Index', 
+         dimension == 'score', 
+         region_id == 0)
+
+# n goals assessed
+g = as.character(unique(scores$goal))
+n_goals = g[str_length(g) == 2]
+
+# n regions assessed
+n_rgns = length(unique(scores$region_id)) - 1 # exclude China
+
+
+### info for bulleted markdown text ----
+lyrs = read.csv(file.path(dir_scenario, 'layers.csv'))
+
+## all data layers
+local_data = lyrs %>%
+  filter(str_detect(lyrs$filename, "chn"))
+percent_local = round(nrow(local_data)/nrow(lyrs)*100, 2)
+
+## goal data
+goal_data = filter(lyrs, !lyrs$target %in% c("pressures", "resilience", "spatial"))
+local_data_goal = filter(goal_data, str_detect(goal_data$filename, "chn"))
+percent_local_goal = round(nrow(local_data_goal)/nrow(goal_data)*100, 2)
+
+## pressure/resilience data
+pressure_data = filter(lyrs, str_detect(lyrs$targets, "pressures"))
+local_pressure = filter(pressure_data, str_detect(pressure_data$filename, "chn"))
+percent_local_press = nrow(local_pressure)/nrow(pressure_data) * 100
+
+resilience_data = filter(lyrs, str_detect(lyrs$targets, "resilience"))
+local_resilience = filter(resilience_data, str_detect(resilience_data$filename, "chn"))
+percent_local_resilience = round(nrow(local_resilience)/nrow(resilience_data)*100, 2)
+
+```
+
+**The OHI+ China assessment scored `r length(n_goals)` goals in `r n_rgns` regions.** The overall OHI+ Index score for China was `r round(score_chn_index$score)`. This is the area-weighted average of scores calculated for each goal in every region. 
+
+The OHI+ China assessment was able to use local information for many of the inputs, including goal models, pressures and resilience. The following compares local information to information used from the 2014 global assessment:
+
+  - **overall, OHI+ China used `r percent_local`% local information**
+
+  - goal models used `r percent_local_goal`% local information
+
+  - pressures components used `r percent_local_press`% local information
+
+  - resilience components used `r percent_local_resilience`% local information
+
+### Major modifications
+
+- LSP's reference point is changed to 5% protection, which is a management goal set by Chinese marine resource management and protection agencies to achieve by 2020.
+- For MAR, we used coastal area permitted for mariculture as the area data, which produces a more realistic representation of mariculture status than using the entire coastal area for calculation.
+- CS model included a new variable, relative carbon sequestration rate of each habitat. Together with habitat extent, these two variables provide a more complete picture of how habitats contribute to CS than extent alone could do.
+- TR incorporated both international and local tourists data. 
+  
+### Suggestions for improvement
+
+Mostly the assessment would benefit from higher quality, time-series data.
+
+- Habitat data are scarce for some regions. Habitat trend was calculated based on available data. When there was only one year of data, the trend was assumed to be -0.1. 
+- Species area data was missing. SPP model wasn't able to incorporate area data at all, reslting in an incomplete picture of the status of SPP and BD. 
+- AO model needs to be revisited. (Need to edit: Current model is not good)
+- FIS catch data collection needs to be standardized and at finer scale. See the Goal Model Comparison table below for more detail. 
+
+### OHI+ China scores table
+
+Explore scores for the OHI+ China assessment. There are scores for the 11 regions as well as an overall China score.
+
+```{r datatable, echo = FALSE, message = FALSE, warning = FALSE}
+
+DT::datatable(scores_neat, 
+              caption = 'OHI+ China Assessment Scores', 
+              rownames = FALSE, 
+              colnames = names(scores_neat), 
+              filter   = 'top',
+              options = list(pageLength = 10)) 
+
+```
+
+### OHI+ China figures
+
+#### Flower plot: China
+
+Flower plots represent Index scores (inside circle) and individual goal scores (coloured petals). The outer ring is the maximum possible score for each goal, and a goal’s score is represented by the petal's length from the center circle (0) to the outer ring (100, a perfect score in relation to the goal's reference point). The weight (relative contribution) of each goal is represented by the petal’s width. Grey indicates that a goal is not relevant to that reporting region.
+
+![Flower plot of country-level scores](https://raw.githubusercontent.com/OHI-Science/chn/draft/province2015/reports/figures/flower_China.png)  
+
+<!---TODO: including maps would be great--->
+
+
+
+## Comparison: OHI+ China vs. OHI global assessments
+
+### How scores can be compared across assessments
+
+The purpose of any OHI+ assessment is to customize the OHI framework methodology to best represent the local context being assessed, which can mean different visions of what a healthy ocean is and what it should provide. This makes OHI+ scores not directly comparable to scores calculated in any other assessment, including global assessments that are based on coarser-scale information, models, and reference points. 
+
+However, while direct, quantitative comparison of scores from China with scores from other assessments is limited, qualitative comparisons can be made because assessments use a consistent framework. It can be valuable to make such comparisons to see which locations are closer to achieving their stated management targets and learn about how goals were modeled and targets were set. 
+
+### Methods comparison table
+
+This table compares models and reference points from the OHI 2014 global assessment with the OHI+ 2015 China assessment. Note that some methods have improved since the original Halpern *et al*. 2012 global assessment and were published in Halpern *et al*. 2015. These improvements are also indicated in the table below.
+
+(Sub-)Goal | OHI 2014 global assessment | OHI+ China assessment | 
+----------|-----------------------|-----------------------|
+**Fisheries (FIS)** | Status model is based on B/B<sub>MSY</sub>, which is the estimated population biomass (B) relative to the biomass that can deliver maximum sustainable yield for each landed stock (B<sub>MSY</sub>). Regions are penalized for both underharvest and overharvest (more severely). B<sub>MSY</sub> is calculated with a single-species MSY reference point, with the assumption that this value is sustainable. | Status model and reference point are the same as in the global assessment 2012, which is based on multi-species MSY. China incorporated local, province-level harvest data to reveal finer differences among provinces. <br /><br />  However, MSY was estimated based on total, non-species-specific harvest, using Walters & Hilborn (1976) non-equilibirium model, since species-specific yield data was not available. Furthermore, harvest data were reported by each fishing boat, which often fishes across provincial boundaries and outside of the EEZ. Current data thus might not reflect the best regional differences, and may exceed actual harvest levels within the EEZ. |
+**Mariculture (MAR)** | Status model is based on tonnes of harvest of mariculture species per coastal inhabitant (with coastal defined as within 25 km inland). The spatial reference point is the region with the highest value, with the assumption that production depends on the presence of coastal communities that can provide the labor force, infrastructures, and economic demand to support the development and economic viability of mariculture facilities. | Status model and reference point are similar to the 2012 global assessment. The spatial reference point was the region with the highest value, but the status model was based on tonnes of mariculture species per habitat identified as suitable area by the Chinese government. <br /><br /> This approach provides a more realistic picture of the status of mariculture. Currently Maricutlure Sustainability Index (MSI) values were obtained from the global study. More data on water quality standards and food sources (eg. species, origin, etc) will help determine the sustainability of mariculture. |
+**Artisanal Fishing Opportunities (AO)** | Status model is based on the demand for artisanal fishing, estimated using indirect measures of poverty measured by the gross domestic product (GDP) per capita. Supply was estimated using an indicator ranking how well regions regulated and supported artisanal fishing, and did not incorporate a measure of the health of the targeted species or of sustainability of the fishing practices. The reference point is that all demand for artisanal fishing is achieved and that the fishing is done in a way that doesn't compromise future fishing resources. | Status model is rewritten and is similar to the 2014 U.S. West Coast assessment. It is based on the three indicators: <br />  &nbsp;&nbsp;&nbsp;- capcacity for exports, measured by the number of ports per kilometer of coastline <br />  &nbsp;&nbsp;&nbsp;- the need for artisanal fishing opportunities, represented by the number of artisanal fishermen per kilometer of coastline<br />  &nbsp;&nbsp;&nbsp;- economic capacity, measured by the ratio of diesel price and disposable income. <br /><br /> For each indicator, the spatial reference point is the maximum value across all region and all years. |
+**Natural Products (NP)** | Status model is based on the most recent harvest of each product per region relative to a fraction of the maximum value ever achieved in that region, with the assumption that the previous maximum achieved was the maximum possible. | Status model is the same as in global assessments, but the reference point was the 5-year production average due to large disparities in production among provinces. <br /><br /> Three natural products were assessed: sea salt, chemical products, and bio-pharmaceuticals. | 
+**Coastal Protection (CP)** | Status model is based on the amount and/or condition (depending on data availability) of marine habitat(s) and their ranked protective ability of each habitat type to protect the coast relative to their reference states in the early 1980's. | Status model is the same as in global assessments, and a temporal reference point for each habitat is set to its condition in 1980's. <br /><br /> Four habitats are measured: mangroves, seagrasses, salt marshes, and coral reef, which provide the most coastal protection and have available data. Not all habitat exist in all provinces and time-series data of extent is poor for some. Time-series data on the condition of each habitat is not obtainable. However, rough estimate of relative change in coverage areas since the 1980's was found in literature. |
+**Carbon Storage (CS)** | Status model is based on the amount and/or condition (depending on data availability) of marine habitat(s) and their relative contribution to total carbon storage relative to their reference states in the early 1980's. Relative contribution was indirectly measured as the amount of area each habitat covers relative to the total area covered by all three habitats given the available data. | Our model improved upon the global model and included relative rate of carbon sequestration of each habitat to better reflect its carbon storage contribution. Mangroves, seagrasses, and saltmarshes were assessed. . <br /><br />  A temporal reference point for each habitat is set to its condition in 1980's. Time-series data on condition of each habitat was not obtainable. However, rough estimate of relative change in coverage areas since the 1980's was found in literature. |
+**Clean Waters (CW)** | Status model is based on categories of pollution: eutrophication/nutrients, chemicals, pathogens and marine debris. The reference point is that waters are free from all pollution. | Status model is similar to global assessments, and the same reference point that waters are free from all pollution. <br /><br /> Pollution is based on nitrogen, phosphate, chemical oxygen demand, and petroleum pollution; data on pathogens and marine debris are poor or unavailable. |
+**Tourism and Recreation (TR)** | Status model is based on the proportion of direct employment in the tourism industry relative to total labor force as an indirect measure for the total number of people engaged in coastal tourism and recreation activities.<br /><br /> The reference point was the region with the highest ratio, under the assumption that all regions would in fact want a higher proportion in this industry. | Status model is based on the ratio of visitors and coastal area, and the spatial reference point was the region with the highest ratio across all years. <br /><br />  The number of visitors included both domestic and international visitors. Travel and Touisms Competitive Index (TTCI) was also incorporated.  |
+**Livelihoods (LIV)** | Status model is based on the number of direct and indirect jobs across marine sectors within a region and the average wages within each sector. Jobs has a moving target temporal reference point; the objective of the jobs component is no loss of jobs and they must keep pace with growth in employment rates or sustain losses no greater than national increases in unemployment rates. Wages has a spatial reference point, which is determined from the region with the highest average wages across all sectors. | Status model is the based on the number of direct jobs across marine sectors and the average disposable income among rural and urban inhabitants within a region. Both jobs and wages have a spatial reference point of the maximum value among all provinces across all years.  <br /><br />  Eleven marine sectors are assessed. The number of jobs per sector is not readily available and is extenuated from the nation-wide number of employments for each sector and the total number of marine-related jobs per province. There is not enough information on indirect jobs and is thus left out of the calculation. Due to unavailability of wage information per sector, wage is substituted by disposable income. |
+**Economies (ECO)** | Status model is based on the total revenue generated directly and indirectly from each marine sector. The reference point was a moving target temporal comparison, with a correction based on a region's GDP so that revenue kept pace with growth in GDP or sustained losses comparable to national declines in GDP. | Status model is the same as in global assessments, and the spatial reference point is the maximum revenue across all years. <br /><br /> Data on revenue generated from each marine sector is not available, and thus total revenue from all sectors are used for the assessment. |
+**Iconic Species (ICO)** | Status model is based on the average extinction risk of identified iconic species, calculated as the weighted sum of the number of species in each threat category, where an increasing weight is assigned by level of extinction risk of the threat category. The reference point is to have the risk status of all iconic species at lowest risk of extinction. | Status model is similar to global assessment model. However, data is localized by including species listed in China's List of Protected Species. <br /><br /> The reference point is to have the risk status of all iconic species at lowest risk of extinction. |
+**Lasting Special Places (LSP)** | Status model is based on the percent of coastal waters that are special, measured by coastal marine protected areas and the percent of public or protected land along the coast. Both sea and land components are compared to a reference point of 30% protection. | Status model is similar to global assessments, but the reference point is only 5% protection, a target set by national marine protection policies to achieve by 2020. Additionally, only coastal marine protected areas was considered, since protected coastline information is not available. |
+**Habitats (HAB)** | Status model is based on the amount and/or condition (depending on data availability) of marine habitat(s) relative to their reference states in the early 1980's. | Status model is the same as in global assessments, and a temporal reference point for each habitat is set to its condition in 1980's. <br /><br /> Three types of habitats were assessed: seagrasses, saltmarsh, and mangroves. Not all habitat exist in all provinces and time-series data of extent is poor for some. Time-series data on the condition of each habitat is not obtainable. However, rough estimate of relative change in coverage areas since the 1980's was found in literature. |
+**Species (SPP)** | Status model is based on the average extinction risk of all assessed species, calculated as the weighted sum of area and the number of species in each threat category, where an increasing weight is assigned by level of extinction risk of the threat category. The reference point is to have the risk status of all assessed species at lowest risk of extinction. | Status model is similar to global assessments. However, average extinction risk of all assessed species was only calculated as the weighted sum of the number of species in each threat category, since habitat area per species is not obtainable. <br /><br /> The reference point is to have the risk status of all iconic species at lowest risk of extinction. |
+
+### Scores comparison table
+
+
+```{r global_score_compare, echo = FALSE, message = FALSE, warning = FALSE}
+
+## read in global/eez2014 scores ----
+## from final score release: github.com/OHI-Science/ohi-global/releases/tag/v2014.3
+v2014.3_url = 'https://raw.githubusercontent.com/OHI-Science/ohi-global/4da6b4a1d69d694264ea68456359a939b0c03f9c/eez2014/scores.csv'
+scores_v2014.3 = read.csv(v2014.3_url)
+
+# china's region_id in the global assessment is 209
+scores_global_china = scores_v2014.3 %>%
+  filter(region_id == 209) %>%
+  mutate(goal = as.character(goal))
+
+## read in chn/province2015 scores
+scores_local = scores %>%
+  select(-region_name) %>%
+  mutate(goal = as.character(goal))
+
+
+## join OHI+ and global scores ----
+scores_compare = scores_global_china %>%
+  select(goal,
+         dimension,
+         score_global = score) %>%
+  left_join(scores_local %>%
+              filter(region_id == 0) %>%
+              select(goal,
+                     dimension,
+                     score_local = score),
+            by = c('goal', 'dimension')) %>%
+  filter(dimension %in% c('score')) %>%  # no p, r for OHI+; s, lfs not necess. 
+  mutate(score_global = round(score_global, 1),
+         score_local  = round(score_local, 1),
+         score_diff = round(score_local - score_global, 1))
+
+
+## make an html file that is color coded ----
+pal = brewer.pal(10, 'RdYlBu')
+pal = pal[1:9]
+
+# cols = data.frame(goal = scores_compare$goal)
+cols = scores_compare[, 'score_diff']
+cols = assign('score_diff', 
+              cut(cols,
+                  breaks=c(-100, -50, -30, -20, -10, 0, 10, 20, 50, 100),
+                  include.lowest = TRUE, labels=pal))
+
+hwrite(scores_compare,
+       file.path(dir_report, 'compare_scores_global_china.html'), 
+       br=TRUE, center=TRUE, border=0,
+       row.style=list(goal='text-align:center'), 
+       table.style='padding: 10px; margin:20px;',
+       col.bgcolor=list(scenario='#fff',dimension='#fff',country='#fff',
+                        region_id='#fff', score_diff=cols))
+
+
+# for summary markdown text below
+score_chn_index_global = scores_global_china %>% 
+  filter(goal == 'Index', 
+         dimension == 'score')
+
+gl_score_diff = score_chn_index$score - score_chn_index_global$score
+
+```
+
+**The OHI+ China assessment scored (`r round(score_chn_index$score)`), is `r ifelse(gl_score_diff > 0, "higher", "lower")` than that of the 2014 global study (`r round(score_chn_index_global$score)`).  
+
+[Click here](http://htmlpreview.github.io/?https://github.com/OHI-Science/chn/blob/draft/province2015/reports/compare_scores_global_china.html) to view a full comparison table of 2014 global OHI scores for China, China OHI+ scores, and the differences between them. The table colors differences from blue to red, with <span style="color:blue">blue</span> indicating the largest positive difference and <span style="color:red">red</span> indicating the largest negative difference. 
+
+### Narrative regarding differences
+
+Regional assessment scores of CW, LSP, NP, and TR are higher than the global assessments. Reasons vary. CW and TR models are modified and different variables are incorporated. LSP and NP reference points are changed, which are easier to achieve than those in the global study. 
+
+Most goal scores are lower than their counterparts in the global study. AO has the most drastic reduction in score. 
+
+
+``` {r viz setup, echo = FALSE, message = FALSE, warning = FALSE}
+
+
+# set visualization options
+ohi.options <- function() {
+  double.digits <- 15 # <- floor(log10(.Machine$double.base^.Machine$double.digits))
+  options(digits=double.digits)
+  options(stringsAsFactors=FALSE) # to prevent factors
+  options(width=120) # for outputting wide columns
+  options(rstudio.markdownToHTML =
+            function(inputFile, outputFile) {
+              # example: eg /var/data/ohi/model/GL-NCEAS-Pressures_Matrix/report9.Rmd
+              # see: http://www.rstudio.com/ide/docs/authoring/markdown_custom_rendering
+              # original: '/Applications/RStudio.app/Contents/Resources/resources/markdown.css'
+              markdownToHTML(inputFile, options=getOption('markdown.HTML.options'), 
+                             outputFile, stylesheet=ohi.markdown.css)
+            })
+  options()
+}
+opt_old = options(ohi.options())
+
+# get goals for flowers, all and specific to weights
+goals.all = arrange(conf$goals, order_color)[['goal']]
+
+# get colors for aster, based on 10 colors, but extended to all goals. subselect for goals.wts
+cols.goals.all = colorRampPalette(RColorBrewer::brewer.pal(10, 'Spectral'), space='Lab')(length(goals.all))
+names(cols.goals.all) = goals.all
+
+# get subgoals and goals, not supragoals, for doing flower plot
+goals_supra = na.omit(unique(conf$goals$parent))
+wts = with(subset(conf$goals, !goal %in% goals_supra, c(goal, weight)), setNames(weight, goal))
+goal_labels = gsub('\\n', '\n', with(conf$goals, setNames(name_flower, goal))[names(wts)], fixed=T)
+
+# region names, ordered by GLOBAL and alphabetical
+rgn_names = SelectLayersData(layers, layers=conf$config$layer_region_labels, narrow=T) %>%
+  select(region_id = id_num,
+         rgn_name  = val_chr)
+rgn_names = rbind(data.frame(region_id=0, rgn_name='China'),
+                  arrange(rgn_names, rgn_name))
+
+# determine regions
+if (chn_only){
+  rgns = 0
+} else {
+  rgns = rgn_names$region_id
+}
+
+# use factors to sort by goal and dimension in scores
+conf$goals = arrange(conf$goals, order_hierarchy)
+scores$goal_label = factor(
+  scores$goal,
+  levels = c('Index', conf$goals$goal),
+  labels = c('Index', ifelse(!is.na(conf$goals$parent),
+                             sprintf('. %s', conf$goals$name),
+                             conf$goals$name)),ordered=T)
+scores$dimension_label = factor(
+  scores$dimension,
+  levels = names(conf$config$dimension_descriptions),
+  ordered=T)
+
+# loop through regions
+for (rgn_id in rgns){ # rgn_id=0
+
+  # header md
+  rgn_name = subset(rgn_names, region_id==rgn_id, rgn_name, drop=T)
+  # cat(sprintf('\n## %s (%d)\n\n', rgn_name, rgn_id))
+
+  # flower plot ----
+  if (do_flowers){
+
+    # region scores
+    x = with(subset(scores, dimension=='score' & region_id==rgn_id & goal %in% names(wts)),
+             setNames(score, goal))[names(wts)]
+
+    fig_pdf = sprintf('%s/flower_%s.pdf', dir_fig, gsub(' ','_', rgn_name))
+    fig_png = sprintf('%s/flower_%s.png', dir_fig, gsub(' ','_', rgn_name))
+    res=72
+    if (overwrite | !file.exists(fig_png)){
+      png(fig_png, 
+          width=res*14, height=res*14, 
+          pointsize = 20) # specify size and resolution of the png
+      PlotFlower(main = rgn_name,
+                 lengths=x,
+                 widths=wts,
+                 fill.col=ifelse(is.na(x),
+                                 'grey80',
+                                 cols.goals.all[names(wts)]),
+                 labels  =ifelse(is.na(x),
+                                 paste(goal_labels, '-', sep='\n'),
+                                 paste(goal_labels, round(x), sep='\n')),
+                 center=round(weighted.mean(x, wts, na.rm=T)),
+                 max.length = 100, disk=0.4, label.cex=0.9, 
+                 label.offset=0.155, cex=2.2, cex.main=2.5)
+      dev.off()
+    }
+
+    if (overwrite | !file.exists(fig_pdf)){
+      pdf(fig_pdf, width=7, height=7)
+      PlotFlower(main = rgn_name,
+                 lengths=x,
+                 widths=wts,
+                 fill.col=ifelse(is.na(x),
+                                 'grey80',
+                                 cols.goals.all[names(wts)]),
+                 labels  =ifelse(is.na(x),
+                                 paste(goal_labels, '-', sep='\n'),
+                                 paste(goal_labels, round(x), sep='\n')),
+                 center=round(weighted.mean(x, wts, na.rm=T)),
+                 max.length = 100, disk=0.4, label.cex=0.9, 
+                 label.offset=0.155, cex=2.2, cex.main=2.5)
+      dev.off()
+    }
+
+  }
+
+  # table md
+  if (do_tables){
+
+    scores_csv = sprintf('%s/scores_%s.csv', dir_tab, gsub(' ','_', rgn_name))
+
+    scores %>%
+      filter(region_id == rgn_id) %>%
+      select(goal_label, dimension_label, score) %>%
+      spread(dimension_label, score) %>%
+      dplyr::rename(' '=goal_label) %>%
+      write.csv(scores_csv, row.names=F, na='')
+
+  }
+}
+
+# cat(sprintf('\nfigures and tables saved in %s\n\n', dir_report))
+````
+
+
+## To update this report
+This report was written with [Rmarkdown](http://rmarkdown.rstudio.com/) and can be updated as scores change. You can edit `chn/province2015/reports/report_china2015.rmd` locally in RStudio and push to GitHub. 

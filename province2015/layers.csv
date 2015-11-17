@@ -1,8 +1,6 @@
 "targets","layer","name","description","fld_value","units","filename","fld_id_num","fld_id_chr","fld_category","fld_year","fld_val_num","fld_val_chr","file_exists","year_min","year_max","val_min","val_max","val_0to1","flds_unused","flds_missing","rows_duplicated","num_ids_unique","data_na"
-"AO","ao_port","Port","Number of ports","count","value","ao_apc_chn2015_LZH.csv","rgn_id",,,,"count",,TRUE,,,3,290,FALSE,,,,11,FALSE
-"AO","ao_port_ref","Port reference","Reference point for number of ports","count","value","ao_apr_chn2015_LZH.csv","rgn_id",,,,"count",,TRUE,,,290,290,FALSE,,,,11,FALSE
-"AO","ao_men","Fishermen","Number of fishermen","individual","value","ao_afc_chn2015_LZH.csv","rgn_id",,,"year","individual",,TRUE,2003,2013,3312,902792,FALSE,,,,11,FALSE
-"AO","ao_men_ref","Fishermen reference","Reference point for number of fishermen","individual","value","ao_afr_chn2015_LZH.csv","rgn_id",,,"year","individual",,TRUE,2003,2013,818372,902792,FALSE,,,,11,FALSE
+"AO","ao_port","Port","Number of ports","count","per kilometer ","ao_apc_chn2015_LZH.csv","rgn_id",,,,"count",,TRUE,,,0.0141226,0.128802,TRUE,,,,11,FALSE
+"AO","ao_men","Fishermen","Number of fishermen","count","per kiometer","ao_afc_chn2015_LZH.csv","rgn_id",,,"year","count",,TRUE,2003,2013,15.6967,258.976,FALSE,,,,11,FALSE
 "AO","ao_diesel","Diesel price","Average diesel price per year ","rmb_l","RMB/L","ao_gc_chn2015_LZH.csv","rgn_id",,,"year","rmb_l",,TRUE,2010,2013,6.05,7.92,FALSE,,,,11,FALSE
 "AO","ao_income","Average income ","Average yearly disposable income, as documented by each province's Statistical Yearbook","rmb","RMB","ao_ic_chn2015_LZH.csv","rgn_id",,,"year","rmb",,TRUE,2009,2013,13751,43851,FALSE,,,,11,FALSE
 "CW","cw_phosphate","Inorganic phosphate pollution ","Together with nitrogen and COD form an integrated indicator of nutrients and chemical pollutants","score","score","cw_phosphate_chn2015_LM.csv","rgn_id",,,"year","score",,TRUE,2011,2013,0.1414,0.9998,TRUE,,,,11,FALSE
