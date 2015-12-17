@@ -85,7 +85,7 @@ Data sources:
 "pressures ","po_pathogens","Human pathogens","","pressure_score","pressure score","po_pathogens_chn2015.csv","rgn_id",,,,"pressure_score",,TRUE,,,0.2,0.6,TRUE,,,,11,FALSE
 "pressures","po_sedimentation","Sedimentation","","pressure_score","pressure score","po_sedimentation_chn2015.csv","rgn_id",,,,"pressure_score",,TRUE,,,0,0.2,TRUE,,,,11,FALSE
 "pressures ","po_trash","Marine debris ","","pressure_score","pressure score","po_trash_chn2015.csv","rgn_id",,,,"pressure_score",,TRUE,,,0.2,0.6,TRUE,,,,11,FALSE
-"pressures ","hab_presence","Habitat presence","Modeled combined habitat presence","boolean","boolean","hab_presence_chn2015.csv","rgn_id",,"habitat",,"boolean",,TRUE,,,0,1,TRUE,,,,11,FALSE
+"pressures ","hab_presence","Habitat presence","Modeled combined habitat presence","boolean","boolean","hab_presence_chn2015.csv","rgn_id",,"habitat",,"boolean",,TRUE,,,1,1,TRUE,,,,11,FALSE
 "resilience","alien_species","Alien species","The number and type of invasive and harmful invasive species in each marine ecoregion (Molnar et al. 2008).
 
 Data sources:
