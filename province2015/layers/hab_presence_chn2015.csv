@@ -1,45 +1,23 @@
 "rgn_id","habitat","boolean"
-1,"saltmarshes","1"
-2,"saltmarshes","1"
-3,"saltmarshes","1"
-4,"saltmarshes","1"
-5,"saltmarshes","1"
-6,"saltmarshes","1"
-7,"saltmarshes","1"
-8,"saltmarshes","1"
-9,"saltmarshes","1"
-10,"saltmarshes","1"
-11,"saltmarshes","1"
-1,"seagrasses","1"
-4,"seagrasses","1"
-9,"seagrasses","1"
-10,"seagrasses","1"
-11,"seagrasses","1"
-7,"mangroves","1"
-8,"mangroves","1"
-9,"mangroves","1"
-10,"mangroves","1"
-11,"mangroves","1"
-11,"coral reef","1"
-2,"seagrasses","0"
-3,"seagrasses","0"
-5,"seagrasses","0"
-6,"seagrasses","0"
-7,"seagrasses","0"
-8,"seagrasses","0"
-1,"mangroves","0"
-2,"mangroves","0"
-3,"mangroves","0"
-4,"mangroves","0"
-5,"mangroves","0"
-6,"mangroves","0"
-1,"coral reef","0"
-2,"coral reef","0"
-3,"coral reef","0"
-4,"coral reef","0"
-5,"coral reef","0"
-6,"coral reef","0"
-7,"coral reef","0"
-8,"coral reef","0"
-9,"coral reef","0"
-10,"coral reef","0"
+1,"saltmarshes",1
+2,"saltmarshes",1
+3,"saltmarshes",1
+4,"saltmarshes",1
+5,"saltmarshes",1
+6,"saltmarshes",1
+7,"saltmarshes",1
+8,"saltmarshes",1
+9,"saltmarshes",1
+10,"saltmarshes",1
+11,"saltmarshes",1
+1,"seagrasses",1
+4,"seagrasses",1
+9,"seagrasses",1
+10,"seagrasses",1
+11,"seagrasses",1
+7,"mangroves",1
+8,"mangroves",1
+9,"mangroves",1
+10,"mangroves",1
+11,"mangroves",1
+11,"coral reef",1
