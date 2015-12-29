@@ -894,21 +894,22 @@ ICO = function(layers){
 #   3      1       LC     5     0.4
 #
 
-  #CHN model: xICO = sum(Si * Wi)/sum(Si)
-  #                = sum(count of species * weight.risk )/sum(count of species)
+  #CHN model: xICO = 1 - sum(Si * Wi)/sum(Si)
+  #                = 1 - sum(count of species * weight.risk )/sum(count of species)
 
   r.status = d %>%
   mutate(count_wt = count * risk.wt) %>%
   group_by(rgn_id) %>%
-  summarize(score = sum(count_wt)/sum(count)*100,
+  summarize(score = (1 - sum(count_wt)/sum(count)) * 100,
             dimension = 'status',
             goal = 'ICO') %>%
   select( goal, dimension, region_id = rgn_id, score)
 
-#   region_id    score dimension goal
-# 1          1 44.00000    status  ICO
-# 2          2 48.57143    status  ICO
-# 3          3 41.66667    status  ICO
+#   goal dimension region_id    score
+#   (chr)     (chr)     (int)    (dbl)
+#   1   ICO    status         1 54.73684
+#   2   ICO    status         2 56.66667
+#   3   ICO    status         3 53.33333
 
 # Trend: the same as SPP trend. Data from gl2014. only contains 10 species in 10 provinces.
 
