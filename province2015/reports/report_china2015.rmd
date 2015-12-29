@@ -11,7 +11,8 @@ output:
 # This report is for the China assessment in 2015.
 
 # load packages
-suppressWarnings(require(ohicore))
+# suppressWarnings(require(ohicore))
+devtools::load_all('~/github/ohicore')
 library(tidyr) 
 library(dplyr)
 library(stringr)
