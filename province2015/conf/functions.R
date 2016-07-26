@@ -56,7 +56,7 @@ FIS = function(layers){
            mmsy = r*K/4,
            mmsy_r = mmsy*0.75)  %>%
     select(-dlm) %>%
-    ungroup; head(D2); summary(D2)
+    ungroup(); head(D2); summary(D2)
   ### NOTE: take a look at D2, some mmsy values are negative.
 
   ## status:
@@ -71,7 +71,7 @@ FIS = function(layers){
     } else if ( abs > 0.05*mmsy_r & abs < mmsy_r) {
       abs
     } else mmsy_r ) %>%
-    ungroup %>%
+    ungroup() %>%
     left_join(tc, by = 'rgn_id') %>%
     mutate(x.fis = pmax(-1, pmin(1, (1-(d_Ct/mmsy_r))*tc)) *100)
 
@@ -98,7 +98,8 @@ FIS = function(layers){
     select(goal,
            dimension,
            region_id = rgn_id,
-           score = trend)
+           score = trend) %>%
+    ungroup()
 
   scores_FIS = rbind(r.status, r.trend)
   return(scores_FIS)
