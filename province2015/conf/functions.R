@@ -44,9 +44,11 @@ FIS = function(layers){
            # Q: lost the most recent year's (2013) info. r, q, k, and mmsy can also be calculated up to 2012, and therefore status
            # will only be calculated up to 2012.
            y = ut_plus1/ut - 1) %>%
-    filter(!year=='2013')
+    filter(!year=='2013') %>%
+    ungroup()
 
   D2 = D1 %>%
+    group_by(rgn_id) %>%
     do(dlm = lm(y ~ ut + ft, data = .)) %>%
     # calculating r, q, and K from multiple linear regression
     mutate(r = coef(dlm)[["(Intercept)"]],
@@ -63,7 +65,7 @@ FIS = function(layers){
   status.all.years = D2 %>%
     select(rgn_id, mmsy_r) %>%
     left_join(ct, by='rgn_id') %>%
-    filter(!year == max(year)) %>% # take out most recent eyar. See reasoning in D1.
+    filter(!year == max(year)) %>% # take out most recent year. See reasoning in D1.
     mutate(abs = abs(mmsy_r - ct)) %>%
     group_by(rgn_id, year) %>%
     mutate(d_Ct = if (abs< 0.05*mmsy_r) {
@@ -92,7 +94,7 @@ FIS = function(layers){
     filter(year > (max(year)-5)) %>% # most recent 5 years of data
     group_by(rgn_id) %>%
     do(dml = lm(x.fis ~ year, data =.)) %>%
-    mutate(trend = max(-1, min(1, coef(dml)[['year']]*5)),
+    mutate(trend = round(max(-1, min(1, coef(dml)[['year']] * 0.05)), 1),
            goal = 'FIS',
            dimension = 'trend') %>%
     select(goal,
@@ -159,7 +161,7 @@ MAR = function(layers){
     group_by(rgn_id) %>%
     filter(year > (max(year)-5) & !rgn_id== 6) %>% #the most recent 5 years of data; ignore region 6 b/c no harvest in past 5 years
     do(dml = lm(x.mar ~ year, data=.)) %>% # lm 线性方程
-    mutate(score = pmax(-1, pmin(1, coef(dml)[['year']]*5))) %>%
+    mutate(score = pmax(-1, pmin(1, coef(dml)[['year']]*0.05))) %>%
     select(region_id = rgn_id,
            score) %>%
     rbind(data.frame(region_id = as.integer(6), score = NA)) %>% # rgn 6 (SH), again doesn't have a trend as there is no more MAR
@@ -310,7 +312,7 @@ AO = function(layers){
     group_by(rgn_id) %>%
     do(dml = lm(x.ao ~ year, data =.)) %>%
     #mutate(trend = coef(dml)[['year']]*5)
-    mutate(trend = max(-1, min(1, coef(dml)[['year']]*5)),
+    mutate(trend = max(-1, min(1, coef(dml)[['year']]*0.05)),
            goal = "AO",
            dimension = "trend") %>%
     select(goal,
@@ -433,7 +435,7 @@ NP <- function(layers){
     group_by(rgn_id) %>%
     do(mdl = lm(status ~ year, data=.)) %>%
     summarize(region_id = rgn_id,
-              score = max(-1, min(1, coef(mdl)[['year']] * 5))) %>%
+              score = max(-1, min(1, coef(mdl)[['year']] * 0.05))) %>%
     rbind(data.frame(region_id = as.integer(6), score = NA)) %>%
     arrange(region_id) %>%
     mutate(goal = 'NP', dimension = 'trend') %>%
@@ -659,7 +661,7 @@ r.trend = d %>%
   summarize(goal = 'TR',
             dimension = 'trend',
             region_id = as.integer(rgn_id),
-            score = max(min(coef(dml)[['year']] * 5, 1), -1)) %>%
+            score = max(min(coef(dml)[['year']] *0.05, 1), -1)) %>%
   ungroup
 
 scores_TR = rbind(r.status, r.trend)
@@ -794,7 +796,7 @@ r.trend = left_join(jobs, wage, by=c('rgn_id', 'year')) %>%
     weight = weight,
     rgn_id = rgn_id,
     industry = industry,
-    industry_trend = pmax(-1, pmin(1, coef(mdl)[['year']] * 5))) %>%
+    industry_trend = pmax(-1, pmin(1, coef(mdl)[['year']] * 0.05))) %>%
   arrange(rgn_id, metric, industry) %>%
   # get weighted mean across sectors per region-metric
   group_by(metric, rgn_id) %>%
@@ -842,7 +844,7 @@ r.trend = xECO_all_years %>%
   group_by(rgn_id) %>%
   do(lmd = lm(xECO ~ year, data =.)) %>%
   summarize(region_id = rgn_id,
-            score = pmax(pmin(coef(lmd)[['year']] *5, 1) ,-1),
+            score = pmax(pmin(coef(lmd)[['year']] * 0.05, 1) ,-1),
             dimension = 'trend',
             goal = 'ECO') %>%
   select(goal, dimension, region_id, score); head(r.trend)
@@ -980,7 +982,7 @@ LSP = function(layers){
    summarize( goal = 'LSP',
               dimension = 'trend',
               region_id = rgn_id,
-             score = max(min(coef(dlm)[['year']]*5, 1) -1)) ; head(r.trend)
+             score = max(min(coef(dlm)[['year']]*0.05, 1) -1)) ; head(r.trend)
 
 scores_LSP = rbind(r.status, r.trend)
 return(scores_LSP)
@@ -1048,7 +1050,7 @@ CW = function(layers){
    group_by(rgn_id) %>%
    do(dml = lm(x.cw ~ year, data = .)) %>%
    summarize(region_id = rgn_id,
-             trend = max(-1, min(1, coef(dml)[['year']]*5))) %>%
+             trend = max(-1, min(1, coef(dml)[['year']]*0.05))) %>%
    mutate(goal = 'CW',
           dimension = 'trend') %>%
    select(goal,
