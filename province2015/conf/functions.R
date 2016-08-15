@@ -171,7 +171,8 @@ MAR = function(layers){
            dimension,
            region_id,
            score) %>%
-    arrange(region_id)
+    arrange(region_id) %>%
+    ungroup()
 
   scores_MAR = rbind(r.status, r.trend)
   return(scores_MAR)
@@ -189,7 +190,8 @@ FP = function(layers, scores, debug=T){
     group_by(rgn_id) %>%
     filter(year == 2012) %>%
     summarize(sum.yk = sum(tonnes)) %>%
-    dplyr::rename(region_id = rgn_id)
+    dplyr::rename(region_id = rgn_id) %>%
+    ungroup()
 
   fis_ct = layers$data[['fis_ct']] %>%
     filter(year == 2012) %>%
@@ -279,7 +281,8 @@ AO = function(layers){
     filter(!is.na(fishermen) & !is.na(diesel) & !is.na(income)) %>% # NA prevents further calculations; 去掉NA，因为无法计算
  #   rowwise %>%
     group_by(rgn_id, year) %>%
-    mutate(x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen + ae)/3))*100)
+    mutate(x.ao = max(0, min(1, (port/port_ref + fishermen/fishermen + ae)/3))*100) %>%
+    ungroup()
   ## Q for CHN: only 2010-2013 have data in all three categories (port, fishermen, gas), and thus only those
   ## years have status scores. do you want to see score for 2014, using only gas and port data?
   ## 问题：只有2010-2013 有所有数据（port, fishermen, gas)， 所以只有这几年有现状得分。2014 只有gas 和port
@@ -305,7 +308,8 @@ AO = function(layers){
     select(goal,
            dimension,
            region_id = rgn_id,
-           score = x.ao)
+           score = x.ao) %>%
+    ungroup()
 
   # trend calculation: 2010-2013
   r.trend = status.all.years %>%
@@ -318,7 +322,8 @@ AO = function(layers){
     select(goal,
            dimension,
            region_id = rgn_id,
-           score = trend)
+           score = trend) %>%
+    ungroup()
 
 
   scores_AO = rbind(r.status, r.trend)
@@ -366,7 +371,8 @@ NP <- function(layers){
     mutate(tonnes_mean = mean(tonnes),
            tonnes_rel = tonnes / tonnes_mean) %>%
     rowwise() %>%
-    mutate(tonnes_rel_capped = min(tonnes_rel, 1)); head(np_harvest_rel)
+    mutate(tonnes_rel_capped = min(tonnes_rel, 1)) %>%
+    ungroup(); head(np_harvest_rel)
   hist(np_harvest_rel$tonnes_rel_capped)
 
   # Question for OHI-China Team:
@@ -439,7 +445,8 @@ NP <- function(layers){
     rbind(data.frame(region_id = as.integer(6), score = NA)) %>%
     arrange(region_id) %>%
     mutate(goal = 'NP', dimension = 'trend') %>%
-    select(goal, dimension, region_id, score)
+    select(goal, dimension, region_id, score) %>%
+    ungroup()
 
   ### return scores
   scores_NP = rbind(r.status, r.trend)
@@ -499,7 +506,8 @@ CS = function(layers){
     mutate(total_extent = sum(extent),
            extent_ratio = extent/total_extent) %>%
     summarize(xCS = sum(contribution * condition * extent_ratio),
-              score = pmax(-1, pmin(1, xCS))*100)
+              score = pmax(-1, pmin(1, xCS))*100) %>%
+    ungroup()
 
 
   # format to combine with other goals **variable must be called r.status with the proper formatting**
@@ -515,7 +523,8 @@ CS = function(layers){
   trendCS = rk %>%
     group_by(region_id) %>%
     summarize(trend_raw = sum(extent * extent_trend) / sum(extent),
-              score = max(min(trend_raw, 1), -1))
+              score = max(min(trend_raw, 1), -1)) %>%
+    ungroup()
 
   # format to combine with other goals **variable must be called r.trend with the following formatting**
   r.trend = trendCS %>%
@@ -596,7 +605,8 @@ CP = function(layers){
     summarize(score = pmax(-1, pmin(1, sum(condition* weight/4*extent/sum(extent)) )) * 100,
               dimension ='status',
               goal = 'CP') %>%
-    select(goal, dimension, region_id = rgn_id, score); head(r.status)
+    select(goal, dimension, region_id = rgn_id, score)%>%
+    ungroup(); head(r.status)
 
 
 # Trend
@@ -608,7 +618,8 @@ r.trend = m %>%
             dimension = 'trend',
             goal = 'CP') %>%
   select(goal, dimension, region_id = rgn_id,
-         score) ; head(r.trend)
+         score) %>%
+  ungroup() ; head(r.trend)
 
 #combine status and trend
 scores_CP = rbind(r.status, r.trend)
@@ -629,13 +640,14 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
   #library(dplyr)
   #library(tidyr)
   # Select data; calculate status score for each year in each region
-  S = 0.787
+
   d = layers$data[['tr_tourist']] %>%
-    left_join(layers$data[["tr_marinearea"]], by="rgn_id") %>%
+    left_join(layers$data[["tr_coastalwaterarea"]], by="rgn_id") %>%
     select(rgn_id = as.integer(rgn_id),
            year,
            tourist = million,
            area = km2) %>%
+    left_join(select(layers$data[["tr_sustainability"]], - layer, S = value), by = "rgn_id") %>%
     mutate(tour_per_area = tourist*1000000/area,
            tour_per_area_S = tour_per_area * S,
            tour_per_area_S_1 = tour_per_area_S +1,
@@ -744,7 +756,8 @@ LIV = function(layers){
   # Jobs score
   jobs_score = jobs %>%
    group_by(rgn_id, year) %>%
-   summarize(jobs_score = sum(jobs_adj)/sum(jobs_ref)); head(jobs_score)
+   summarize(jobs_score = sum(jobs_adj)/sum(jobs_ref)) %>%
+    ungroup(); head(jobs_score)
 
   # Wage score
  wage = left_join(wage_urban, wage_rural, by = c('rgn_id', 'year')) %>%
@@ -810,7 +823,8 @@ r.trend = left_join(jobs, wage, by=c('rgn_id', 'year')) %>%
   mutate(
     goal      = 'LIV',
     dimension = 'trend') %>%
-  select(goal, dimension, region_id = rgn_id, score); head(r.trend)
+  select(goal, dimension, region_id = rgn_id, score) %>%
+  ungroup(); head(r.trend)
 
 scores_LIV = rbind(r.status, r.trend)
 return(scores_LIV)
@@ -847,7 +861,8 @@ r.trend = xECO_all_years %>%
             score = pmax(pmin(coef(lmd)[['year']] * 0.05, 1) ,-1),
             dimension = 'trend',
             goal = 'ECO') %>%
-  select(goal, dimension, region_id, score); head(r.trend)
+  select(goal, dimension, region_id, score)%>%
+  ungroup(); head(r.trend)
 
 scores_ECO = rbind(r.status, r.trend)
 return(scores_ECO)
@@ -906,7 +921,8 @@ ICO = function(layers){
   summarize(score = (1 - sum(count_wt)/sum(count)) * 100,
             dimension = 'status',
             goal = 'ICO') %>%
-  select( goal, dimension, region_id = rgn_id, score)
+  select( goal, dimension, region_id = rgn_id, score) %>%
+    ungroup()
 
 #   goal dimension region_id    score
 #   (chr)     (chr)     (int)    (dbl)
@@ -922,9 +938,10 @@ ICO = function(layers){
 d2 = layers$data[['spp_iucn_trends']] %>%
   select(rgn_id, trend_score)
 
-spp.trend = d2 %>%
+spp.trend.1 = d2 %>%
   group_by(rgn_id) %>%
-  summarize(score = mean(trend_score))
+  summarize(score = mean(trend_score)) %>%
+  ungroup()
 
 NA.trend = data.frame(rgn_id = as.integer(2), score = NA) ## assign NA to the rest of the provinces
 
@@ -982,7 +999,8 @@ LSP = function(layers){
    summarize( goal = 'LSP',
               dimension = 'trend',
               region_id = rgn_id,
-             score = max(min(coef(dlm)[['year']]*0.05, 1) -1)) ; head(r.trend)
+             score = max(min(coef(dlm)[['year']]*0.05, 1) -1)) %>%
+   ungroup() ; head(r.trend)
 
 scores_LSP = rbind(r.status, r.trend)
 return(scores_LSP)
@@ -1030,7 +1048,7 @@ CW = function(layers){
 
  cw.status.all.years = D %>%
    group_by(rgn_id, year) %>%
-   mutate(x.cw = max(-1, (min(1, phosphate*nitrogen*cod*oil)^(1/4)))*100)
+   mutate(x.cw = max(-1, (min(1, phosphate*nitrogen*cod*oil)^(1/4)))*100) %>%
    ungroup
 
 
@@ -1043,7 +1061,8 @@ CW = function(layers){
    select(goal,
           dimension,
           region_id = rgn_id,
-          score = x.cw); head(r.status)
+          score = x.cw) %>%
+   ungroup()
 
   # trend
  r.trend = cw.status.all.years %>%
@@ -1056,7 +1075,8 @@ CW = function(layers){
    select(goal,
           dimension,
           region_id,
-          score = trend)
+          score = trend) %>%
+   ungroup()
 
  scores_CW = rbind(r.status, r.trend)
  return(scores_CW)
@@ -1106,7 +1126,8 @@ HAB = function(layers){
     select(goal,
            dimension,
            region_id = rgn_id,
-           score) ; head(r.status)
+           score) %>%
+    ungroup(); head(r.status)
 
   # trend = sum(extent * extent_trend) / sum(extent)
   r.trend = d %>%
@@ -1119,7 +1140,8 @@ HAB = function(layers){
     select(goal,
            dimension,
            region_id = rgn_id,
-           score) ; head(r.trend)
+           score) %>%
+    ungroup(); head(r.trend)
 
   #   region_id       score dimension goal
   # 1         1   -9.999159     trend  HAB
@@ -1150,14 +1172,16 @@ SPP = function(layers){
     summarize(score = (1- mean(risk.wt)) *100,
               dimension = 'status',
               goal = 'SPP') %>%
-   select(goal, dimension, region_id = rgn_id, score)
+   select(goal, dimension, region_id = rgn_id, score) %>%
+    ungroup()
 
   # Trend: the same as SPP trend. Data from gl2014
   # region 2 will be given NA for now.
 
   spp.trend = trend.data %>%
     group_by(rgn_id) %>%
-    summarize(score = mean(trend_score))
+    summarize(score = mean(trend_score)) %>%
+    ungroup()
 
   NA.trend = data.frame(rgn_id = as.integer(2), score = NA) ## assign NA to province without trend data
 
