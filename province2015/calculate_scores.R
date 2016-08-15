@@ -25,6 +25,11 @@ scores = CalculateAll(conf, layers)
 
 # save scores as .csv file, tables and figures
 write.csv(scores, 'scores.csv', na='', row.names=F)
+# scores with AO - requested by OHI-CHN May, 2016
+write.csv(scores, 'scores_with_AO.csv', na='', row.names=F)
+# scores without AO - requested by OHI-CHN May, 2016
+write.csv(scores, 'scores_without_AO.csv', na='', row.names=F)
+
 source('~/github/chn/province2015/reports/report_china2015.rmd')
 
 
