@@ -36,7 +36,9 @@
 "NP","np_harvest_weight","Weight","Weight of a single product relative to the output of all products","weight","weight","np_weight_chn2015_HHM.csv","rgn_id",,"product",,"weight",,TRUE,,,0,1,TRUE,,,,11,FALSE
 "SPP","spp_species","Species lists, China and IUCN threat categories as a proxy for iconic species trend","China's protected species list, and International Union for Conservation of Nature (IUCN) Red List threat categories with aggregated species lists.","value","value","spp_species_chn2015_LM.csv","rgn_id",,"sciname",,"value",,TRUE,,,0,0.8,TRUE,"chn_class,iucn_class",,,11,FALSE
 "TR","tr_marinearea","Marine area","Area of sea within jurisdiction of each province","km2","km2","tr_marinearea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,3000,2e+06,FALSE,,,,11,FALSE
-"TR","tr_tourist","Number of tourists ","number of tourists in year t","million","millions","tr_tourist_chn2015_YWW.csv","rgn_id",,,"year","million",,TRUE,2008,2011,568.93,229472,FALSE,,,,11,FALSE
+"TR","tr_sustainability","Sustainability indicator","Sustainability indicator for each province, by expert judgment ","value","value","tr_s_chn2015_YWW.csv","rgn_id",,,,"value",,TRUE,,,0.0909,1,TRUE,,,,11,FALSE
+"TR","tr_coastalwaterarea","Coastal water area","","km2","km2","tr_coastalwaterarea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,285.208,7435.78,FALSE,,,,11,FALSE
+"TR","tr_tourist","Number of tourists ","number of tourists in year t","million","millions","tr_tourist_chn2015_YWW.csv","rgn_id",,,"year","million",,TRUE,2008,2011,568.93,229472.38,FALSE,,,,11,FALSE
 "pressures","cc_acid","Ocean acidification","Modeled distribution of the aragonite saturation state (AAS) of the ocean in pre-industrial (~1870) and modern times (2000-2009) (Halpern et al. 2008).
 
 Data sources:
