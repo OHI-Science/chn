@@ -938,7 +938,7 @@ ICO = function(layers){
 d2 = layers$data[['spp_iucn_trends']] %>%
   select(rgn_id, trend_score)
 
-spp.trend.1 = d2 %>%
+spp.trend = d2 %>%
   group_by(rgn_id) %>%
   summarize(score = mean(trend_score)) %>%
   ungroup()
