@@ -210,10 +210,12 @@ for (f_orig in ao_file_list) { # f_orig = ao_file_list[5]
 
 # TR ----
 
-tr_file_list = c("6G_tr_marinearea_chn2015_YWW.csv",
-                 "6G_tr_tourist_chn2015_YWW.csv",
-                 "6G_tr_coastalwaterarea_chn2015_YWW.csv",
-                 "6G_tr_s_chn2015_YWW.csv")
+tr_file_list = c("6G_tr_tourist_chn2015_YWW.csv",
+                 "6G_tr_s_chn2015_YWW.csv",
+                 "6G_tr_coastalline_chn2015_YWW.csv",
+                 # "6G_tr_coastalwaterarea_chn2015_YWW.csv",
+                 # "6G_tr_marinearea_chn2015_YWW.csv"
+                 )
 
 for (f_orig in tr_file_list) {
   dir_f = file.path(dir_chn_prep, "7_TR")
