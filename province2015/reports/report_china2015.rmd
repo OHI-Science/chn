@@ -12,7 +12,8 @@ output:
 
 # load packages
 # suppressWarnings(require(ohicore))
-devtools::load_all('~/github/ohicore')
+# devtools::load_all('~/github/ohicore')
+library(ohicore)
 library(tidyr) 
 library(dplyr)
 library(stringr)

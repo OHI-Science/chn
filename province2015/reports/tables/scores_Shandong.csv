@@ -1,20 +1,20 @@
 " ","score","status","future","trend","pressures","resilience"
-"Index",68.6,,70.8,,,
-"Food Provision",55.4,61.5,49.2,-0.2,,
-". Fisheries",24.6,23.3,26,0.2,58.7,55.1
-". Mariculture",72,82.2,61.8,-0.4,55.2,64.3
-"Artisanal Fishing Opportunity",52.7,52.6,52.9,0,54.2,55.1
-"Natural Products",93.7,90,97.4,0.1,50.1,60
+"Index",63.3,,63.4,,,
+"Food Provision",62.2,61.5,62.8,0,,
+". Fisheries",23.2,23.3,23,0,58.7,55.1
+". Mariculture",83.3,82.2,84.4,0,55.2,64.3
+"Artisanal Fishing Opportunity",52.7,52.6,52.8,0,54.2,55.1
+"Natural Products",91.5,90,92.9,0,50.1,60
 "Carbon Storage",39.4,40,38.8,-0.1,52.1,62.9
 "Coastal Protection",36.9,37.5,36.3,-0.1,52.1,62.9
-"Tourism & Recreation",87,73.9,100,1,54.1,62.9
-"Coastal Livelihoods & Economies",84.8,70.8,98.8,1,,
-". Livelihoods",76.9,56.2,97.5,1,37.3,64.9
-". Economies",92.7,85.4,100,1,37.3,61.6
-"Sense of Place",79.7,82.5,76.9,-0.1,,
-". Iconic Species",59.4,65,53.9,-0.2,59.1,57.9
-". Lasting Special Places",100,100,100,0,58.1,62.9
-"Clean Waters",95.1,90.2,100,0.4,59.9,64.1
+"Tourism & Recreation",73.8,72.9,74.7,0,54.1,62.9
+"Coastal Livelihoods & Economies",80.7,70.8,90.6,0.5,,
+". Livelihoods",68.7,56.2,81.2,0.5,37.3,64.9
+". Economies",92.7,85.4,100,0.5,37.3,61.6
+"Sense of Place",41.2,49.4,33,-0.6,,
+". Iconic Species",57.1,62.5,51.8,-0.2,59.1,57.9
+". Lasting Special Places",25.2,36.3,14.2,-0.9,58.1,62.9
+"Clean Waters",93.7,93.1,94.2,0,59.9,64.1
 "Biodiversity",61.3,65,57.6,-0.2,,
 ". Habitats",63,65,61.1,-0.1,55.4,57.5
 ". Species",59.6,65,54.1,-0.2,66.8,67
