@@ -1,12 +1,7 @@
 # load required libraries
 suppressWarnings(require(ohicore))
 library(tidyr) #install.packages('tidyr')
-library(dplyr) #install.packages('dplyr)
-
-# for debugging only
-# remove.packages('ohicore') #remove original ohicore
-# devtools::load_all('~/github/ohicore') #load regional ohicore so not to affect the original ohicore accidentally
-# debug=F
+library(dplyr) #install.packages('dplyr')
 
 # set working directory to the scenario directory, ie containing conf and layers directories
 setwd('~/github/chn/province2015')

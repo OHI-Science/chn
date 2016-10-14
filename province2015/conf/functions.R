@@ -628,13 +628,13 @@ return(scores_CP)
 }
 
 
-TR = function(layers, year_max, debug=FALSE, pct_ref=90){
+TR = function(layers, year_max, debug = FALSE, pct_ref=90){
 
   ## China model:
   # X =  log [(At/Vt * S) + 1]
 
   # At = number of tourists in year t (million)
-  # Vt = area of sea whitin jurisdiction (km2)
+  # Vt = coastline length (km)
   # S = 0.787, sustainability coefficient
 
   #library(dplyr)
@@ -642,23 +642,23 @@ TR = function(layers, year_max, debug=FALSE, pct_ref=90){
   # Select data; calculate status score for each year in each region
 
   d = layers$data[['tr_tourist']] %>%
-    left_join(layers$data[["tr_coastalwaterarea"]], by="rgn_id") %>%
+    left_join(layers$data[["tr_coastline"]], by="rgn_id") %>%
     select(rgn_id = as.integer(rgn_id),
            year,
            tourist = million,
-           area = km2) %>%
+           coastline = km) %>%
     left_join(select(layers$data[["tr_sustainability"]], - layer, S = value), by = "rgn_id") %>%
-    mutate(tour_per_area = tourist*1000000/area,
-           tour_per_area_S = tour_per_area * S,
-           tour_per_area_S_1 = tour_per_area_S +1,
-           log = log(tour_per_area_S_1),
+    mutate(tour_per_km = tourist*1000000/coastline,
+           tour_per_km_S = tour_per_km * S,
+           tour_per_km_S_1 = tour_per_km_S +1,
+           log = log(tour_per_km_S_1),
            ref_point = max(log), #assume ref point is maximum log(tour_per_area_S_1) （2010 SH）
                                  # 参考点使用 log(tour_per_area_S_1) 跨省最大值 （2010 上海）
            xTR = log/ref_point*100); head(d); summary(d)
 
  # current TR status
 r.status = d %>%
-  filter(year == 2011) %>%
+  filter(year == 2015) %>%
    mutate(goal = 'TR',
          dimension = 'status') %>%   #format
    select(goal,
@@ -666,7 +666,7 @@ r.status = d %>%
           region_id = as.integer(rgn_id),
           score = xTR); head(r.status)
 
- # Trend: 4 years of data, 3 intervals
+ # Trend: 2 years of data
 r.trend = d %>%
   group_by(rgn_id) %>%
   do(dml = lm(xTR ~ year, data =.)) %>%
@@ -963,27 +963,34 @@ return(scores_ICO)
 LSP = function(layers){
 
   # CHN model:
-  # xLSP = %cmpa / reference%
-  #      = (cmpa/total_marine_area) / 5%
+  # xLSP = %cmpa * St
+  #      = (cmpa/total_coastal_water_area) / cultural_impact_factor
 
   # cast data ----
-  cmpa = SelectLayersData(layers, layers='lsp_cmpa')
-  marinearea = SelectLayersData(layers, layers='lsp_marinearea')
+  cmpa = SelectLayersData(layers, layers='lsp_cmpa') #2009 - 2012
+  coastal_area = SelectLayersData(layers, layers='lsp_coastalarea')
+  cul_factor = SelectLayersData(layers, layers='lsp_cultural_impact')
 
   cmpa = cmpa %>%
     select(rgn_id = id_num,
            year,
-           cmpa = val_num); head(cmpa)
+           cmpa = val_num)
 
-  marinearea = marinearea %>%
+  coastal_area = coastal_area %>%
     select(rgn_id = id_num,
-           marinearea = val_num); head(marinearea)
+           area = val_num)
+
+  cul_factor = cul_factor %>%
+    select(rgn_id = id_num,
+           cul_value = val_num)
 
   # Calculate status of each year in each province
   status.all.years = cmpa %>%
-    left_join(marinearea, by = 'rgn_id') %>% #head(d)
-    mutate(reference = marinearea*0.05)%>% # ref is 5% of jurisdictional marine area
-    mutate(pct_cmpa = cmpa/marinearea*100)%>%
+    left_join(coastal_area, by = 'rgn_id') %>% #head(d)
+    left_join(cul_factor, by = 'rgn_id') %>%
+    mutate(pct_cmpa = cmpa/area*cul_value,
+           ref_point = max(pct_cmpa)) %>%
+
     mutate(status = pmin(pct_cmpa/5 *100, 100))
 
  # Current status: year = 2012
@@ -1025,12 +1032,12 @@ return(rbind(scores, scores_SP))
 
 CW = function(layers){
 
-  # cast data: 8/14: CHN manual showed 2010-2014 calculations. but I only have 2011 - 2013. Have emailed
-  # Mian for more data.
+  # cast data: 2010-2014
+
  lyrs = c('cw_phosphate', 'cw_nitrogen', 'cw_cod', 'cw_oil')
  d = SelectLayersData(layers, layers = lyrs); head(d) ; summary(d)
 
- D = d%>%
+ D = d %>%
    select(rgn_id = id_num,
           year,
           val_num,
