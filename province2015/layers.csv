@@ -3,10 +3,10 @@
 "AO","ao_men","Fishermen","Number of fishermen","count","per kiometer","ao_afc_chn2015_LZH.csv","rgn_id",,,"year","count",,TRUE,2003,2013,15.6967,258.976,FALSE,,,,11,FALSE
 "AO","ao_diesel","Diesel price","Average diesel price per year ","rmb_l","RMB/L","ao_gc_chn2015_LZH.csv","rgn_id",,,"year","rmb_l",,TRUE,2010,2013,6.05,7.92,FALSE,,,,11,FALSE
 "AO","ao_income","Average income ","Average yearly disposable income, as documented by each province's Statistical Yearbook","rmb","RMB","ao_ic_chn2015_LZH.csv","rgn_id",,,"year","rmb",,TRUE,2009,2013,13751,43851,FALSE,,,,11,FALSE
-"CW","cw_phosphate","Inorganic phosphate pollution ","Together with nitrogen and COD form an integrated indicator of nutrients and chemical pollutants","score","score","cw_phosphate_chn2015_LM.csv","rgn_id",,,"year","score",,TRUE,2011,2013,0.1414,0.9998,TRUE,,,,11,FALSE
-"CW","cw_nitrogen","In organic nitrogen pollution","Together with phosphate and COD form an integrated indicator of nutrients and chemical pollutants","score","score","cw_nitrogen_chn2015_LM.csv","rgn_id",,,"year","score",,TRUE,2011,2013,0.0209,1,TRUE,,,,11,FALSE
-"CW","cw_cod","Chemical oxygen demand","Together with nitrogen and phosphateform an integrated indicator of nutrients and chemical pollutants","score","score","cw_cod_chn2015_LM.csv","rgn_id",,,"year","score",,TRUE,2011,2013,0.5895,1,TRUE,,,,11,FALSE
-"CW","cw_oil","Oil pollution","Oil pollution","score","score","cw_oil_chn2015_LM.csv","rgn_id",,,"year","score",,TRUE,2011,2013,0.6282,0.9003,TRUE,,,,11,FALSE
+"CW","cw_phosphate","Inorganic phosphate pollution ","Together with nitrogen and COD form an integrated indicator of nutrients and chemical pollutants","score","score","cw_phosphate_chn2015_LM.csv","rgn_id",,,"year","score",,TRUE,2010,2014,0.1414,1,TRUE,,,,11,FALSE
+"CW","cw_nitrogen","In organic nitrogen pollution","Together with phosphate and COD form an integrated indicator of nutrients and chemical pollutants","score","score","cw_nitrogen_chn2015_LM.csv","rgn_id",,,"year","score",,TRUE,2010,2014,0.0209,1,TRUE,,,,11,FALSE
+"CW","cw_cod","Chemical oxygen demand","Together with nitrogen and phosphateform an integrated indicator of nutrients and chemical pollutants","score","score","cw_cod_chn2015_LM.csv","rgn_id",,,"year","score",,TRUE,2010,2014,0.5895,1,TRUE,,,,11,FALSE
+"CW","cw_oil","Oil pollution","Oil pollution","score","score","cw_oil_chn2015_LM.csv","rgn_id",,,"year","score",,TRUE,2010,2014,0.6282,0.9363,TRUE,,,,11,FALSE
 "FIS","fis_ct","Catch","Catch at time t (China Fisheries Statistical Yearbook, 1994-2013)","tonnes","Tonnes","fis_ct_chn2015_LZH.csv","rgn_id",,,"year","tonnes",,TRUE,1994,2013,15754,3395750,FALSE,,,,11,FALSE
 "FIS","fis_ft","Fishing effort ","Fishing effort at time t (China Fisheries Statistical Yearbook, 1994-2013)","kilowatt","Kilowatts","fis_ft_chn2015_LZH.csv","rgn_id",,,"year","kilowatt",,TRUE,1994,2013,30348,3815090,FALSE,,,,11,FALSE
 "FIS","fis_mmsy","Maximum sustainable yield ","Maximum sustainable yield in each province (China Fisheries Statistical Yearbook, 1994-2013)","tonnes","Tonnes","fis_mmsy_chn2015_LZH.csv","rgn_id",,,,"tonnes",,TRUE,,,23838.5,3091850,FALSE,,,,11,FALSE
@@ -25,7 +25,9 @@
 "LIV","liv_wage_urban","Urban income","Average personal yearly income in urban households ","value","RMB","le_livwagetown_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2013,11792,42173.6,FALSE,,,,11,FALSE
 "LIV","liv_wage_rural","Rural income","Average personal yearly income in rural households","value","RMB","le_livwagevillage_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2013,3224.05,19595,FALSE,,,,11,FALSE
 "ECO","eco_eco","Economy","total economy of sea-related industries in coastal provinces ","value","Billion Yuan","le_eco_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2011,343.5,10506.6,FALSE,,,,11,FALSE
-"LSP","lsp_cmpa","Coastal marine protected area_CMPA","Coastal marine protected area_CMPA)","km2","km2","lsp_cmpa_chn2015_YWW.csv","rgn_id",,,"year","km2",,TRUE,2009,2012,70.17,34476.7,FALSE,,,,11,FALSE
+"LSP","lsp_cmpa","Coastal marine protected area_CMPA","Coastal marine protected area_CMPA)","km2","km2","lsp_cmpa_chn2015_YWW.csv","rgn_id",,,"year","km2",,TRUE,2009,2012,70.17,34476.69,FALSE,,,,11,FALSE
+"LSP","lsp_coastalarea","Coastalwater  area ","Coastal water area","km2","km2","lsp_coastalwaterarea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,285.208,7435.78,FALSE,,,,11,FALSE
+"LSP","lsp_cultural_impact","Cultural Impact factor","Cultural impact of lasting special places ","value","value","lsp_cultureimpact_chn2015_YWW.csv","rgn_id",,,"year","value",,TRUE,2015,2015,3,8,FALSE,,,,11,FALSE
 "LSP","lsp_marinearea","Jurisdictional marine area","Area of sea within jurisdiction of each province","km2","km2","lsp_marinearea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,3000,2e+06,FALSE,,,,11,FALSE
 "MAR","mar_smk","MSI of each species ","Mariculture sustainability index (MSI) of each species","score","value","mar_smk_chn2015_LZH.csv","rgn_id",,"species",,"score",,TRUE,,,0.367,0.867,TRUE,,,,11,FALSE
 "MAR","mar_ac","Area of mariculture","Area of coastal region that could be permitted for maricultre in each province  ","km2","km2","mar_ac_chn2015_LZH.csv","rgn_id",,,"year","km2",,TRUE,1994,2013,0,942050,FALSE,,,,11,FALSE
@@ -38,7 +40,8 @@
 "TR","tr_marinearea","Marine area","Area of sea within jurisdiction of each province","km2","km2","tr_marinearea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,3000,2e+06,FALSE,,,,11,FALSE
 "TR","tr_sustainability","Sustainability indicator","Sustainability indicator for each province, by expert judgment ","value","value","tr_s_chn2015_YWW.csv","rgn_id",,,,"value",,TRUE,,,0.0909,1,TRUE,,,,11,FALSE
 "TR","tr_coastalwaterarea","Coastal water area","","km2","km2","tr_coastalwaterarea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,285.208,7435.78,FALSE,,,,11,FALSE
-"TR","tr_tourist","Number of tourists ","number of tourists in year t","million","millions","tr_tourist_chn2015_YWW.csv","rgn_id",,,"year","million",,TRUE,2008,2011,568.93,229472.38,FALSE,,,,11,FALSE
+"TR","tr_tourist","Number of tourists ","number of tourists in year t","million","millions","tr_tourist_chn2015_YWW.csv","rgn_id",,,"year","million",,TRUE,2014,2015,0.802888,21.181564,FALSE,,,,11,FALSE
+"TR","tr_coastline","Length of coastline per province ","Length of coastline per province ","km","km","tr_coastalline_chn2015_YWW.csv","rgn_id",,,,"km",,TRUE,,,154,4015,FALSE,,,,11,FALSE
 "pressures","cc_acid","Ocean acidification","Modeled distribution of the aragonite saturation state (AAS) of the ocean in pre-industrial (~1870) and modern times (2000-2009) (Halpern et al. 2008).
 
 Data sources:
