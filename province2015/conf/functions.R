@@ -964,37 +964,32 @@ LSP = function(layers){
 
   # CHN model:
   # xLSP = %cmpa * St
-  #      = (cmpa/total_coastal_water_area) / cultural_impact_factor
+  #      = (cmpa/total_marine_water_area) / cultural_impact_factor
 
   # cast data ----
-  cmpa = SelectLayersData(layers, layers='lsp_cmpa') #2009 - 2012
-  coastal_area = SelectLayersData(layers, layers='lsp_coastalarea')
-  cul_factor = SelectLayersData(layers, layers='lsp_cultural_impact')
+  cmpa = SelectLayersData(layers, layers='lsp_cmpa') %>% #2009 - 2012
+  select(rgn_id = id_num,
+         year,
+         cmpa = val_num)
 
-  cmpa = cmpa %>%
-    select(rgn_id = id_num,
-           year,
-           cmpa = val_num)
-
-  coastal_area = coastal_area %>%
+  marine_area = SelectLayersData(layers, layers='lsp_marinearea') %>%
     select(rgn_id = id_num,
            area = val_num)
 
-  cul_factor = cul_factor %>%
+  cul_factor = SelectLayersData(layers, layers='lsp_cultural_impact') %>%
     select(rgn_id = id_num,
            cul_value = val_num)
 
   # Calculate status of each year in each province
   status.all.years = cmpa %>%
-    left_join(coastal_area, by = 'rgn_id') %>% #head(d)
+    left_join(marine_area, by = 'rgn_id') %>% #head(d)
     left_join(cul_factor, by = 'rgn_id') %>%
     mutate(pct_cmpa = cmpa/area*cul_value,
-           ref_point = max(pct_cmpa)) %>%
-
-    mutate(status = pmin(pct_cmpa/5 *100, 100))
+           ref_point = max(pct_cmpa),
+          status = pmin(pct_cmpa/ref_point *100, 100))
 
  # Current status: year = 2012
-  r.status = filter(status.all.years, year == 2012)%>%
+  r.status = filter(status.all.years, year == max(year))%>%
    mutate(dimension = 'status',
           goal = "LSP") %>%
    select(goal, dimension, region_id = rgn_id, score = status) ; head(r.status)

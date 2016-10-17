@@ -27,7 +27,7 @@
 "ECO","eco_eco","Economy","total economy of sea-related industries in coastal provinces ","value","Billion Yuan","le_eco_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2011,343.5,10506.6,FALSE,,,,11,FALSE
 "LSP","lsp_cmpa","Coastal marine protected area_CMPA","Coastal marine protected area_CMPA)","km2","km2","lsp_cmpa_chn2015_YWW.csv","rgn_id",,,"year","km2",,TRUE,2009,2012,70.17,34476.69,FALSE,,,,11,FALSE
 "LSP","lsp_coastalarea","Coastalwater  area ","Coastal water area","km2","km2","lsp_coastalwaterarea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,285.208,7435.78,FALSE,,,,11,FALSE
-"LSP","lsp_cultural_impact","Cultural Impact factor","Cultural impact of lasting special places ","value","value","lsp_cultureimpact_chn2015_YWW.csv","rgn_id",,,"year","value",,TRUE,2015,2015,3,8,FALSE,,,,11,FALSE
+"LSP","lsp_cultural_impact","Cultural Impact factor","Cultural impact of lasting special places ","value","value","lsp_cultureimpact_chn2015_YWW.csv","rgn_id",,,"year","value",,TRUE,2015,2015,1,3,FALSE,,,,11,FALSE
 "LSP","lsp_marinearea","Jurisdictional marine area","Area of sea within jurisdiction of each province","km2","km2","lsp_marinearea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,3000,2e+06,FALSE,,,,11,FALSE
 "MAR","mar_smk","MSI of each species ","Mariculture sustainability index (MSI) of each species","score","value","mar_smk_chn2015_LZH.csv","rgn_id",,"species",,"score",,TRUE,,,0.367,0.867,TRUE,,,,11,FALSE
 "MAR","mar_ac","Area of mariculture","Area of coastal region that could be permitted for maricultre in each province  ","km2","km2","mar_ac_chn2015_LZH.csv","rgn_id",,,"year","km2",,TRUE,1994,2013,0,942050,FALSE,,,,11,FALSE

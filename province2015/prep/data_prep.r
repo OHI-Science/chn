@@ -256,7 +256,7 @@ for (f_orig in ico_file_list) {
 lsp_file_list = c("6H_lsp_cmpa_chn2015_YWW.csv",
                   "6H_lsp_coastalwaterarea_chn2015_YWW.csv",
                   "6H_lsp_cultureimpact_chn2015_YWW.csv"
-                  # "6H_lsp_marinearea_chn2015_YWW.csv" # older file, not needed anymore
+                  #"6H_lsp_marinearea_chn2015_YWW.csv" # older file, not needed anymore
                   )
 
 for (f_orig in lsp_file_list) {
