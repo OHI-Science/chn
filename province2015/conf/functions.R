@@ -1000,7 +1000,7 @@ LSP = function(layers){
    summarize( goal = 'LSP',
               dimension = 'trend',
               region_id = rgn_id,
-             score = max(min(coef(dlm)[['year']]*0.05, 1) -1)) %>%
+             score = max(min(coef(dlm)[['year']]*0.05, 1), -1)) %>%
    ungroup() ; head(r.trend)
 
 scores_LSP = rbind(r.status, r.trend)
