@@ -963,8 +963,8 @@ return(scores_ICO)
 LSP = function(layers){
 
   # CHN model:
-  # xLSP = %cmpa * St
-  #      = (cmpa/total_marine_water_area) / cultural_impact_factor
+  # xLSP = cmpa/ ref point * St
+  #      = (cmpa/ (0.05*total_marine_water_area) / cultural_impact_factor
 
   # cast data ----
   cmpa = SelectLayersData(layers, layers='lsp_cmpa') %>% #2009 - 2012
@@ -974,7 +974,7 @@ LSP = function(layers){
 
   marine_area = SelectLayersData(layers, layers='lsp_marinearea') %>%
     select(rgn_id = id_num,
-           area = val_num)
+           marinearea = val_num)
 
   cul_factor = SelectLayersData(layers, layers='lsp_cultural_impact') %>%
     select(rgn_id = id_num,
@@ -983,10 +983,9 @@ LSP = function(layers){
   # Calculate status of each year in each province
   status.all.years = cmpa %>%
     left_join(marine_area, by = 'rgn_id') %>% #head(d)
-    left_join(cul_factor, by = 'rgn_id') %>%
-    mutate(pct_cmpa = cmpa/area*cul_value,
-           ref_point = max(pct_cmpa),
-          status = pmin(pct_cmpa/ref_point *100, 100))
+    left_join(cul_factor,  by = 'rgn_id') %>%
+    mutate(reference = marinearea*0.05,
+           status = pmin(cmpa/reference*cul_value*100, 100))
 
  # Current status: year = 2012
   r.status = filter(status.all.years, year == max(year))%>%
