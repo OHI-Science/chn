@@ -25,7 +25,7 @@
 "LIV","liv_wage_urban","Urban income","Average personal yearly income in urban households ","value","RMB","le_livwagetown_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2013,11792,42173.6,FALSE,,,,11,FALSE
 "LIV","liv_wage_rural","Rural income","Average personal yearly income in rural households","value","RMB","le_livwagevillage_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2013,3224.05,19595,FALSE,,,,11,FALSE
 "ECO","eco_eco","Economy","total economy of sea-related industries in coastal provinces ","value","Billion Yuan","le_eco_chn2015_zb.csv","rgn_id",,,"year","value",,TRUE,2007,2011,343.5,10506.6,FALSE,,,,11,FALSE
-"LSP","lsp_cmpa","Coastal marine protected area_CMPA","Coastal marine protected area_CMPA)","km2","km2","lsp_cmpa_chn2015_YWW.csv","rgn_id",,,"year","km2",,TRUE,2009,2012,70.17,34476.69,FALSE,,,,11,FALSE
+"LSP","lsp_cmpa","Coastal marine protected area_CMPA","Coastal marine protected area_CMPA)","km2","km2","lsp_cmpa_chn2015_YWW.csv","rgn_id",,,"year","km2",,TRUE,2009,2012,938.21,34476.69,FALSE,,,,11,FALSE
 "LSP","lsp_coastalarea","Coastalwater  area ","Coastal water area","km2","km2","lsp_coastalwaterarea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,285.208,7435.78,FALSE,,,,11,FALSE
 "LSP","lsp_cultural_impact","Cultural Impact factor","Cultural impact of lasting special places ","value","value","lsp_cultureimpact_chn2015_YWW.csv","rgn_id",,,"year","value",,TRUE,2015,2015,1,3,FALSE,,,,11,FALSE
 "LSP","lsp_marinearea","Jurisdictional marine area","Area of sea within jurisdiction of each province","km2","km2","lsp_marinearea_chn2015_YWW.csv","rgn_id",,,,"km2",,TRUE,,,3000,2e+06,FALSE,,,,11,FALSE
