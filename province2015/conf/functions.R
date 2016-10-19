@@ -1045,13 +1045,13 @@ CW = function(layers){
           oil = cw_oil)
 
  # status
- # model = 4th.root (phosphate*nitrogen*cod*oil)
-
  cw.status.all.years = D %>%
    group_by(rgn_id, year) %>%
-   mutate(x.cw = max(-1, (min(1, phosphate*nitrogen*cod*oil)^(1/4)))*100) %>%
-   ungroup
+   mutate(x.cw = max(-1, (min(1, (phosphate^0.3)*(nitrogen^0.5)*(cod^0.1)*(oil^0.1))))*100) %>%
+   ungroup()
 
+ dir_cw = '~/github/chn/province2015'
+ write_csv(cw.status.all.years, file.path(dir_cw, "cw.status.all.years.csv"))
 
  # current status
  r.status = cw.status.all.years %>%
